@@ -2,6 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Theme Variables */
 :root {
   --background: #ffffff;
   --foreground: #171717;
@@ -14,8 +15,65 @@
   }
 }
 
+/* Global Typography */
 body {
-  color: var(--foreground);
+  color: var(--foreground); /* Set default text color to dark gray */
   background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Gabarito', Arial, Helvetica, sans-serif; /* Use the custom font */
+}
+
+/* Reusable Components */
+@layer components {
+  /* Font Styles */
+  .header-xl {
+    @apply text-heading-xl text-textGray uppercase tracking-wider;
+  }
+
+  .header-md {
+    @apply text-heading-md;
+  }
+
+  .section-heading {
+    @apply font-semibold text-textGray;
+  }
+
+  /* Button Styles */
+  .btn-primary {
+    @apply bg-buttonBlue text-white py-2 px-6 rounded-lg font-bold hover:bg-blue-600 transition duration-300;
+  }
+
+  .btn-secondary {
+    @apply bg-lightBackground text-buttonBlue py-2 px-6 rounded-lg font-bold hover:bg-blue-200 transition duration-300;
+  }
+
+  .btn-danger {
+    @apply bg-dangerRed text-white py-2 px-6 rounded-lg font-bold hover:bg-red-700 transition duration-300;
+  }
+
+  .btn-neutral {
+    @apply bg-transparent border border-textGray text-textGray py-2 px-6 rounded-lg font-bold hover:bg-formGray hover:text-white transition duration-300;
+  }
+
+  .btn-disabled {
+    @apply bg-formGray text-textGray py-2 px-6 rounded-lg font-bold opacity-50 cursor-not-allowed;
+  }
+
+  .btn-icon {
+    @apply flex items-center gap-2 py-2 px-4 bg-buttonBlue text-white rounded-md font-bold hover:bg-blue-600 transition duration-300;
+  }
+
+  /* Input Styles */
+  .input {
+    @apply bg-formGray text-textGray py-2 px-4 rounded-lg border border-textGray focus:ring-2 focus:ring-buttonBlue focus:outline-none;
+  }
+
+  /* Label Styles */
+  .label {
+    @apply text-label-md text-textGray uppercase tracking-wide;
+  }
+
+  /* Card Component */
+  .card {
+    @apply bg-babyBlue p-6 rounded-lg shadow-md hover:shadow-lg transition duration-300;
+  }
 }
