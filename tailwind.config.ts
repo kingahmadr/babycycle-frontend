@@ -36,6 +36,9 @@ const config: Config = {
         'body-xs': ['12px', { lineHeight: '16px', letterSpacing: '0.01em', fontWeight: '400' }], // Extra small body text
 
       },
+      textColor: {
+        DEFAULT: '#171717', // Set dark gray as default text color
+      },
       spacing: {
         buttonPadding: '12px 24px', // Padding for buttons
       },
