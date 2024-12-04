@@ -22,11 +22,12 @@ function index() {
       </div>
       <div className='w-3/4'>
         <div className='uppercase text-[14px] h-auto py-3 flex justify-end items-center'>
-          <div className='space-x-3'>
+          <div className='flex items-center gap-3'>
 
             <span className='text-buttonBlue'>Sort By</span>
-            <button className="w-60 h-8 bg-white text-black border-black border-2 rounded-none px-4 text-left" onClick={toggleDropdown}>
-              {selectedOption}
+            <button className="w-60 h-8 flex justify-between items-center bg-white text-black border-black border-2 rounded-none px-4 text-left" onClick={toggleDropdown}>
+              {selectedOption} 
+              <img src="/Polygon 1.png"/>
             </button>
           </div>
 
