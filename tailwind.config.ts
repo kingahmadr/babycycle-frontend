@@ -9,21 +9,22 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        foreground: '#171717', // Define the foreground color here
-        background: '#ffffff', // Optional: Ensure the background color is also defined
-        textBlue: '#5D9ACC', // Blue for the footer background and texts
-        buttonBlue: '#659FCF', // Blue for buttons like "Submit"
-        textGray: '#171717', // Gray for text and strokes
-        formGray: '#9EA2AB', // Gray for input fields, placeholders, and rating stars
-        starYellow: '#F5A200', // Yellow for star ratings
-        lightBackground: '#E4F3FF', // Light background colors
-        babyBlue: '#B4DCFD', // Light blue for background like Shopping Cart page
-        labelGreen: '#67B35B', // Green for Warranty label and snackbar
-        lightHeaderBlue: '#E4F3FF', // Added for secondary headers
-        dangerRed: '#BA4F4F', // Red for snackbar, deactivate, etc
+        'foreground': '#171717', // Define the foreground color here
+        'background': '#ffffff', // Optional: Ensure the background color is also defined
+        'textBlue': '#5D9ACC', // Blue for the footer background and texts
+        'buttonBlue': '#659FCF', // Blue for buttons like "Submit"
+        'textGray': '#171717', // Gray for text and strokes
+        'formGray': '#9EA2AB', // Gray for input fields, placeholders, and rating stars
+        'starYellow': '#F5A200', // Yellow for star ratings
+        'lightBackground': '#E4F3FF', // Light background colors
+        'babyBlue': '#B4DCFD', // Light blue for background like Shopping Cart page
+        'labelGreen': '#67B35B', // Green for Warranty label and snackbar
+        'lightHeaderBlue': '#E4F3FF', // Added for secondary headers
+        'dangerRed': '#BA4F4F', // Red for snackbar, deactivate, etc
       },
       fontFamily: {
         sans: ['Gabarito', 'sans-serif'],
+        decor: ['Darumadrop One', 'sans-serif'],
       },
       fontSize: {
         'heading-xl': ['48px', { lineHeight: '48px', letterSpacing: '0.02em', fontWeight: '700'}], // Large headings, such as Product Name, Sale & Promo, etc
@@ -37,7 +38,7 @@ const config: Config = {
 
       },
       spacing: {
-        buttonPadding: '12px 24px', // Padding for buttons
+        buttonPadding: '12px 32px', // Padding for buttons
       },
     },
   },
