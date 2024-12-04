@@ -1,9 +1,10 @@
+@import url('https://fonts.googleapis.com/css2?family=Darumadrop+One&family=Gowun+Dodum&family=Oldenburg&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 /* Theme Variables */
-:root {
+/* :root {
   --background: #ffffff;
   --foreground: #171717;
 }
@@ -13,13 +14,18 @@
     --background: #0a0a0a;
     --foreground: #ededed;
   }
-}
+} */
 
 /* Global Typography */
 body {
   color: var(--foreground); /* Set default text color to dark gray */
   background: var(--background);
-  font-family: 'Gabarito', Arial, Helvetica, sans-serif; /* Use the custom font */
+  font-family: 'Gabarito', 'Darumadrop One', Arial, Helvetica, sans-serif; /* Use the custom font */
+  letter-spacing: 0.1em;
+  display:flex; 
+  flex-direction:column; 
+  align-items:center;
+  min-height:100vh;
 }
 
 /* Reusable Components */
@@ -39,27 +45,27 @@ body {
 
   /* Button Styles */
   .btn-primary {
-    @apply bg-buttonBlue text-white py-2 px-6 rounded-lg font-bold hover:bg-blue-600 transition duration-300;
+    @apply w-fit bg-buttonBlue text-white py-2 px-9 font-bold hover:bg-blue-600 transition duration-300;
   }
 
   .btn-secondary {
-    @apply bg-lightBackground text-buttonBlue py-2 px-6 rounded-lg font-bold hover:bg-blue-200 transition duration-300;
+    @apply bg-lightBackground text-buttonBlue py-2 px-9 rounded-lg font-bold hover:bg-blue-200 transition duration-300;
   }
 
   .btn-danger {
-    @apply bg-dangerRed text-white py-2 px-6 rounded-lg font-bold hover:bg-red-700 transition duration-300;
+    @apply bg-dangerRed text-white py-2 px-9 rounded-lg font-bold hover:bg-red-700 transition duration-300;
   }
 
   .btn-neutral {
-    @apply bg-transparent border border-textGray text-textGray py-2 px-6 rounded-lg font-bold hover:bg-formGray hover:text-white transition duration-300;
+    @apply bg-transparent border border-textGray text-textGray py-2 px-9 rounded-lg font-bold hover:bg-formGray hover:text-white transition duration-300;
   }
 
   .btn-disabled {
-    @apply bg-formGray text-textGray py-2 px-6 rounded-lg font-bold opacity-50 cursor-not-allowed;
+    @apply bg-formGray text-textGray py-2 px-9 rounded-lg font-bold opacity-50 cursor-not-allowed;
   }
 
   .btn-icon {
-    @apply flex items-center gap-2 py-2 px-4 bg-buttonBlue text-white rounded-md font-bold hover:bg-blue-600 transition duration-300;
+    @apply flex items-center gap-2 py-2 px-9 bg-buttonBlue text-white rounded-md font-bold hover:bg-blue-600 transition duration-300;
   }
 
   /* Input Styles */
