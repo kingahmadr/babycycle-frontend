@@ -28,6 +28,10 @@ body {
   min-height:100vh;
 }
 
+option {
+    border-radius: 0%;
+}
+
 /* Reusable Components */
 @layer components {
   /* Font Styles */
@@ -70,7 +74,7 @@ body {
 
   /* Input Styles */
   .input {
-    @apply bg-formGray text-textGray py-2 px-4 rounded-lg border border-textGray focus:ring-2 focus:ring-buttonBlue focus:outline-none;
+    @apply bg-formGray text-textGray py-2 px-4 border border-textGray focus:ring-2 focus:ring-buttonBlue focus:outline-none;
   }
 
   /* Label Styles */
@@ -82,4 +86,5 @@ body {
   .card {
     @apply bg-babyBlue p-6 rounded-lg shadow-md hover:shadow-lg transition duration-300;
   }
+
 }
