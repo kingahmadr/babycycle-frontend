@@ -53,14 +53,14 @@ h1, h2, h3, h4, h5, h6, p, span, label {
 
 /* Add to Cart Button */
 .btn-add-to-cart {
-  @apply bg-black text-white py-2 px-8 text-center font-bold text-label-md rounded-full hover:opacity-50 transition duration-300;
+  @apply bg-black text-white py-2 px-8 text-center font-bold text-body-md rounded-full hover:opacity-50 transition duration-300;
   width: 500px; /* Set width as per the design */
   height: 45px; /* Set height as per the design */
 }
 
 /* Buy Now Button */
 .btn-buy-now {
-  @apply bg-buttonBlue text-white py-2 px-8 text-center font-bold text-label-md rounded-full hover:bg-babyBlue hover:text-buttonBlue transition duration-300;
+  @apply bg-buttonBlue text-white py-2 px-8 text-center font-bold text-body-md rounded-full hover:bg-babyBlue hover:text-buttonBlue transition duration-300;
   width: 500px; /* Set width as per the design */
   height: 45px; /* Set height as per the design */
 }

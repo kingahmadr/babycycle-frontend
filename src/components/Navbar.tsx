@@ -6,46 +6,48 @@ const Navbar: React.FC = () => {
   const [isSearchActive, setIsSearchActive] = useState(false);
 
   return (
-    <nav className="bg-white px-8 py-4 shadow-md">
-      <div className="flex items-center justify-between">
+    <nav className="bg-white px-8 mt-12 shadow-md">
+      <div className="flex items-center justify-between relative">
+        
         {/* Left Section - Search Bar */}
-        <div className="relative">
-          {isSearchActive ? (
-            <div className="relative flex items-center">
-              <input
-                type="text"
-                placeholder="Search products..."
-                className="border border-textBlue px-4 py-2 rounded-lg text-textGray focus:outline-none w-64"
-                onBlur={() => setIsSearchActive(false)} // Collapse the search bar when it loses focus
-              />
-              <button
-                onClick={() => setIsSearchActive(true)}
-                className="absolute right-2 top-1/2 transform -translate-y-1/2"
-              >
-                <Image
-                  src="/assets/search.png"
-                  alt="Search Icon"
-                  width={50}
-                  height={50}
-                  className="cursor-pointer"
-                />
-              </button>
-            </div>
-          ) : (
-            <button onClick={() => setIsSearchActive(true)}>
-              <Image
-                src="/assets/search.png"
-                alt="Search Icon"
-                width={50}
-                height={50}
-                className="cursor-pointer"
-              />
-            </button>
-          )}
-        </div>
+<div className="w-1/4 flex items-center relative">
+  {isSearchActive ? (
+    <div className="relative flex items-center w-full">
+      <input
+        type="text"
+        placeholder="Search products..."
+        className="border border-textBlue px-4 py-2 rounded-lg text-textGray focus:outline-none w-full"
+        onBlur={() => setIsSearchActive(false)} // Collapse the search bar when it loses focus
+      />
+      <button
+        onClick={() => setIsSearchActive(true)}
+        className="absolute right-3 top-1/2 transform -translate-y-1/2"
+      >
+        <Image
+          src="/assets/search.png"
+          alt="Search Icon"
+          width={50}
+          height={50}
+          className="cursor-pointer"
+        />
+      </button>
+    </div>
+  ) : (
+    <button onClick={() => setIsSearchActive(true)}>
+      <Image
+        src="/assets/search.png"
+        alt="Search Icon"
+        width={50}
+        height={50}
+        className="cursor-pointer"
+      />
+    </button>
+  )}
+</div>
+
 
         {/* Center Section - Logo */}
-        <div className="flex justify-center items-center py-5">
+        <div className="absolute left-1/2 transform -translate-x-1/2">
           <Link href="/">
             <Image
               src="/assets/logo_main.png"
@@ -70,7 +72,7 @@ const Navbar: React.FC = () => {
                 className="cursor-pointer"
               />
             </button>
-            <div className="absolute hidden group-hover:block bg-white shadow-lg mt-2 rounded-lg">
+            <div className="absolute hidden group-hover:block bg-white mt-(-2) shadow-lg rounded-lg">
               <Link href="/login" className="block px-4 py-2 hover:bg-babyBlue">
                 Login
               </Link>
@@ -94,7 +96,7 @@ const Navbar: React.FC = () => {
       </div>
 
       {/* Navigation Links */}
-      <div className="flex justify-center mt-4">
+      <div className="flex justify-center mt-12">
         <div className="flex space-x-8">
           <Link href="/" className="text-textBlue uppercase font-bold hover:text-textGray">
             Home
@@ -106,7 +108,10 @@ const Navbar: React.FC = () => {
             <span className="text-textBlue uppercase font-bold cursor-pointer hover:text-textGray">
               Shop by Category
             </span>
-            <div className="absolute hidden group-hover:block bg-white shadow-lg mt-2 rounded-lg">
+            <div className="absolute hidden group-hover:block bg-white shadow-lg rounded-lg">
+            <Link href="/product" className="block px-4 py-2 hover:bg-babyBlue">
+                All Products
+              </Link>
               <Link href="/category/clothing" className="block px-4 py-2 hover:bg-babyBlue">
                 Clothing
               </Link>
