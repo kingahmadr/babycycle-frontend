@@ -7,14 +7,14 @@ const TestingPage: React.FC = () => {
 
       {/* Font Styles */}
       <section className="mb-10">
-        <h2 className="header-md text-textGray mb-4">Font Styles</h2>
-        <p className="text-heading-xl text-textGray mb-2">Heading XL</p>
-        <p className="text-heading-md text-textGray mb-2">Heading MD</p>
-        <p className="text-body-lg text-textGray mb-2">Body LG - Section Heading</p>
-        <p className="text-body-md text-textGray mb-2">Body MD - Product Details</p>
-        <p className="text-body-sm text-textGray mb-2">Body SM - Small text for reviews</p>
-        <p className="text-label-md text-textGray mb-2">Label MD - Buttons and Inputs</p>
-        <p className="text-label-sm text-textGray mb-2">Label SM - Small uppercase labels</p>
+        <h2 className="header-md mb-4">Font Styles</h2>
+        <p className="text-heading-xl mb-2">Heading XL</p>
+        <p className="text-heading-md mb-2">Heading MD</p>
+        <p className="text-body-lg mb-2">Body LG - Section Heading</p>
+        <p className="text-body-md mb-2">Body MD - Product Details</p>
+        <p className="text-body-sm mb-2">Body SM - Small text for reviews</p>
+        <p className="text-label-md mb-2">Label MD - Buttons and Inputs</p>
+        <p className="text-label-sm mb-2">Label SM - Small uppercase labels</p>
       </section>
 
       {/* Buttons */}
@@ -24,16 +24,35 @@ const TestingPage: React.FC = () => {
           <button className="btn-primary">Primary Button</button>
           <button className="btn-secondary">Secondary Button</button>
           <button className="btn-danger">Danger Button</button>
-          <button className="btn-neutral">Neutral Button</button>
           <button className="btn-disabled" disabled>
             Disabled Button
           </button>
-          <button className="btn-icon">
-            <span>Icon Button</span>
-            <span>🔍</span>
-          </button>
+
         </div>
       </section>
+
+{/* Labels */}
+<section className="mb-10">
+        <h2 className="header-md mb-4">Labels</h2>
+        <div className="flex items-center space-x-4">
+          {/* Warranty Label */}
+          <div className="warranty-label">WARRANTY</div>
+        </div>
+      </section>
+
+{/* Add to Cart & Buy Button */}
+<section className="mb-10">
+        <h2 className="header-md mb-4">Add to Cart & Buy Now </h2>
+        <div className="flex flex-col items-center gap-4">
+        {/* Add to Cart Button */}
+        <button className="btn-add-to-cart">ADD TO CART</button>
+
+        {/* Buy Now Button */}
+        <button className="btn-buy-now">BUY NOW</button>
+</div>
+
+      </section>
+
 
       {/* Input Fields */}
       <section className="mb-10">
@@ -44,13 +63,9 @@ const TestingPage: React.FC = () => {
             type="text"
             placeholder="Default Input Field"
           />
-          <input
-            className="input-sm"
-            type="text"
-            placeholder="Small Input Field"
-          />
+
           <textarea
-            className="textarea"
+            className="text-area"
             placeholder="Textarea Field"
             rows={3}
           ></textarea>
