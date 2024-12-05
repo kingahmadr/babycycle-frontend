@@ -1,18 +1,32 @@
+@import url('https://fonts.googleapis.com/css2?family=Darumadrop+One&family=Gowun+Dodum&family=Oldenburg&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 /* Theme Variables */
-:root {
+/* :root {
   --background: #ffffff;
   --foreground: #171717;
 }
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+} */
+
 
 /* Global Typography */
 body {
   color: var(--foreground); /* Set default text color to dark gray */
   background: var(--background);
-  font-family: 'Gabarito', Arial, Helvetica, sans-serif; /* Use the custom font */
+  font-family: 'Gabarito', 'Darumadrop One', Arial, Helvetica, sans-serif; /* Use the custom font */
+  letter-spacing: 0.1em;
+  display:flex; 
+  flex-direction:column; 
+  align-items:center;
+  min-height:100vh;
 }
 
 h1, h2, h3, h4, h5, h6, p, span, label {

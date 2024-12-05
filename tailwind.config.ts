@@ -25,6 +25,7 @@ const config: Config = {
       },
       fontFamily: {
         sans: ['Gabarito', 'sans-serif'],
+        decor: ['Darumadrop One', 'sans-serif'],
       },
       fontSize: {
         'heading-xl': ['48px', { lineHeight: '48px', letterSpacing: '0.02em', fontWeight: '700'}], // Large headings, such as Product Name, Sale & Promo, etc
@@ -41,7 +42,7 @@ const config: Config = {
         DEFAULT: '#171717', // Set dark gray as default text color
       },
       spacing: {
-        buttonPadding: '12px 24px', // Padding for buttons
+        buttonPadding: '12px 32px', // Padding for buttons
       },
     },
   },
