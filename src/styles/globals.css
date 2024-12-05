@@ -102,27 +102,22 @@ h1, h2, h3, h4, h5, h6, p, span, label {
     @apply bg-babyBlue p-6 rounded-lg shadow-md hover:shadow-lg transition duration-300;
   }
 }
-/* Add borders for cards and components */
 .border-card {
   @apply border border-formGray;
 }
 
-/* Add shadows for hover effects */
 .shadow-hover {
   @apply shadow-md hover:shadow-lg transition duration-300;
 }
 
-/* Add padding utilities */
 .padding-section {
   @apply p-6 md:p-8;
 }
 
-/* Add specific font styles for labels */
 .label-primary {
   @apply font-bold uppercase text-label-md text-textGray;
 }
 
-/* Add hover effects for links */
 .link-hover {
   @apply text-textBlue hover:underline transition duration-200;
 }

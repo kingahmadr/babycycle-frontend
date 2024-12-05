@@ -57,77 +57,94 @@ const CartPage: React.FC<CartProps> = ({ cartItems: initialCartItems }) => {
 
   return (
     <div className="bg-babyBlue min-h-screen flex flex-col">
+
       <header className="mb-6">
-        {/* Add Navbar */}
       </header>
 
-      <main className="flex-1 flex p-6 space-x-6">
+      <main className="flex-1 flex p-20 space-x-20">
+
         {/* Left Section */}
         <div className="flex-1 space-y-6">
+
           {/* Address Section */}
-          <div className="bg-white p-6 rounded-lg shadow-md">
+          <div className="bg-white p-6 rounded-lg shadow-md flex flex-col justify-between">
+          <div className="flex-1">
             <p className="text-body-sm font-bold">Samuel Indra W.</p>
             <p className="text-body-sm">08567425627</p>
             <p className="text-body-sm">
               Gang Masjid Jami Al Huda, Lewinutug, Kec. Citeureup, Kabupaten Bogor,
               Jawa Barat
             </p>
-            <button className="btn-primary mt-4 w-fit">Change Address</button>
+            </div>
+            <div className="flex justify-end">
+            <button className="btn-primary mt-4 w-30 justify-end">Change Address</button>
+          </div>
           </div>
 
           <div className="border-t-2 border-white my-4"></div>
+          
 
           {/* Product List */}
-          <div className="space-y-4">
-            {cartItems.map((item) => (
-              <div
-                key={item.id}
-                className="bg-white p-4 rounded-lg shadow-md flex items-center justify-between"
-              >
-                <Image
-                  src="/assets/placeholder.png" // Placeholder image
-                  alt="Product Image"
-                  width={80}
-                  height={80}
-                  className="rounded-lg"
-                />
-                <div className="flex-1 ml-4">
-                  <h2 className="text-body-sm font-bold">{item.name}</h2>
-                  <p className="text-body-sm">Rp {item.price.toLocaleString()} / unit</p>
+<div className="flex flex-col justify-between">
+<div className="flex-1 space-y-4">
+  {cartItems.map((item) => (
+    <div
+      key={item.id}
+      className="bg-white p-4 rounded-lg shadow-md flex items-center justify-between gap-x-8"
+    >
+      {/* Product Image and Details */}
+      <div className="flex flex-1 items-center gap-x-4">
+        <Image
+          src="/assets/placeholder.png" // Placeholder image
+          alt="Product Image"
+          width={80}
+          height={80}
+          className="rounded-lg"
+        />
+        <div>
+          <h2 className="text-body-sm font-bold">{item.name}</h2>
+          <p className="text-body-sm">Rp {item.price.toLocaleString()} / unit</p>
+        </div>
+      </div>
+
+      {/* Qty Handler */}
+      <div className="flex flex-row items-center text-body-sm space-x-1">
+                <span>{item.quantity}</span>
+                <div className="flex flex-col items-center space-y-1">
+                  <button onClick={() => increaseQuantity(item.id)}>
+                    <Image src="/assets/increase.png" alt="Increase" width={24} height={24} />
+                  </button>
+                  
+                  <button onClick={() => decreaseQuantity(item.id)}>
+                    <Image src="/assets/decrease.png" alt="Decrease" width={24} height={24} />
+                  </button>
+                </div>
                 </div>
 
-                {/* Qty Handler */}
-                <div className="flex items-center space-x-2">
-                      <span>{item.quantity}</span>
-                      <div className="flex flex-col items-center space-y-1">
-                        <button onClick={() => increaseQuantity(item.id)}>
-                          <Image src="/assets/increase.png" alt="Increase" width={24} height={24} />
-                        </button>
-                        <button onClick={() => decreaseQuantity(item.id)}>
-                          <Image src="/assets/decrease.png" alt="Decrease" width={24} height={24} />
-                        </button>
-                      </div>
-                </div>
+      {/* Total Price */}
+      <div className="flex-1 text-body-sm font-bold text-center">
+        Rp {(item.price * item.quantity).toLocaleString()}
+      </div>
 
-                {/* Total Price */}
-                <div className="text-body-sm font-bold text-center mx-4">
-                  Rp {(item.price * item.quantity).toLocaleString()}
-                </div>
+      {/* Remove Icon */}
+      <div className="flex justify-end">
+        <button onClick={() => removeItem(item.id)}>
+          <Image
+            src="/assets/remove.png"
+            alt="Remove"
+            width={24}
+            height={24}
+          />
+        </button>
+      </div>
+    </div>
+  ))}
+</div>
 
-                {/* Remove Icon */}
-                <button onClick={() => removeItem(item.id)} className="ml-auto">
-                  <Image
-                    src="/assets/remove.png"
-                    alt="Remove"
-                    width={24}
-                    height={24}
-                  />
-                </button>
-              </div>
-            ))}
+<div className="flex py-6 justify-end">
+          <button className="btn-primary w-30 justify-end">Continue Shopping</button>
           </div>
-
-          <button className="btn-primary w-full">Continue Shopping</button>
+        </div>
         </div>
 
         {/* Right Section (Payment Details) */}
