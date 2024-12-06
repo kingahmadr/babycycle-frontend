@@ -109,7 +109,7 @@ const Navbar: React.FC = () => {
               Shop by Category
             </span>
             <div className="absolute hidden group-hover:block bg-white shadow-lg rounded-lg">
-            <Link href="/product" className="block px-4 py-2 hover:bg-babyBlue">
+            <Link href="/listing" className="block px-4 py-2 hover:bg-babyBlue">
                 All Products
               </Link>
               <Link href="/category/clothing" className="block px-4 py-2 hover:bg-babyBlue">
