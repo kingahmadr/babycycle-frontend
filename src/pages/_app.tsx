@@ -7,7 +7,7 @@ const MyApp = ({ Component, pageProps }: AppProps) => {
   return (
     <>
       <Navbar />
-      <main className="min-h-screen">
+      <main>
         <Component {...pageProps} />
       </main>
       <Footer />

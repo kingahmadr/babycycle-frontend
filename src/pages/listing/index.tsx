@@ -17,7 +17,7 @@ function index() {
     };
 
   return (
-    <div className='w-[1440px] flex'>
+    <div className='body-width flex'>
       <div className='fixed w-1/4 uppercase py-3 flex flex-col gap-6'>
         <div className='text-xl text-buttonBlue'>All Filters</div>
 
