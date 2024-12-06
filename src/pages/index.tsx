@@ -7,15 +7,15 @@ function Home() {
     <div>
 
       <div className='h-[660px] bg-babyBlue flex -z-10 object-contain relative'>
-        <img className='absolute top-[55px] left-[180px] z-[3]' src='/image_2.png'/>
-        <img className='absolute top-[96px] left-[144px] z-[1]' src='/Rectangle_42.png'/>
-        <img className='absolute top-0 right-0 z-[5]' src='/asset3_1.png'/>
-        <img className='absolute' src='/asset2_2.png'/>
-        <img className='absolute bottom-0 right-0' src='/asset2_1.png'/>
-        <img className='absolute bottom-0 z-[5]' src='/asset1_1.png'/>
         <div className='w-1/2'>
-
+          <img className='absolute top-[55px] left-[180px] z-[3]' src='/image_2.png'/>
+          <img className='absolute top-[96px] left-[144px] z-[1]' src='/Rectangle_42.png'/>
+          <img className='absolute top-0 right-0 z-[5]' src='/asset3_1.png'/>
+          <img className='absolute' src='/asset2_2.png'/>
+          <img className='absolute bottom-0 right-0' src='/asset2_1.png'/>
+          <img className='absolute bottom-0 z-[5]' src='/asset1_1.png'/>
         </div>
+        
         <div className='w-1/2 flex flex-col justify-center items-center gap-6 z-0'>
           <span className='font-decor text-4xl'>Smart mom, shop recycle</span>
           <PrimaryButton type='button'>Explore</PrimaryButton>

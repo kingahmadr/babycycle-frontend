@@ -11,7 +11,7 @@ function index() {
 
     const [selectedOption, setSelectedOption] = useState('HIGHEST PRICE')
   
-    const handleSelect = (option) => {
+    const handleSelect = (option: any) => {
       setSelectedOption(option)
       setIsOpen(false)
     };
@@ -132,7 +132,7 @@ function index() {
             <span className='text-buttonBlue'>Sort By</span>
             <button className="w-60 h-8 flex justify-between items-center bg-white text-black border-black border-2 rounded-none px-4 text-left" onClick={toggleDropdown}>
               {selectedOption} 
-              <img src="/Polygon 1.png"/>
+              <img src="/Polygon_1.png"/>
             </button>
           </div>
 
@@ -196,7 +196,15 @@ function index() {
           <ProductCard></ProductCard>
         </div>
         <div>
-          page
+          <div className='flex justify-end space-x-6 py-8'>
+            <div>
+              <img src='/Polygon_2.png'/>
+            </div>
+            <div>1</div>
+            <div>
+              <img src='/Polygon_3.png'/>
+            </div>
+          </div>
         </div>
       </div>
     </div>
