@@ -6,7 +6,7 @@ function Home() {
   return (
     <div>
 
-      <div className='h-[660px] bg-babyBlue flex -z-10 object-contain relative'>
+<div className='h-[660px] bg-babyBlue flex -z-10 object-contain relative'>
         <div className='w-1/2'>
           <img className='absolute top-[55px] left-[180px] z-[3]' src='/image_2.png'/>
           <img className='absolute top-[96px] left-[144px] z-[1]' src='/Rectangle_42.png'/>

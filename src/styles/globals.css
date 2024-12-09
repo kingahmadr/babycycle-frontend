@@ -23,9 +23,9 @@ body {
   background: var(--background);
   font-family: 'Gabarito', 'Darumadrop One', Arial, Helvetica, sans-serif; /* Use the custom font */
   letter-spacing: 0.1em;
-  display:flex; 
+  /* display:flex; 
   flex-direction:column; 
-  align-items:center;
+  align-items:center; */
   min-height:100vh;
 }
 
@@ -68,15 +68,15 @@ h1, h2, h3, h4, h5, h6, p, span, label {
 /* Add to Cart Button */
 .btn-add-to-cart {
   @apply bg-black text-white py-2 px-8 text-center font-bold text-body-md rounded-full hover:opacity-50 transition duration-300;
-  width: 500px; /* Set width as per the design */
-  height: 45px; /* Set height as per the design */
+  width: 500px; 
+  height: 45px; 
 }
 
 /* Buy Now Button */
 .btn-buy-now {
   @apply bg-buttonBlue text-white py-2 px-8 text-center font-bold text-body-md rounded-full hover:bg-babyBlue hover:text-buttonBlue transition duration-300;
-  width: 500px; /* Set width as per the design */
-  height: 45px; /* Set height as per the design */
+  width: 500px; 
+  height: 45px; 
 }
 
   /* Input Styles */
