@@ -26,6 +26,7 @@ function index() {
             {activeTab === 'personalData' && (
             <div className='p-6'>
                 <div className='w-full flex'>
+
                     <div className='w-[450px] h-[450px]'>
                         <img className='w-full h-full' src=''></img>
                     </div>
@@ -43,9 +44,36 @@ function index() {
                                 <span>phone number</span>
                             </div>
                         </div>
-                        <div className='w-full flex justify-end gap-8'>
+                        <div className='w-full flex justify-end gap-8 text-xl'>
                             <PrimaryButton type='button'>Change Profile Picture</PrimaryButton>
                             <PrimaryButton type='button'>Change Data</PrimaryButton>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            )}
+
+            {activeTab === 'addressList' && (
+            <div className='p-6'>
+                <div className='w-full flex flex-col gap-6'>
+                    
+                    <div className='w-full flex justify-between text-xl'>
+                        <div>Find Address</div>
+                        <PrimaryButton type='button'>Add New Address +</PrimaryButton>
+                    </div>
+
+                    <div className='w-full p-6 flex flex-col gap-8 border-4 border-borderGray rounded-xl text-xl'>
+                        <div className='w-full flex flex-col'>
+                            <span className='font-bold'>Adinda Maya</span>
+                            <span>083674657890</span>
+                            <span>Gang Masjid Jami Al Huda, Leuwinutug, Kec. Citeureup, Kabupaten Bogor, Jawa Barat</span>
+                        </div>
+
+                        <div className='w-full flex justify-end gap-3'>
+                            <PrimaryButton type='button'>Set As Main</PrimaryButton>
+                            <PrimaryButton type='button'>Change</PrimaryButton>
+                            <PrimaryButton type='button'>Delete</PrimaryButton>
                         </div>
                     </div>
 
