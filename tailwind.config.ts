@@ -22,7 +22,8 @@ const config: Config = {
         lightHeaderBlue: '#E4F3FF', // Added for secondary headers
         dangerRed: '#BA4F4F', // Red for snackbar, deactivate, etc
         paymentPurple: '#565ABB', // Purple for payment
-        borderGray: 'D9D9D9'
+        borderGray: '#D9D9D9',
+        lighterBabyBlue: '#E4F3FF'
       },
       fontFamily: {
         sans: ['Gabarito', 'sans-serif'],
