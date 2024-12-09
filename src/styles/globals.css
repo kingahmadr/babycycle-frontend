@@ -146,6 +146,3 @@ h1, h2, h3, h4, h5, h6, p, span, label {
   transition: all 0.1s step-end;
 }
 
-img {
-  transition: transform 0.3s ease;
-}
