@@ -1,5 +1,3 @@
-import React from 'react'
-
 interface PrimaryButtonProps {
     children: string,
     type: "submit" | "reset" | "button",

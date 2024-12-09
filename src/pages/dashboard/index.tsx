@@ -1,5 +1,5 @@
 import { PrimaryButton } from '@/components/PrimaryButton'
-import React, { useState } from 'react'
+import { useState } from 'react'
 
 function index() {
 
@@ -116,6 +116,31 @@ function index() {
                         <div className='w-full flex justify-end gap-3'>
                             <PrimaryButton type='button'>Add Review +</PrimaryButton>
                         </div>
+                    </div>
+
+                </div>
+            </div>
+            )}
+
+            {activeTab === 'becomeSeller' && (
+            <div className='w-full p-6 flex justify-center'>
+                <div className='w-[506px] flex flex-col gap-6 text-xl'>
+
+                    <div className='w-full space-y-1'>
+                        <label className='text-buttonBlue'>Shop Name</label>
+                        <input className='w-full h-10 border-2 border-formGray rounded-md' type='text'></input>
+                    </div>
+                    <div className='w-full space-y-1'>
+                        <label className='text-buttonBlue'>Description</label>
+                        <input className='w-full h-40 border-2 border-formGray rounded-md' type='textarea'></input>
+                    </div>
+                    <div className='w-full space-y-1'>
+                        <label className='text-buttonBlue'>Location</label>
+                        <input className='w-full h-10 border-2 border-formGray rounded-md' type='text'></input>
+                    </div>
+
+                    <div className='w-full flex justify-end'>
+                        <PrimaryButton type='submit'>Submit</PrimaryButton>
                     </div>
 
                 </div>

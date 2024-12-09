@@ -1,6 +1,6 @@
 import { PrimaryButton } from '@/components/PrimaryButton';
 import ProductCard from '@/components/ProductCard'
-import React, { useState } from 'react'
+import { useState } from 'react'
 
 function index() {
 
