@@ -3,7 +3,8 @@ import React from 'react'
 interface PrimaryButtonProps {
     children: string,
     type: "submit" | "reset" | "button",
-    onClick?: () => void
+    onClick?: () => void,
+    className?: string
 }
 
 export const PrimaryButton = ({ children, type, onClick } : PrimaryButtonProps) => {
