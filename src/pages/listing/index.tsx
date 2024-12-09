@@ -2,7 +2,7 @@ import { PrimaryButton } from '@/components/PrimaryButton';
 import ProductCard from '@/components/ProductCard'
 import { useState } from 'react'
 
-function index() {
+function Index() {
 
     const [isOpen, setIsOpen] = useState(false);
     const toggleDropdown = () => {
@@ -211,4 +211,4 @@ function index() {
   )
 }
 
-export default index
+export default Index

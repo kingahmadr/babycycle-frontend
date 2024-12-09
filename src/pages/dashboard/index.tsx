@@ -1,7 +1,7 @@
 import { PrimaryButton } from '@/components/PrimaryButton'
 import { useState } from 'react'
 
-function index() {
+function Index() {
 
     const [activeTab, setActiveTab] = useState('personalData')
 
@@ -152,4 +152,4 @@ function index() {
   )
 }
 
-export default index
+export default Index
