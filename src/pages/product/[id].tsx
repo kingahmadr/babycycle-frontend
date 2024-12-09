@@ -1,4 +1,4 @@
-import { GetServerSideProps } from "next";
+// import { GetServerSideProps } from "next";
 import Image from "next/image";
 
 const ProductDetailsPage: React.FC = () => {

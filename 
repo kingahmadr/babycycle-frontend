@@ -1,0 +1,115 @@
+[33mcommit bfdc2c830f865ededb9a73a91c73e55323582dcd[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mproduct_listing[m[33m, [m[1;31morigin/product_listing[m[33m)[m
+Merge: d76f868 b3013d7
+Author: Adinda Maya <adnmaya02@gmail.com>
+Date:   Fri Dec 6 15:32:00 2024 +0700
+
+    fix: conflict resolve
+
+[33mcommit d76f8684b4336c8004311019ba242076e894c8a2[m
+Author: Adinda Maya <adnmaya02@gmail.com>
+Date:   Fri Dec 6 13:57:20 2024 +0700
+
+    feat: slicing pagination
+
+[33mcommit b3013d7b277ad1dd1dd1168734880c39e01a65c7[m[33m ([m[1;31morigin/dev[m[33m)[m
+Author: GIta Asaria <yosephine.gah@gmail.com>
+Date:   Thu Dec 5 23:34:01 2024 +0800
+
+    fix cart
+
+[33mcommit 504b5db68b01273308b46a825df353a7340db8e7[m
+Merge: 8f842e0 fe045d3
+Author: GIta Asaria <66896829+yosegit111@users.noreply.github.com>
+Date:   Thu Dec 5 20:34:41 2024 +0800
+
+    Merge pull request #3 from Group-D-Revou-Final-Project/gita
+    
+    Gita
+
+[33mcommit fe045d3b1dcea01de586ddf3c9765d4869185a51[m
+Merge: dc82d19 8f842e0
+Author: GIta Asaria <66896829+yosegit111@users.noreply.github.com>
+Date:   Thu Dec 5 20:34:13 2024 +0800
+
+    Merge branch 'dev' into gita
+
+[33mcommit dc82d1992ba4af2713329addeedbf03c359f884e[m
+Author: GIta Asaria <yosephine.gah@gmail.com>
+Date:   Thu Dec 5 20:06:02 2024 +0800
+
+    fix navbar, footer, product details
+
+[33mcommit 57b9cfe72a8f6524c1f1d53b68b50fd4e5fddbae[m
+Author: Adinda Maya <adnmaya02@gmail.com>
+Date:   Wed Dec 4 22:43:14 2024 +0700
+
+    feat: added slicing for filters
+
+[33mcommit a0ef8f634bd07aa9c903f5066b14d0f85367f383[m
+Author: GIta Asaria <yosephine.gah@gmail.com>
+Date:   Wed Dec 4 23:13:35 2024 +0800
+
+    add cart, product details, navbar and footer
+
+[33mcommit bc3e5d66821a518d5f92950885d9efef7a6cb9cc[m
+Author: Adinda Maya <adnmaya02@gmail.com>
+Date:   Wed Dec 4 21:40:27 2024 +0700
+
+    fix: add down icon in sort button
+
+[33mcommit bb1d7e37b2feb0711a14e021eadf2c8ab498aa14[m
+Author: Adinda Maya <adnmaya02@gmail.com>
+Date:   Wed Dec 4 21:30:40 2024 +0700
+
+    feat: add slicing for sort by function
+
+[33mcommit 138143c197582935da9e4bb53f313619fb6c0e66[m
+Author: Adinda Maya <adnmaya02@gmail.com>
+Date:   Wed Dec 4 19:51:33 2024 +0700
+
+    feat: slicing, add product segment
+
+[33mcommit 8f842e02656ea79b676845bfc593caa566cb4462[m[33m ([m[1;32mdev[m[33m)[m
+Merge: 1e9524a 4f1be0f
+Author: Adinda Maya <adnmaya02@gmail.com>
+Date:   Wed Dec 4 19:27:07 2024 +0700
+
+    Merge pull request #2 from Group-D-Revou-Final-Project/landing_page
+    
+    feat: landing page slicing
+
+[33mcommit 4f1be0f757be3a9bda49fde41a066164208076a7[m[33m ([m[1;31morigin/landing_page[m[33m)[m
+Author: Adinda Maya <adnmaya02@gmail.com>
+Date:   Wed Dec 4 15:40:48 2024 +0700
+
+    feat: landing page slicing
+
+[33mcommit 6f67b06e67d1515993ff774df86ab39ec19d113c[m[33m ([m[1;31morigin/gita[m[33m)[m
+Author: GIta Asaria <yosephine.gah@gmail.com>
+Date:   Tue Dec 3 22:48:16 2024 +0800
+
+    add global css config
+
+[33mcommit 5016a0a9c7cd5fb3fcfcd5a8ed9a01c0785023df[m
+Author: GIta Asaria <yosephine.gah@gmail.com>
+Date:   Tue Dec 3 22:38:04 2024 +0800
+
+    add global css config
+
+[33mcommit 1e9524a9466ea28841723129e9234eb7a10a87ee[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m
+Author: GIta Asaria <yosephine.gah@gmail.com>
+Date:   Mon Dec 2 23:42:15 2024 +0800
+
+    add global css config
+
+[33mcommit 99c7e6bf3bb5947ef796d7ac81dc8e2ace77bea5[m[33m ([m[1;31morigin/integration[m[33m)[m
+Author: kingahmadr <ahmadnromiz@gmail.com>
+Date:   Mon Dec 2 15:12:54 2024 +0700
+
+    Init setup
+
+[33mcommit 41cf821cf368dc8499254987bf895af96a251ddf[m
+Author: kingahmadr <73722953+kingahmadr@users.noreply.github.com>
+Date:   Tue Nov 26 21:41:53 2024 +0700
+
+    Initial commit
