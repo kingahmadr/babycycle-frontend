@@ -1,18 +1,14 @@
-import "../styles/globals.css"; // Ensure your styles are imported
-import type { AppProps } from "next/app";
-import Navbar from "../components/Navbar";
-import Footer from "../components/Footer";
+import '../styles/globals.css' // Ensure your styles are imported
+import type { AppProps } from 'next/app'
+import Layout from '@/layouts'
 
 const MyApp = ({ Component, pageProps }: AppProps) => {
   return (
-    <>
-      <Navbar />
-      <main className="min-h-screen">
-        <Component {...pageProps} />
-      </main>
-      <Footer />
-    </>
-  );
-};
+    <Layout>
+      <Component {...pageProps} />
+    </Layout>
+  )
+}
 
-export default MyApp;
+export default MyApp
+
