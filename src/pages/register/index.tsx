@@ -1,52 +1,63 @@
 import { useState } from 'react';
+import axios from 'axios';
 
 export default function Register() {
-  const [form, setForm] = useState({ username: '', email: '', password: '' });
+  const [form, setForm] = useState({ email: '', username: '', password: '' });
+  const [message, setMessage] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setForm({ ...form, [name]: value });
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true); // Show loading spinner
+    try {
+      const response = await axios.post('https://api.babycycle.my.id/api/v1/users/register', form); // Replace with your actual API URL
+      setMessage(response.data.message || 'User registered successfully!');
+    } catch (error: any) {
+      setMessage(error.response?.data?.message || 'An error occurred');
+    } finally {
+      setLoading(false); // Hide loading spinner
+    }
   };
 
   return (
-    <>
-    <div className="w-full max-w-md bg-white rounded-lg shadow-md p-8">
-        <h1 className="text-xl font-semibold text-gray-800 mb-4">Register</h1>
-        <form className="space-y-4">
-          <input
-            type="text"
-            name="username"
-            placeholder="Username"
-            value={form.username}
-            onChange={handleInputChange}
-            className="w-full p-3 border rounded-md"
-          />
+    <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+      <div className="bg-white p-6 rounded shadow-md w-full max-w-md">
+        <h1 className="text-xl font-semibold mb-4">Register</h1>
+        <form onSubmit={handleSubmit}>
           <input
             type="email"
-            name="email"
             placeholder="Email"
             value={form.email}
-            onChange={handleInputChange}
-            className="w-full p-3 border rounded-md"
+            onChange={(e) => setForm({ ...form, email: e.target.value })}
+            required
+            className="w-full p-3 border rounded mb-4"
+          />
+          <input
+            type="text"
+            placeholder="Username"
+            value={form.username}
+            onChange={(e) => setForm({ ...form, username: e.target.value })}
+            required
+            className="w-full p-3 border rounded mb-4"
           />
           <input
             type="password"
-            name="password"
             placeholder="Password"
             value={form.password}
-            onChange={handleInputChange}
-            className="w-full p-3 border rounded-md"
+            onChange={(e) => setForm({ ...form, password: e.target.value })}
+            required
+            className="w-full p-3 border rounded mb-4"
           />
-          <button className="w-full py-3 bg-blue-500 text-white rounded-md">
-            Next
+          <button
+            type="submit"
+            className="w-full bg-blue-500 text-white py-2 rounded"
+            disabled={loading}
+          >
+            {loading ? 'Loading...' : 'Register'}
           </button>
         </form>
-        <p className="text-sm text-center text-gray-600 mt-4">
-          Already have an account? <a href="/login" className="text-blue-500">Log in</a>
-        </p>
+        {message && <p className="text-center mt-4 text-sm">{message}</p>}
       </div>
-
-    </>
-
+    </div>
   );
 }
