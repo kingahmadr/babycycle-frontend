@@ -11,7 +11,7 @@ export default function Login() {
     setLoading(true);
 
     try {
-      const response = await axios.post('', form); // Flask endpoint
+      const response = await axios.post('https://api.babycycle.my.id/api/v1/users/login', form); // Flask endpoint
       setMessage(response.data.message);
       // Optionally, save user data or token in localStorage
       localStorage.setItem('username', response.data.username);
