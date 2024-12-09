@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -6,7 +6,7 @@ const Navbar: React.FC = () => {
   const [isSearchActive, setIsSearchActive] = useState(false);
 
   return (
-    <nav className="bg-white px-8 mt-12 shadow-md">
+    <nav className="bg-white px-8 shadow-md">
       <div className="flex items-center justify-between relative">
         
         {/* Left Section - Search Bar */}
@@ -96,7 +96,7 @@ const Navbar: React.FC = () => {
       </div>
 
       {/* Navigation Links */}
-      <div className="flex justify-center mt-12">
+      <div className="flex justify-center">
         <div className="flex space-x-8">
           <Link href="/" className="text-textBlue uppercase font-bold hover:text-textGray">
             Home

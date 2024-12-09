@@ -9,7 +9,7 @@ export default function Document() {
           href="https://fonts.googleapis.com/css2?family=Gabarito:wght@400;500;700&display=swap"
           rel="stylesheet"
         />
-      <body className="antialiased">
+      <body className="w-full min-h-screen">
         <Main />
         <NextScript />
       </body>
