@@ -1,8 +1,5 @@
-import React from 'react';
-
-export interface LayoutProps {
-  children: React.ReactNode;
-}
+import React from 'react'
+import { LayoutProps } from '.'
 
 const MainLayout: React.FC<LayoutProps> = ({ children }) => {
   return (
@@ -11,7 +8,7 @@ const MainLayout: React.FC<LayoutProps> = ({ children }) => {
         {children}
       </main>
     </>
-  );
-};
+  )
+}
 
-export default MainLayout;
+export default MainLayout
