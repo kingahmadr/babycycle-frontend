@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
@@ -6,6 +7,7 @@ const Navbar: React.FC = () => {
   const [isSearchActive, setIsSearchActive] = useState(false)
 
   return (
+
     <nav className='bg-white shadow-md w-full min-h-[235px] pt-9 pb-2 flex flex-col justify-center'>
       <div className='max-w-[1440px] w-full mx-auto'>
         <div className='flex items-center justify-between mb-20'>
@@ -44,7 +46,7 @@ const Navbar: React.FC = () => {
               </button>
             )}
           </div>
-
+    
           {/* Center Section - Logo */}
           <div className='absolute left-1/2 transform -translate-x-1/2'>
             <Link href='/'>
@@ -94,6 +96,7 @@ const Navbar: React.FC = () => {
           </div>
         </div>
 
+
         {/* Navigation Links */}
         <div className='flex justify-center'>
           <div className='flex space-x-8'>
@@ -130,6 +133,7 @@ const Navbar: React.FC = () => {
                   Toys
                 </Link>
               </div>
+      
             </div>
             <Link
               href='/contact'
