@@ -1,10 +1,9 @@
-import React from 'react'
 import ProductCard from '@/components/ProductCard'
 import { PrimaryButton } from '@/components/PrimaryButton'
 
 function Home() {
   return (
-    <div>
+    <div className='body-width'>
 
       <div className='h-[660px] bg-babyBlue flex -z-10 object-contain relative'>
         <div className='w-1/2'>
