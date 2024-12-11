@@ -1,5 +1,8 @@
 import { GetServerSideProps } from "next";
+import { useContext } from "react";
+import { useRouter } from "next/router";
 import { ProductModel } from "@/models/Product";
+import { CartContext } from "@/context/CartContext";
 import Image from "next/image";
 
 interface ProductDetailsPageProps {
@@ -7,6 +10,35 @@ interface ProductDetailsPageProps {
 }
 
 const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({ product }) => {
+  const cartContext = useContext(CartContext);
+  const router = useRouter();
+
+  if (!cartContext) {
+    throw new Error("CartContext is not available. Ensure CartProvider wraps the component.");
+  }
+
+  const { addToCart } = cartContext;
+
+  const handleAddToCart = () => {
+    addToCart({
+      id: product.id.toString(),
+      name: product.name,
+      price: product.price,
+      quantity: 1,
+    });
+    alert("Product has been added to the cart!");
+  };
+
+  const handleBuyNow = () => {
+    addToCart({
+      id: product.id.toString(),
+      name: product.name,
+      price: product.price,
+      quantity: 1,
+    });
+    router.push("/cart");
+  };
+
   return (
     <div className="py-12 px-20 bg-white min-w-[1440]">
       {/* Product Section */}
@@ -36,13 +68,19 @@ const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({ product }) => {
         <div className="w-1/2">
           <h1 className="text-heading-xl mb-4">{product.name || "PRODUCT NAME"}</h1>
           <div className="flex items-center space-x-4 mb-4">
-            <p className="text-dangerRed text-body-md font-bold">IDR {product.price.toLocaleString()}</p>
-            <p className="line-through text-body-md text-formGray">{product.oldPrice || "IDR 199,999.99"}</p>
+            <p className="text-dangerRed text-body-md font-bold">
+              IDR {product.price.toLocaleString()}
+            </p>
+            <p className="line-through text-body-md text-formGray">
+              {product.oldPrice || "IDR 199,999.99"}
+            </p>
           </div>
-      
+
           <div className="flex items-center space-x-4 mb-4">
             <p className="text-body-lg">{product.rating || 4.5} ⭐</p>
-            <p className="text-body-md text-formGray">({product.reviews || 10} reviews)</p>
+            <p className="text-body-md text-formGray">
+              ({product.reviews || 10} reviews)
+            </p>
           </div>
 
           {/* Warranty and Category */}
@@ -59,8 +97,12 @@ const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({ product }) => {
 
           {/* Buttons */}
           <div className="flex flex-col space-y-4 py-10">
-            <button className="btn-add-to-cart w-1/2">Add to Cart</button>
-            <button className="btn-buy-now w-1/2">Buy Now</button>
+            <button className="btn-add-to-cart w-1/2" onClick={handleAddToCart}>
+              Add to Cart
+            </button>
+            <button className="btn-buy-now w-1/2" onClick={handleBuyNow}>
+              Buy Now
+            </button>
           </div>
 
           <p className="text-body-md">{product.descriptions || "No description available."}</p>
