@@ -144,7 +144,7 @@ function Index() {
           </div>
 
         {isOpen && (
-          <div className='relative'>
+          <div className='relative z-20'>
             <div className="absolute w-60 h-auto top-4 right-0 bg-white border-none rounded-none z-10">
               <ul>
                 <li className="px-4 py-2 hover:bg-buttonBlue hover:text-white cursor-pointer"
@@ -167,6 +167,13 @@ function Index() {
             </div>
           </div>
         )}
+
+        {isOpen && (
+          <div
+            className='fixed inset-0 bg-transparent bg-opacity-40 z-10'
+            onClick={() => setIsOpen(false)}
+          ></div>
+        )}
           {/* <label className='flex'><span className='text-buttonBlue'>Sort By</span>
             <select className='w-60 h-8 bg-white text-black  border-black border-2 rounded-none uppercase px-4'>
               <option className='' value="highestPrice">Highest Price</option>
@@ -177,7 +184,7 @@ function Index() {
           </label> */}
         </div>
         <div className='flex flex-wrap justify-end gap-6'>
-        {fetchedData && fetchedData.products.slice(0,20).map((product, index)=>(
+        {fetchedData && fetchedData.data.slice(0,20).map((product, index)=>(
           <ProductCard
               key={index}
               image_url={product.image_url}

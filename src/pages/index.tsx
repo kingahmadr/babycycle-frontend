@@ -49,7 +49,7 @@ const Home = () => {
             <PrimaryButton type='button'>See All</PrimaryButton>
           </div>
         </div>
-        {fetchedData && fetchedData.products.slice(0,4).map((product, index)=>(
+        {fetchedData && fetchedData.data.slice(0,4).map((product, index)=>(
           <ProductCard
             key={index}
             image_url={product.image_url}
@@ -60,7 +60,7 @@ const Home = () => {
       </div>
 
       <div className='flex gap-6 py-16'>
-      {fetchedData && fetchedData.products.slice(0,4).map((product, index)=>(
+      {fetchedData && fetchedData.data.slice(0,4).map((product, index)=>(
           <ProductCard
             key={index}
             image_url={product.image_url}
