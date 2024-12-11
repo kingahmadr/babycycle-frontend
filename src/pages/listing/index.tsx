@@ -1,8 +1,15 @@
 import { PrimaryButton } from '@/components/PrimaryButton';
 import ProductCard from '@/components/ProductCard'
+import useFetch from '@/hooks/useFetch';
+import { DataWithCount } from '@/models/DataWithCount';
+import { ProductModel } from '@/models/Product';
 import { useState } from 'react'
 
 function Index() {
+
+    const {data: fetchedData } = useFetch<DataWithCount<ProductModel>>({
+      endpoint: 'https://api.babycycle.my.id/api/v1/products'
+    })
 
     const [isOpen, setIsOpen] = useState(false);
     const toggleDropdown = () => {
@@ -18,10 +25,10 @@ function Index() {
 
   return (
     <div className='body-width flex'>
-      <div className='fixed w-1/4 uppercase py-3 flex flex-col gap-6'>
+      <div className='w-72 uppercase py-3 flex flex-col gap-6'>
         <div className='text-xl text-buttonBlue'>All Filters</div>
 
-        <div className='flex flex-col gap-2 px-3'>
+        {/* <div className='flex flex-col gap-2 px-3'>
           <div>Availability</div>
           <div className='flex flex-col gap-1 text-sm'>
             <label className='flex gap-2 items-center'>
@@ -37,7 +44,7 @@ function Index() {
               <span>Out of stock</span>
             </label>
           </div>
-        </div>
+        </div> */}
 
         <div className='flex flex-col gap-2 px-3'>
           <div>Product Type</div>
@@ -94,7 +101,7 @@ function Index() {
         </div>
 
         <div className='flex flex-col gap-2 px-3'>
-          <div>Product Type</div>
+          <div>Age Category</div>
           <div className='flex flex-col gap-1 text-sm'>
             <label className='flex gap-2 items-center'>
               <input type="checkbox"
@@ -125,7 +132,7 @@ function Index() {
 
 
 
-      <div className='w-3/4 ml-[25%]'>
+      <div className='w-full'>
         <div className='uppercase text-[14px] h-auto py-3 flex justify-end items-center'>
           <div className='flex items-center gap-3'>
 
@@ -170,30 +177,14 @@ function Index() {
           </label> */}
         </div>
         <div className='flex flex-wrap justify-end gap-6'>
-          <ProductCard></ProductCard>
-          <ProductCard></ProductCard>
-          <ProductCard></ProductCard>
-          <ProductCard></ProductCard>
-
-          <ProductCard></ProductCard>
-          <ProductCard></ProductCard>
-          <ProductCard></ProductCard>
-          <ProductCard></ProductCard>
-
-          <ProductCard></ProductCard>
-          <ProductCard></ProductCard>
-          <ProductCard></ProductCard>
-          <ProductCard></ProductCard>
-
-          <ProductCard></ProductCard>
-          <ProductCard></ProductCard>
-          <ProductCard></ProductCard>
-          <ProductCard></ProductCard>
-
-          <ProductCard></ProductCard>
-          <ProductCard></ProductCard>
-          <ProductCard></ProductCard>
-          <ProductCard></ProductCard>
+        {fetchedData && fetchedData.products.slice(0,20).map((product, index)=>(
+          <ProductCard
+              key={index}
+              image_url={product.image_url}
+              name={product.name}
+              price={product.price}
+            />
+        ))}
         </div>
         <div>
           <div className='flex justify-end space-x-6 py-8'>

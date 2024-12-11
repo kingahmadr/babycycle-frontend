@@ -1,7 +1,28 @@
 import ProductCard from '@/components/ProductCard'
 import { PrimaryButton } from '@/components/PrimaryButton'
+import useFetch from '@/hooks/useFetch'
+import { useEffect, useState } from 'react'
+import { ProductModel } from '@/models/Product'
+import { DataWithCount } from '@/models/DataWithCount'
 
-function Home() {
+const Home = () => {
+
+  // const[productData, setProductData] = useState<ProductModel[]>([])
+  const {data: fetchedData } = useFetch<DataWithCount<ProductModel>>({
+    endpoint: 'https://api.babycycle.my.id/api/v1/products'
+  })
+
+  // useEffect(() => {
+  //   if (fetchedData) {
+  //     setProductData(fetchedData.products as any);
+
+  //     console.log(fetchedData)
+      
+  //   }
+  // }, [fetchedData]);
+  
+  // console.log(productData)
+
   return (
     <div className='body-width'>
 
@@ -28,17 +49,25 @@ function Home() {
             <PrimaryButton type='button'>See All</PrimaryButton>
           </div>
         </div>
-        <ProductCard></ProductCard>
-        <ProductCard></ProductCard>
-        <ProductCard></ProductCard>
-        <ProductCard></ProductCard>
+        {fetchedData && fetchedData.products.slice(0,4).map((product, index)=>(
+          <ProductCard
+            key={index}
+            image_url={product.image_url}
+            name={product.name}
+            price={product.price}
+          />
+        ))}
       </div>
 
       <div className='flex gap-6 py-16'>
-        <ProductCard></ProductCard>
-        <ProductCard></ProductCard>
-        <ProductCard></ProductCard>
-        <ProductCard></ProductCard>        
+      {fetchedData && fetchedData.products.slice(0,4).map((product, index)=>(
+          <ProductCard
+            key={index}
+            image_url={product.image_url}
+            name={product.name}
+            price={product.price}
+          />
+        ))}        
         <div className='w-[240px] h-[291px] flex flex-col gap-around'>
           <span className='h-1/2 uppercase text-6xl'>New Arrival</span>
           <div className='h-1/2 flex justify-center items-center'>
