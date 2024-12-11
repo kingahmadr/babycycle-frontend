@@ -1,9 +1,7 @@
 import Navbar from '@/components/Navbar'
-import MainLayout from './MainLayout'
 import Footer from '@/components/Footer'
 import { useRouter } from 'next/router'
 import { PUBLIC_ROUTES } from '@/constants/page'
-import PublicLayout from './PublicLayout'
 
 export interface LayoutProps {
   children: React.ReactNode
@@ -20,11 +18,14 @@ export default function Layout({ children }: LayoutProps) {
   return (
     <>
       <Navbar />
-      {isPublicRoute() ? (
-        <PublicLayout>{children}</PublicLayout>
-      ) : (
-        <MainLayout>{children}</MainLayout>
-      )}
+      <main
+        className={`${
+          isPublicRoute() ? 'w-full' : 'max-w-[1440px]'
+        } flex flex-col gap-8 row-start-2 items-center sm:items-start`}
+        style={{ marginTop: `239px` }}
+      >
+        {children}
+      </main>
       <Footer />
     </>
   )
