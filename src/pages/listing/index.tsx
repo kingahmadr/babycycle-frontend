@@ -2,6 +2,7 @@ import { PrimaryButton } from '@/components/PrimaryButton';
 import ProductCard from '@/components/ProductCard'
 import useFetch from '@/hooks/useFetch';
 import { DataWithCount } from '@/models/DataWithCount';
+import { DiscountModel } from '@/models/Discount';
 import { ProductModel } from '@/models/Product';
 import { useState } from 'react'
 
@@ -10,6 +11,19 @@ function Index() {
     const {data: fetchedData } = useFetch<DataWithCount<ProductModel>>({
       endpoint: 'https://api.babycycle.my.id/api/v1/products'
     })
+
+    // const {data: discountData } = useFetch<DiscountModel>({
+    //   endpoint: 'https://api.babycycle.my.id/api/v1/discount/11'
+    // })
+
+    // const getDiscount = (productId: string) => {
+    //   const { data: discountData } = useFetch<DiscountModel>({
+    //     endpoint: `https://api.babycycle.my.id/api/v1/discount/11`,
+    //   })
+    // }
+
+    //   console.log(getDiscount('11'))
+
 
     const [isOpen, setIsOpen] = useState(false);
     const toggleDropdown = () => {
@@ -184,12 +198,14 @@ function Index() {
           </label> */}
         </div>
         <div className='flex flex-wrap justify-end gap-6'>
-        {fetchedData && fetchedData.data.slice(0,20).map((product, index)=>(
+        {fetchedData && fetchedData.data.slice(0, 20).map((product, index)=>(
           <ProductCard
               key={index}
               image_url={product.image_url}
               name={product.name}
               price={product.price}
+              stock={product.stock}
+              
             />
         ))}
         </div>
