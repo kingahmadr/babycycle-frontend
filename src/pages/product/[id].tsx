@@ -2,16 +2,22 @@ import { GetServerSideProps } from "next";
 import { useContext } from "react";
 import { useRouter } from "next/router";
 import { ProductModel } from "@/models/Product";
+import { DiscountModel } from "@/models/Discount";
 import { CartContext } from "@/context/CartContext";
 import Image from "next/image";
+import { finalPrice } from "@/utils/DiscountedPrice";
 
 interface ProductDetailsPageProps {
   product: ProductModel;
+  discount: DiscountModel | null;
 }
 
-const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({ product }) => {
+const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({ product,discount }) => {
   const cartContext = useContext(CartContext);
   const router = useRouter();
+  
+
+  const discountedPrice = finalPrice(product.price,Number(discount?.discount_percentage)||0);
 
   if (!cartContext) {
     throw new Error("CartContext is not available. Ensure CartProvider wraps the component.");
@@ -23,7 +29,7 @@ const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({ product }) => {
     addToCart({
       id: product.id.toString(),
       name: product.name,
-      price: product.price,
+      price: discountedPrice,
       quantity: 1,
     });
     alert("Product has been added to the cart!");
@@ -33,7 +39,7 @@ const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({ product }) => {
     addToCart({
       id: product.id.toString(),
       name: product.name,
-      price: product.price,
+      price: discountedPrice,
       quantity: 1,
     });
     router.push("/cart");
@@ -68,21 +74,26 @@ const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({ product }) => {
         <div className="w-1/2">
           <h1 className="text-heading-xl mb-4">{product.name || "PRODUCT NAME"}</h1>
           <div className="flex items-center space-x-4 mb-4">
+            {/* Price before discount */}
+            {discount && (
+              <p className="line-through text-body-md text-formGray">
+                IDR {product?.price ? product.price.toLocaleString() : ""}
+              </p>
+            )}
+  
+            {/* Price after discount */}
             <p className="text-dangerRed text-body-md font-bold">
-              IDR {product.price.toLocaleString()}
-            </p>
-            <p className="line-through text-body-md text-formGray">
-              {product.oldPrice || "IDR 199,999.99"}
+              IDR {discountedPrice.toLocaleString()}
             </p>
           </div>
-
+  
           <div className="flex items-center space-x-4 mb-4">
             <p className="text-body-lg">{product.rating || 4.5} ⭐</p>
             <p className="text-body-md text-formGray">
               ({product.reviews || 10} reviews)
             </p>
           </div>
-
+  
           {/* Warranty and Category */}
           <div className="flex space-x-4 mb-4">
             {product.is_warranty && (
@@ -94,7 +105,7 @@ const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({ product }) => {
               {product.category || "Toys"}
             </span>
           </div>
-
+  
           {/* Buttons */}
           <div className="flex flex-col space-y-4 py-10">
             <button className="btn-add-to-cart w-1/2" onClick={handleAddToCart}>
@@ -104,11 +115,11 @@ const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({ product }) => {
               Buy Now
             </button>
           </div>
-
+  
           <p className="text-body-md">{product.descriptions || "No description available."}</p>
         </div>
       </div>
-
+  
       {/* Reviews Section */}
       <div className="mt-12">
         <h2 className="text-heading-md text-center mb-8">Reviews</h2>
@@ -133,28 +144,41 @@ const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({ product }) => {
       </div>
     </div>
   );
+  
 };
 
 export default ProductDetailsPage;
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const { id } = context.params!;
-  const API_URL = `https://api.babycycle.my.id/api/v1/products/${id}`;
+  const API_URL_PRODUCT = `https://api.babycycle.my.id/api/v1/products/${id}`;
+  const API_URL_DISCOUNT = `https://api.babycycle.my.id/api/v1/discount/${id}`;
 
   try {
-    const response = await fetch(API_URL);
+    const response_product = await fetch(API_URL_PRODUCT);
+    const response_discount = await fetch(API_URL_DISCOUNT);
 
-    if (!response.ok) {
+    if (!response_product.ok) {
       return {
         notFound: true,
       };
     }
 
-    const product = await response.json();
+    // if (!response_discount.ok) {
+    //   return {
+    //     undefined,
+    //   };
+    // }
+
+
+    const product = await response_product.json();
+    // const discount = await response_discount.json();
+    const discount = response_discount.ok ? await response_discount.json() : null;
+    console.log(product,discount);
 
     return {
       props: {
-        product,
+        product, discount,
       },
     };
   } catch (error) {
@@ -165,3 +189,4 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     };
   }
 };
+
