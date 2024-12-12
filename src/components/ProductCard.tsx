@@ -1,12 +1,13 @@
+import { DiscountModel } from '@/models/Discount'
 import { ProductModel } from '@/models/Product'
 import React from 'react'
 
-export interface ProductCardProps extends Pick<ProductModel, 'name' | 'image_url' | 'price' | 'stock' > {
-  discount_percentage?: string,
-  is_active?: string
-}
+export interface ProductCardProps extends 
+  Pick<ProductModel, 'name' | 'image_url' | 'price' | 'stock' > {
+    discount?: DiscountModel | null;
+  }
 
-const ProductCard:React.FC<ProductCardProps> = ({name, image_url, price, stock, is_active, discount_percentage}) => {
+const ProductCard:React.FC<ProductCardProps> = ({name, image_url, price, stock, discount}) => {
 
   return (
     <div className='w-[240px] h-[291px] flex flex-col relative'>
@@ -16,11 +17,11 @@ const ProductCard:React.FC<ProductCardProps> = ({name, image_url, price, stock, 
         </div>
       )}
 
-      {/* { is_active === 'true' && (
+      { discount && discount.is_active && (
         <div className='w-auto h-auto bg-black text-white text-xs rounded-xl absolute py-1 px-2 top-2 left-2 uppercase'>
-          {discount_percentage}% OFF
+          {Number(discount.discount_percentage).toFixed(0)}% OFF
         </div>
-      )} */}
+      )}
 
       { stock === 0 ? (
           <img 

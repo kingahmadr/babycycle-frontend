@@ -4,7 +4,7 @@ import useFetch from '@/hooks/useFetch';
 import { DataWithCount } from '@/models/DataWithCount';
 import { DiscountModel } from '@/models/Discount';
 import { ProductModel } from '@/models/Product';
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 function Index() {
 
@@ -12,17 +12,44 @@ function Index() {
       endpoint: 'https://api.babycycle.my.id/api/v1/products'
     })
 
-    // const {data: discountData } = useFetch<DiscountModel>({
-    //   endpoint: 'https://api.babycycle.my.id/api/v1/discount/11'
-    // })
+    const [discounts, setDiscounts] = useState<{ [key: number]: DiscountModel | null }>({})
 
-    // const getDiscount = (productId: string) => {
+    const getDiscount = async (id: number) => {
+      const response = await fetch(`https://api.babycycle.my.id/api/v1/discount/${id}`)
+      const discountData: DiscountModel = await response.json();
+      return discountData;
+    }
+
+    // const getDiscount = (id: number) => {
     //   const { data: discountData } = useFetch<DiscountModel>({
-    //     endpoint: `https://api.babycycle.my.id/api/v1/discount/11`,
+    //     endpoint: `https://api.babycycle.my.id/api/v1/discount/${id}`,
     //   })
+
+    //   return discountData
     // }
 
-    //   console.log(getDiscount('11'))
+    const fetchDiscounts = async (products: ProductModel[]) => {
+      const productDiscounts = await Promise.all(
+        products.map(async (product) => {
+          const discountData = await getDiscount(product.id);
+          return { id: product.id, discountData };
+        })
+      );
+    
+      const discountMap: { [key: number]: DiscountModel | null } = {};
+      productDiscounts.forEach(({ id, discountData }) => {
+        discountMap[id] = discountData;
+      });
+      if (discountMap !== null) {
+        setDiscounts(discountMap);
+      }
+    };
+
+    useEffect(() => {
+      if (fetchedData?.data) {
+        fetchDiscounts(fetchedData.data);
+      }
+    }, [fetchedData]); 
 
 
     const [isOpen, setIsOpen] = useState(false);
@@ -41,24 +68,6 @@ function Index() {
     <div className='body-width flex'>
       <div className='w-72 uppercase py-3 flex flex-col gap-6'>
         <div className='text-xl text-buttonBlue'>All Filters</div>
-
-        {/* <div className='flex flex-col gap-2 px-3'>
-          <div>Availability</div>
-          <div className='flex flex-col gap-1 text-sm'>
-            <label className='flex gap-2 items-center'>
-              <input type="radio"
-                name="availability"
-                value="available"/>
-              <span>Available</span>
-            </label>
-            <label className='flex gap-2 items-center'>
-              <input type="radio"
-                name="availability"
-                value="out_of_stock"/>
-              <span>Out of stock</span>
-            </label>
-          </div>
-        </div> */}
 
         <div className='flex flex-col gap-2 px-3'>
           <div>Product Type</div>
@@ -198,16 +207,20 @@ function Index() {
           </label> */}
         </div>
         <div className='flex flex-wrap justify-end gap-6'>
-        {fetchedData && fetchedData.data.slice(0, 20).map((product, index)=>(
-          <ProductCard
-              key={index}
-              image_url={product.image_url}
-              name={product.name}
-              price={product.price}
-              stock={product.stock}
-              
-            />
-        ))}
+        {fetchedData && fetchedData.data.slice(0, 20).map((product, index) => {
+            const discountData = discounts[product.id]
+
+            return (
+              <ProductCard
+                key={index}
+                image_url={product.image_url}
+                name={product.name}
+                price={product.price}
+                stock={product.stock}
+                discount={discountData}
+              />
+            );
+          })}
         </div>
         <div>
           <div className='flex justify-end space-x-6 py-8'>
