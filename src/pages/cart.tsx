@@ -1,76 +1,25 @@
-import { GetServerSideProps } from "next";
-import { useState, useEffect } from "react";
+import { useContext, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { CartContext } from "@/context/CartContext";
 
-interface CartItem {
-  id: string;
-  name: string;
-  price: number;
-  quantity: number;
-}
+const CartPage: React.FC = () => {
+  const cartContext = useContext(CartContext);
 
-interface CartProps {
-  cartItems: CartItem[];
-}
+  if (!cartContext) {
+    throw new Error("CartContext is not available. Ensure CartProvider wraps the component.");
+  }
 
-const CartPage: React.FC<CartProps> = ({ cartItems: initialCartItems }) => {
-  const [cartItems, setCartItems] = useState<CartItem[]>(initialCartItems);
-  const [selectedAddress, setSelectedAddress] = useState<any>(null);
+  const { cart, removeFromCart, increaseQuantity, decreaseQuantity } = cartContext;
+
   const [selectedCardType, setSelectedCardType] = useState<string | null>(null);
 
-  // Load selected address from localStorage or fallback to default
-  useEffect(() => {
-    const savedAddress = JSON.parse(
-      localStorage.getItem("selectedAddress") ||
-        JSON.stringify({
-          id: "1",
-          name: "Samuel Indra W.",
-          phone: "08567425627",
-          address:
-            "Gang Masjid Jami Al Huda, Lewinutug, Kec. Citeureup, Kabupaten Bogor, Jawa Barat",
-        })
-    );
-    setSelectedAddress(savedAddress);
-  }, []);
-
-  const increaseQuantity = (id: string) => {
-    setCartItems((prevItems) =>
-      prevItems.map((item) =>
-        item.id === id ? { ...item, quantity: item.quantity + 1 } : item
-      )
-    );
-  };
-
-  const decreaseQuantity = (id: string) => {
-    setCartItems((prevItems) =>
-      prevItems.map((item) =>
-        item.id === id && item.quantity > 1
-          ? { ...item, quantity: item.quantity - 1 }
-          : item
-      )
-    );
-  };
-
-  const removeItem = (id: string) => {
-    setCartItems((prevItems) => prevItems.filter((item) => item.id !== id));
-  };
-
-  const subtotal = cartItems.reduce(
-    (total, item) => total + item.price * item.quantity,
-    0
-  );
+  const subtotal = cart.reduce((total, item) => total + item.price * item.quantity, 0);
   const shipping = subtotal * 0.1; // 10% of subtotal
   const total = subtotal + shipping;
 
   const handleCheckout = () => {
-    console.log("Transaction Data:", {
-      subtotal,
-      shipping,
-      total,
-      items: cartItems,
-      address: selectedAddress,
-    });
+    console.log("Transaction Data:", { subtotal, shipping, total, items: cart });
   };
 
   return (
@@ -80,15 +29,13 @@ const CartPage: React.FC<CartProps> = ({ cartItems: initialCartItems }) => {
         <div className="flex-1 space-y-6">
           {/* Address Section */}
           <div className="bg-white p-6 rounded-lg shadow-md flex flex-col justify-between">
-            {selectedAddress ? (
-              <div>
-                <p className="text-body-sm font-bold">{selectedAddress.name}</p>
-                <p className="text-body-sm">{selectedAddress.phone}</p>
-                <p className="text-body-sm">{selectedAddress.address}</p>
-              </div>
-            ) : (
-              <p className="text-body-sm font-bold">No address selected</p>
-            )}
+            <div>
+              <p className="text-body-sm font-bold">Samuel Indra W.</p>
+              <p className="text-body-sm">08567425627</p>
+              <p className="text-body-sm">
+                Gang Masjid Jami Al Huda, Lewinutug, Kec. Citeureup, Kabupaten Bogor, Jawa Barat
+              </p>
+            </div>
             <div className="flex justify-end">
               <Link href="/ChangeAddress">
                 <button className="btn-primary mt-4">Change Address</button>
@@ -99,22 +46,26 @@ const CartPage: React.FC<CartProps> = ({ cartItems: initialCartItems }) => {
           {/* Product List */}
           <div className="flex flex-col justify-between">
             <div className="flex-1 space-y-4">
-              {cartItems.map((item) => (
+              {cart.map((item) => (
                 <div
                   key={item.id}
                   className="bg-white p-4 rounded-lg shadow-md flex items-center justify-between gap-x-8"
                 >
                   {/* Product Image and Details */}
                   <div className="flex flex-1 items-center gap-x-4">
-                    <Image
-                      src="/assets/placeholder.png" // Placeholder image
-                      alt="Product Image"
-                      width={80}
-                      height={80}
-                      className="rounded-lg"
-                    />
+                  <Link href={`/product/${item.id}`} passHref>
+                      <Image
+                        src="/assets/placeholder.png" // Placeholder image
+                        alt="Product Image"
+                        width={80}
+                        height={80}
+                        className="rounded-lg cursor-pointer"
+                      />
+                    </Link>
                     <div>
-                      <h2 className="text-body-sm font-bold">{item.name}</h2>
+                      <Link href={`/product/${item.id}`} passHref>
+                      <h2 className="text-body-sm font-bold hover:text-textBlue hover:underline">{item.name}</h2>
+                      </Link>
                       <p className="text-body-sm">
                         Rp {item.price.toLocaleString()} / unit
                       </p>
@@ -133,7 +84,6 @@ const CartPage: React.FC<CartProps> = ({ cartItems: initialCartItems }) => {
                           height={24}
                         />
                       </button>
-
                       <button onClick={() => decreaseQuantity(item.id)}>
                         <Image
                           src="/assets/decrease.png"
@@ -152,7 +102,7 @@ const CartPage: React.FC<CartProps> = ({ cartItems: initialCartItems }) => {
 
                   {/* Remove Icon */}
                   <div className="flex justify-end">
-                    <button onClick={() => removeItem(item.id)}>
+                    <button onClick={() => removeFromCart(item.id)}>
                       <Image
                         src="/assets/remove.png"
                         alt="Remove"
@@ -166,9 +116,9 @@ const CartPage: React.FC<CartProps> = ({ cartItems: initialCartItems }) => {
             </div>
 
             <div className="flex py-6 justify-end">
-              <button className="btn-primary w-30 justify-end">
-                Continue Shopping
-              </button>
+              <Link href="/">
+                <button className="btn-primary w-30">Continue Shopping</button>
+              </Link>
             </div>
           </div>
         </div>
@@ -177,6 +127,7 @@ const CartPage: React.FC<CartProps> = ({ cartItems: initialCartItems }) => {
         <div className="w-1/3 bg-paymentPurple p-6 rounded-lg shadow-md">
           <h3 className="text-heading-md text-white mb-4">Card Details</h3>
           <div className="space-y-4">
+            {/* Card Selection */}
             <div className="flex space-x-4">
               {["mastercard", "visa", "rupay"].map((type) => (
                 <div
@@ -195,6 +146,8 @@ const CartPage: React.FC<CartProps> = ({ cartItems: initialCartItems }) => {
                 </div>
               ))}
             </div>
+
+            {/* Input Fields */}
             <div>
               <label className="text-white">Name on card</label>
               <input type="text" placeholder="Name" className="input w-full" />
@@ -210,11 +163,7 @@ const CartPage: React.FC<CartProps> = ({ cartItems: initialCartItems }) => {
             <div className="flex space-x-4">
               <div>
                 <label className="text-white">Expiration Date</label>
-                <input
-                  type="text"
-                  placeholder="MM/YY"
-                  className="input w-full"
-                />
+                <input type="text" placeholder="MM/YY" className="input w-full" />
               </div>
               <div>
                 <label className="text-white">CVV</label>
@@ -222,24 +171,24 @@ const CartPage: React.FC<CartProps> = ({ cartItems: initialCartItems }) => {
               </div>
             </div>
           </div>
+
+          {/* Payment Summary */}
           <div className="mt-6 space-y-2">
             <div className="flex justify-between">
               <span className="text-white">Subtotal</span>
-              <span className="text-white">
-                IDR {subtotal.toLocaleString()}
-              </span>
+              <span className="text-white">IDR {subtotal.toLocaleString()}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-white">Shipping</span>
-              <span className="text-white">
-                IDR {shipping.toLocaleString()}
-              </span>
+              <span className="text-white">IDR {shipping.toLocaleString()}</span>
             </div>
             <div className="flex justify-between font-bold">
-              <span className="text-white">Total (Tax. incl)</span>
+              <span className="text-white">Total (Tax incl.)</span>
               <span className="text-white">{total.toLocaleString()}</span>
             </div>
           </div>
+
+          {/* Checkout Button */}
           <button
             className="btn-primary w-full mt-4 bg-labelGreen"
             onClick={handleCheckout}
@@ -253,18 +202,3 @@ const CartPage: React.FC<CartProps> = ({ cartItems: initialCartItems }) => {
 };
 
 export default CartPage;
-
-// Fetch cart data using SSR
-export const getServerSideProps: GetServerSideProps = async () => {
-  const cartItems = [
-    { id: "1", name: "Product Name 1", price: 999999, quantity: 1 },
-    { id: "2", name: "Product Name 2", price: 999999, quantity: 1 },
-    { id: "3", name: "Product Name 3", price: 999999, quantity: 1 },
-  ];
-
-  return {
-    props: {
-      cartItems,
-    },
-  };
-};
