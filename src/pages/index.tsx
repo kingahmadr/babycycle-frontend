@@ -55,6 +55,7 @@ const Home = () => {
             image_url={product.image_url}
             name={product.name}
             price={product.price}
+            stock={product.stock}
           />
         ))}
       </div>
@@ -66,6 +67,7 @@ const Home = () => {
             image_url={product.image_url}
             name={product.name}
             price={product.price}
+            stock={product.stock}
           />
         ))}        
         <div className='w-[240px] h-[291px] flex flex-col gap-around'>
