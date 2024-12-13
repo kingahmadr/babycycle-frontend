@@ -20,6 +20,8 @@ function Index() {
       return discountData;
     }
 
+    console.log(getDiscount(11))
+
     // const getDiscount = (id: number) => {
     //   const { data: discountData } = useFetch<DiscountModel>({
     //     endpoint: `https://api.babycycle.my.id/api/v1/discount/${id}`,
@@ -207,7 +209,7 @@ function Index() {
           </label> */}
         </div>
         <div className='flex flex-wrap justify-end gap-6'>
-        {fetchedData && fetchedData.data.slice(0, 20).map((product, index) => {
+        {fetchedData && fetchedData.data.map((product, index) => {
             const discountData = discounts[product.id]
 
             return (

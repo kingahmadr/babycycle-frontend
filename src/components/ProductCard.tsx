@@ -1,5 +1,6 @@
 import { DiscountModel } from '@/models/Discount'
 import { ProductModel } from '@/models/Product'
+import { finalPrice } from '@/utils/DiscountedPrice';
 import React from 'react'
 
 export interface ProductCardProps extends 
@@ -8,6 +9,8 @@ export interface ProductCardProps extends
   }
 
 const ProductCard:React.FC<ProductCardProps> = ({name, image_url, price, stock, discount}) => {
+
+  const discountedPrice = finalPrice(price,Number(discount?.discount_percentage)||0);
 
   return (
     <div className='w-[240px] h-[291px] flex flex-col relative'>
@@ -34,8 +37,22 @@ const ProductCard:React.FC<ProductCardProps> = ({name, image_url, price, stock, 
       )}
             <div className=' w-full h-[64px] flex flex-col gap-1 items-end text-md'>
                 <span className='uppercase'>{name}</span>
-                <span>IDR {price}</span>
-            </div>
+
+      { stock !== 0 ? (
+
+        <div className='w-full flex justify-end items-center space-x-2'>
+          <span className={discount && discount.is_active? 'line-through text-xs' : 'no-underline'}>IDR {price}</span>
+          { discount && discount.is_active && (
+            <span className="text-dangerRed font-bold">
+              IDR {discountedPrice.toLocaleString()}
+            </span>
+          )}
+        </div>
+      ): (
+        <div></div>
+      )}
+
+      </div>          
     </div>
   )
 }
