@@ -18,8 +18,40 @@ const CartPage: React.FC = () => {
   const shipping = subtotal * 0.1; // 10% of subtotal
   const total = subtotal + shipping;
 
-  const handleCheckout = () => {
-    console.log("Transaction Data:", { subtotal, shipping, total, items: cart });
+  const handleCheckout = async () => {
+    const userAddress = "Jalan Contoh"; //Placeholder
+
+    const checkoutData = cart.map((item) => ({
+      product_id: parseInt(item.id,10),
+      quantity: item.quantity,
+      total_price: item.price * item.quantity,
+      user_address: userAddress,
+      user_id: 22, //Placeholder
+    }));
+
+    console.log(checkoutData, cartContext);
+    console.log("Checkout Data:", JSON.stringify(checkoutData));    
+    
+    try {
+      const response = await fetch("https://api.babycycle.my.id/api/v1/carts", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(checkoutData),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to submit checkout data.");
+      }
+
+      alert("Checkout Successful!");
+
+    } catch (error) {
+      console.error("Checkout Error:", error);
+      alert("Failed to process checkout. Please try again later.");
+    }
+
   };
 
   return (
@@ -55,7 +87,7 @@ const CartPage: React.FC = () => {
                   <div className="flex flex-1 items-center gap-x-4">
                   <Link href={`/product/${item.id}`} passHref>
                       <Image
-                        src="/assets/placeholder.png" // Placeholder image
+                        src="/assets/placeholder.png" 
                         alt="Product Image"
                         width={80}
                         height={80}
@@ -116,7 +148,7 @@ const CartPage: React.FC = () => {
             </div>
 
             <div className="flex py-6 justify-end">
-              <Link href="/">
+              <Link href="/listing">
                 <button className="btn-primary w-30">Continue Shopping</button>
               </Link>
             </div>

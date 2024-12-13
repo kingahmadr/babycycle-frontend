@@ -1,7 +1,7 @@
 import ProductCard from '@/components/ProductCard'
 import { PrimaryButton } from '@/components/PrimaryButton'
 import useFetch from '@/hooks/useFetch'
-import { useEffect, useState } from 'react'
+// import { useEffect, useState } from 'react'
 import { ProductModel } from '@/models/Product'
 import { DataWithCount } from '@/models/DataWithCount'
 
