@@ -4,6 +4,8 @@ import useFetch from '@/hooks/useFetch';
 import { DataWithCount } from '@/models/DataWithCount';
 import { DiscountModel } from '@/models/Discount';
 import { ProductModel } from '@/models/Product';
+import { sortProducts } from '@/utils/SortAvailableProducts';
+import next from 'next';
 import { useEffect, useState } from 'react'
 
 function Index() {
@@ -11,8 +13,8 @@ function Index() {
   const [selectedOption, setSelectedOption] = useState('NEWEST')
   const [isOpen, setIsOpen] = useState(false);
   const [discounts, setDiscounts] = useState<{ [key: number]: DiscountModel | null }>({})
-  const [limit, setLimit] = useState(50); // Limit for pagination
-  const [offset, setOffset] = useState(20); // Offset for pagination
+  const [limit, setLimit] = useState(20)
+  const [offset, setOffset] = useState(0)
   const [sortBy, setSortBy] = useState('newest')
 
     const {data: fetchedData } = useFetch<DataWithCount<ProductModel>>({
@@ -50,6 +52,8 @@ function Index() {
       }
     }, [fetchedData]); 
 
+    const sortedData = fetchedData ? sortProducts(fetchedData.data, sortBy, discounts) : []
+
     const toggleDropdown = () => {
       setIsOpen(true)
     };
@@ -74,6 +78,21 @@ function Index() {
       }
       setSortBy(sortValue)
     }
+
+    const handlePage = (direction: string) => {
+      if (direction === 'next') {
+        setOffset((prev) => prev + limit)
+      } else if (direction === 'prev' && offset > 0) {
+        setOffset((prev) => prev - limit);
+      }
+    }
+
+    const totalPages = fetchedData? Math.ceil(fetchedData.total_count / limit) : 0
+
+    console.log(fetchedData?.data.length)
+
+    const currentPage = Math.floor(offset / limit) + 1;
+    
 
   return (
     <div className='body-width flex'>
@@ -210,8 +229,8 @@ function Index() {
         )}
 
         </div>
-        <div className='flex flex-wrap justify-end gap-6'>
-        {fetchedData && fetchedData.data.map((product, index) => {
+        <div className='flex flex-wrap justify-between gap-6'>
+        {sortedData.map((product, index) => {
             const discountData = discounts[product.id]
 
             return (
@@ -229,11 +248,15 @@ function Index() {
         <div>
           <div className='flex justify-end space-x-6 py-8'>
             <div>
-              <img src='/Polygon_2.png'/>
+              <img src='/Polygon_2.png'
+                onClick={() => handlePage('prev')}
+                className={currentPage === 1 ? 'cursor-not-allowed opacity-20' : ''}/>
             </div>
-            <div>1</div>
+            <div>Showing page {currentPage} from total of {totalPages} pages</div>
             <div>
-              <img src='/Polygon_3.png'/>
+              <img src='/Polygon_3.png'
+                onClick={() => handlePage('next')}
+                className={currentPage === totalPages ? 'cursor-not-allowed opacity-20' : ''}/>
             </div>
           </div>
         </div>
