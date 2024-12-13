@@ -8,27 +8,24 @@ import { useEffect, useState } from 'react'
 
 function Index() {
 
+  const [selectedOption, setSelectedOption] = useState('NEWEST')
+  const [isOpen, setIsOpen] = useState(false);
+  const [discounts, setDiscounts] = useState<{ [key: number]: DiscountModel | null }>({})
+  const [limit, setLimit] = useState(50); // Limit for pagination
+  const [offset, setOffset] = useState(20); // Offset for pagination
+  const [sortBy, setSortBy] = useState('newest')
+
     const {data: fetchedData } = useFetch<DataWithCount<ProductModel>>({
-      endpoint: 'https://api.babycycle.my.id/api/v1/products'
+      endpoint: `https://api.babycycle.my.id/api/v1/products/sorting?limit=${limit}&offset=${offset}&sort_by=${sortBy}`
     })
 
-    const [discounts, setDiscounts] = useState<{ [key: number]: DiscountModel | null }>({})
+    console.log(fetchedData)
 
     const getDiscount = async (id: number) => {
       const response = await fetch(`https://api.babycycle.my.id/api/v1/discount/${id}`)
       const discountData: DiscountModel = await response.json();
       return discountData;
     }
-
-    console.log(getDiscount(11))
-
-    // const getDiscount = (id: number) => {
-    //   const { data: discountData } = useFetch<DiscountModel>({
-    //     endpoint: `https://api.babycycle.my.id/api/v1/discount/${id}`,
-    //   })
-
-    //   return discountData
-    // }
 
     const fetchDiscounts = async (products: ProductModel[]) => {
       const productDiscounts = await Promise.all(
@@ -53,18 +50,30 @@ function Index() {
       }
     }, [fetchedData]); 
 
-
-    const [isOpen, setIsOpen] = useState(false);
     const toggleDropdown = () => {
       setIsOpen(true)
     };
-
-    const [selectedOption, setSelectedOption] = useState('HIGHEST PRICE')
   
     const handleSelect = (option: any) => {
       setSelectedOption(option)
       setIsOpen(false)
-    };
+      let sortValue = '';
+      switch (option) {
+        case 'HIGHEST PRICE':
+          sortValue = 'highest_price'
+          break
+        case 'LOWEST PRICE':
+          sortValue = 'lowest_price'
+          break
+        case 'NEWEST':
+          sortValue = 'newest'
+          break
+        case 'DISCOUNT':
+          sortValue = 'discount'
+          break
+      }
+      setSortBy(sortValue)
+    }
 
   return (
     <div className='body-width flex'>

@@ -13,13 +13,15 @@ interface UseFetchParams {
   method?: HttpMethod
   body?: string
   headers?: Record<string, string>
+  queryParams?: Record<string, string | number | boolean>
 }
 
 const useFetch = <T>({
   endpoint,
   method = 'GET',
   body,
-  headers
+  headers,
+  queryParams
 }: UseFetchParams): UseFetchResult<T> => {
   const [data, setData] = useState<T | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -30,7 +32,11 @@ const useFetch = <T>({
       setLoading(true)
       setError(null)
       try {
-        const response = await fetch(endpoint, {
+        const queryString = queryParams
+          ? '?' + new URLSearchParams(queryParams as Record<string, string>).toString()
+          : ''
+
+        const response = await fetch(endpoint + queryString, {
           method,
           body: body ? JSON.stringify(body) : undefined,
           headers: {
@@ -52,7 +58,7 @@ const useFetch = <T>({
     }
 
     fetchData()
-  }, [endpoint, method, body, headers])
+  }, [endpoint, method, body, headers, queryParams])
 
   return { data, error, loading }
 }
