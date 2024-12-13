@@ -199,14 +199,7 @@ function Index() {
             onClick={() => setIsOpen(false)}
           ></div>
         )}
-          {/* <label className='flex'><span className='text-buttonBlue'>Sort By</span>
-            <select className='w-60 h-8 bg-white text-black  border-black border-2 rounded-none uppercase px-4'>
-              <option className='' value="highestPrice">Highest Price</option>
-              <option className='' value="lowestPrice">Lowest Price</option>
-              <option className='' value="newest">Newest</option>
-              <option className='' value="discount">Discount</option>
-            </select>
-          </label> */}
+
         </div>
         <div className='flex flex-wrap justify-end gap-6'>
         {fetchedData && fetchedData.data.map((product, index) => {
