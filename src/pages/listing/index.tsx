@@ -13,15 +13,24 @@ function Index() {
   const [selectedOption, setSelectedOption] = useState('NEWEST')
   const [isOpen, setIsOpen] = useState(false);
   const [discounts, setDiscounts] = useState<{ [key: number]: DiscountModel | null }>({})
-  const [limit, setLimit] = useState(20)
+  const [limit, setLimit] = useState(50)
   const [offset, setOffset] = useState(0)
   const [sortBy, setSortBy] = useState('newest')
+  const [applyFilter, setApplyFilter] = useState(false)
+
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
 
     const {data: fetchedData } = useFetch<DataWithCount<ProductModel>>({
       endpoint: `https://api.babycycle.my.id/api/v1/products/sorting?limit=${limit}&offset=${offset}&sort_by=${sortBy}`
     })
 
     console.log(fetchedData)
+
+    const {data: filteredData } = useFetch<DataWithCount<ProductModel>>({
+      endpoint: `https://api.babycycle.my.id/api/v1/products/category?limit=${limit}&offset=${offset}&category=${selectedCategories.join(',')}`
+    })
+
+    console.log(filteredData)
 
     const getDiscount = async (id: number) => {
       const response = await fetch(`https://api.babycycle.my.id/api/v1/discount/${id}`)
@@ -52,7 +61,8 @@ function Index() {
       }
     }, [fetchedData]); 
 
-    const sortedData = fetchedData ? sortProducts(fetchedData.data, sortBy, discounts) : []
+    const combinedData = filteredData?.data ? filteredData.data : fetchedData?.data || []
+    const sortedData = sortProducts(combinedData, sortBy)
 
     const toggleDropdown = () => {
       setIsOpen(true)
@@ -72,9 +82,9 @@ function Index() {
         case 'NEWEST':
           sortValue = 'newest'
           break
-        case 'DISCOUNT':
-          sortValue = 'discount'
-          break
+        // case 'DISCOUNT':
+        //   sortValue = 'discount'
+        //   break
       }
       setSortBy(sortValue)
     }
@@ -87,10 +97,11 @@ function Index() {
       }
     }
 
+    const handleCategoryChange = (category: string) => {
+      setSelectedCategories([category])
+    }
+
     const totalPages = fetchedData? Math.ceil(fetchedData.total_count / limit) : 0
-
-    console.log(fetchedData?.data.length)
-
     const currentPage = Math.floor(offset / limit) + 1;
     
 
@@ -102,38 +113,38 @@ function Index() {
         <div className='flex flex-col gap-2 px-3'>
           <div>Product Type</div>
           <div className='flex flex-col gap-1 text-sm'>
+
             <label className='flex gap-2 items-center'>
-              <input type="checkbox"
+              <input type="radio"
                 name="category"
-                value="clothing"/>
+                value="clothing"
+                onChange={() => handleCategoryChange('clothing')}/>
               <span>Clothing</span>
             </label>
             <label className='flex gap-2 items-center'>
-              <input type="checkbox"
+              <input type="radio"
                 name="category"
-                value="furniture"/>
+                value="furniture"
+                onChange={() => handleCategoryChange('furniture')}/>
               <span>furniture</span>
             </label>
             <label className='flex gap-2 items-center'>
-              <input type="checkbox"
+              <input type="radio"
                 name="category"
-                value="stroller_and_carrier"/>
-              <span>stroller & carrier</span>
-            </label>
-            <label className='flex gap-2 items-center'>
-              <input type="checkbox"
-                name="category"
-                value="toys"/>
+                value="toys"
+                onChange={() => handleCategoryChange('toys')}/>
               <span>toys</span>
             </label>
             <label className='flex gap-2 items-center'>
-              <input type="checkbox"
+              <input type="radio"
                 name="category"
-                value="others"/>
+                value="others"
+                onChange={() => handleCategoryChange('others')}/>
               <span>others</span>
             </label>
           </div>
         </div>
+
 
         <div className='flex flex-col gap-2 px-3'>
           <div>warranty</div>
@@ -153,33 +164,9 @@ function Index() {
           </div>
         </div>
 
-        <div className='flex flex-col gap-2 px-3'>
-          <div>Age Category</div>
-          <div className='flex flex-col gap-1 text-sm'>
-            <label className='flex gap-2 items-center'>
-              <input type="checkbox"
-                name="age_category"
-                value="0-2"/>
-              <span>0-2</span>
-            </label>
-            <label className='flex gap-2 items-center'>
-              <input type="checkbox"
-                name="age_category"
-                value="3-5"/>
-              <span>3-5</span>
-            </label>
-            <label className='flex gap-2 items-center'>
-              <input type="checkbox"
-                name="age_category"
-                value="all_ages"/>
-              <span>all ages</span>
-            </label>
-          </div>
-        </div>
-
-        <div className='pt-8'>
+        {/* <div className='pt-8'>
           <PrimaryButton type='button'>Apply</PrimaryButton>
-        </div>
+        </div> */}
 
       </div>
 
@@ -212,10 +199,10 @@ function Index() {
                     onClick={() => handleSelect('NEWEST')}>
                   Newest
                 </li>
-                <li className="px-4 py-2 hover:bg-buttonBlue hover:text-white cursor-pointer"
+                {/* <li className="px-4 py-2 hover:bg-buttonBlue hover:text-white cursor-pointer"
                     onClick={() => handleSelect('DISCOUNT')}>
                   Discount
-                </li>         
+                </li>          */}
               </ul>
             </div>
           </div>
@@ -230,7 +217,7 @@ function Index() {
 
         </div>
         <div className='flex flex-wrap justify-between gap-6'>
-        {sortedData.map((product, index) => {
+        {combinedData.map((product, index) => {
             const discountData = discounts[product.id]
 
             return (

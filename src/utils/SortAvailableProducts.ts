@@ -1,9 +1,8 @@
 // utils/sortProducts.ts
 import { ProductModel } from '@/models/Product';
-import { DiscountModel } from '@/models/Discount';
 
 // Function to sort products, including out-of-stock handling
-export const sortProducts = (products: ProductModel[], sortBy: string, discounts: { [key: number]: DiscountModel | null }) => {
+export const sortProducts = (products: ProductModel[], sortBy: string) => {
   return products
     .sort((a, b) => {
       // Sort out-of-stock products to the end
@@ -18,14 +17,11 @@ export const sortProducts = (products: ProductModel[], sortBy: string, discounts
           return a.price - b.price
         case 'newest':
         return b.id - a.id
-        case 'discount':
-          return 0
         default:
           return 0
       }
     })
     .map((product) => ({
-      ...product,
-      discount: discounts[product.id] || null,
+      ...product
     }));
 };
