@@ -17,8 +17,8 @@ function Index() {
   const [offset, setOffset] = useState(0)
   const [sortBy, setSortBy] = useState('newest')
   const [applyFilter, setApplyFilter] = useState(false)
-
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([])
+  const [selectedWarranty, setSelectedWarranty] = useState<boolean | undefined>(undefined)
 
     const {data: fetchedData } = useFetch<DataWithCount<ProductModel>>({
       endpoint: `https://api.babycycle.my.id/api/v1/products/sorting?limit=${limit}&offset=${offset}&sort_by=${sortBy}`
@@ -27,10 +27,16 @@ function Index() {
     console.log(fetchedData)
 
     const {data: filteredData } = useFetch<DataWithCount<ProductModel>>({
-      endpoint: `https://api.babycycle.my.id/api/v1/products/category?limit=${limit}&offset=${offset}&category=${selectedCategories.join(',')}`
+      endpoint: `https://api.babycycle.my.id/api/v1/products/category?limit=${limit}&offset=${offset}&category=${selectedCategories}`
     })
 
     console.log(filteredData)
+
+    const {data: warrantyData } = useFetch<DataWithCount<ProductModel>>({
+      endpoint: `https://api.babycycle.my.id/api/v1/products/warranty?limit=${limit}&offset=${offset}&is_warranty=${selectedWarranty}`
+    })
+    
+    console.log(warrantyData)
 
     const getDiscount = async (id: number) => {
       const response = await fetch(`https://api.babycycle.my.id/api/v1/discount/${id}`)
@@ -61,7 +67,38 @@ function Index() {
       }
     }, [fetchedData]); 
 
-    const combinedData = filteredData?.data ? filteredData.data : fetchedData?.data || []
+    const filteredByCategory = filteredData?.data || [];
+    const filteredByWarranty = warrantyData?.data || [];
+
+    let combinedData: ProductModel[] = []
+
+      // filter by categories
+      if (selectedCategories.length > 0) {
+        combinedData = filteredByCategory.filter(product => selectedCategories.includes(product.category)
+        )
+      }
+
+      // filter by warranty
+      if (selectedWarranty !== undefined && selectedCategories.length === 0) {
+        combinedData = filteredByWarranty.filter(product => product.is_warranty === selectedWarranty)
+      }
+      
+      // filter by warranty if product in category is empty
+      if (!combinedData && selectedWarranty !== undefined) {
+        combinedData = filteredByWarranty.filter(product => product.is_warranty === selectedWarranty)
+      }
+      
+      // filter by warranty if theres product after filtering by category
+      if (combinedData.length > 0 && selectedWarranty !== undefined) {
+        combinedData = combinedData.filter(product => product.is_warranty === selectedWarranty);
+      }
+      
+      // if no filter applied
+      if (selectedCategories.length === 0 && selectedWarranty === undefined) {
+        combinedData = fetchedData?.data || [];
+      }
+    
+
     const sortedData = sortProducts(combinedData, sortBy)
 
     const toggleDropdown = () => {
@@ -99,6 +136,10 @@ function Index() {
 
     const handleCategoryChange = (category: string) => {
       setSelectedCategories([category])
+    }
+
+    const handleWarrantyChange = (warranty: boolean) => {
+      setSelectedWarranty(warranty)
     }
 
     const totalPages = fetchedData? Math.ceil(fetchedData.total_count / limit) : 0
@@ -152,13 +193,17 @@ function Index() {
             <label className='flex gap-2 items-center'>
               <input type="radio"
                 name="warranty"
-                value="yes"/>
+                value='true'
+                checked={selectedWarranty === true}
+                onChange={() => handleWarrantyChange(true)}/>
               <span>yes</span>
             </label>
             <label className='flex gap-2 items-center'>
               <input type="radio"
                 name="warranty"
-                value="no"/>
+                value="false"
+                checked={selectedWarranty === false}
+                onChange={() => handleWarrantyChange(false)}/>
               <span>no</span>
             </label>
           </div>
@@ -217,20 +262,26 @@ function Index() {
 
         </div>
         <div className='flex flex-wrap justify-between gap-6'>
-        {combinedData.map((product, index) => {
-            const discountData = discounts[product.id]
+        {sortedData && sortedData.length > 0 ? (
+          sortedData.map((product, index) => {
+              const discountData = discounts[product.id]
 
-            return (
-              <ProductCard
-                key={index}
-                image_url={product.image_url}
-                name={product.name}
-                price={product.price}
-                stock={product.stock}
-                discount={discountData}
-              />
-            );
-          })}
+              return (
+                <ProductCard
+                  key={index}
+                  image_url={product.image_url}
+                  name={product.name}
+                  price={product.price}
+                  stock={product.stock}
+                  discount={discountData}
+                />
+              )
+            })
+          ) : (
+            <div className='w-full h-[500px] flex justify-center items-center'>
+              <span>No products available</span>
+            </div>
+          )}
         </div>
         <div>
           <div className='flex justify-end space-x-6 py-8'>
