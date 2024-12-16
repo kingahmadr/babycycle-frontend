@@ -84,13 +84,13 @@ const Navbar: React.FC = () => {
                   <>
                     <Link
                       href='/login'
-                      className='block px-4 py-2 hover:bg-babyBlue'
+                      className='block px-4 py-2 uppercase hover:bg-textBlue hover:text-white'
                     >
                       Login
                     </Link>
                     <Link
                       href='/register'
-                      className='block px-4 py-2 hover:bg-babyBlue'
+                      className='block px-4 py-2 uppercase hover:bg-textBlue hover:text-white'
                     >
                       Register
                     </Link>
@@ -139,34 +139,34 @@ const Navbar: React.FC = () => {
               >
                 Shop by Category
               </span>
-              <div className='absolute hidden group-hover:block bg-white shadow-lg rounded-lg'>
+              <div className='absolute hidden group-hover:block bg-white'>
                 <Link
                   href='/listing'
-                  className='block px-4 py-2 hover:bg-babyBlue'
+                  className='block px-4 py-2 uppercase hover:bg-textBlue hover:text-white'
                 >
                   All Products
                 </Link>
                 <Link
                   href='/category/clothing'
-                  className='block px-4 py-2 hover:bg-babyBlue'
+                  className='block px-4 py-2 uppercase hover:bg-textBlue hover:text-white'
                 >
                   Clothing
                 </Link>
                 <Link
                   href='/category/furniture'
-                  className='block px-4 py-2 hover:bg-babyBlue'
+                  className='block px-4 py-2 uppercase hover:bg-textBlue hover:text-white'
                 >
                   Furniture
                 </Link>
                 <Link
                   href='/category/stroller'
-                  className='block px-4 py-2 hover:bg-babyBlue'
+                  className='block px-4 py-2 uppercase hover:bg-textBlue hover:text-white'
                 >
                   Stroller & Carrier
                 </Link>
                 <Link
                   href='/category/toys'
-                  className='block px-4 py-2 hover:bg-babyBlue'
+                  className='block px-4 py-2 uppercase hover:bg-textBlue hover:text-white'
                 >
                   Toys
                 </Link>

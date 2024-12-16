@@ -1,17 +1,19 @@
-import '../styles/globals.css' // Ensure your styles are imported
-import type { AppProps } from 'next/app'
-import Layout from '@/layouts'
-import { CartProvider } from "@/context/CartContext";
+import '../styles/globals.css';
+import type { AppProps } from 'next/app';
+import { CartProvider } from '@/context/CartContext';
+import { AuthProvider } from '@/context/AuthContext';
+import Layout from '@/layouts';
 
 const MyApp = ({ Component, pageProps }: AppProps) => {
   return (
-    <Layout>
+    <AuthProvider>
       <CartProvider>
-      <Component {...pageProps} />
+        <Layout>
+          <Component {...pageProps} />
+        </Layout>
       </CartProvider>
-    </Layout>
-  )
-}
+    </AuthProvider>
+  );
+};
 
-export default MyApp
-
+export default MyApp;

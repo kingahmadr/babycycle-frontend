@@ -65,7 +65,7 @@ const SellerDashboard: React.FC = () => {
   };
 
   return (
-    <div className="bg-white min-h-screen p-8">
+    <div className="bg-white min-h-screen min-w-[1440] p-8">
       {/* Title */}
       <h1 className="text-heading-lg font-bold mb-6">Seller Dashboard</h1>
 
