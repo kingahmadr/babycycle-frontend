@@ -2,10 +2,11 @@ import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import SearchInput from './SearchInput'
-
+import { useAuth } from '@/context/AuthContext'
 
 const Navbar: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false)
+  const { isAuthenticated, logout } = useAuth()
 
   useEffect(() => {
     const handleScroll = () => {
@@ -64,18 +65,37 @@ const Navbar: React.FC = () => {
                 />
               </button>
               <div className='absolute hidden group-hover:block bg-white mt-(-2) shadow-lg rounded-lg'>
-                <Link
-                  href='/login'
-                  className='block px-4 py-2 hover:bg-babyBlue'
-                >
-                  Login
-                </Link>
-                <Link
-                  href='/register'
-                  className='block px-4 py-2 hover:bg-babyBlue'
-                >
-                  Register
-                </Link>
+                {isAuthenticated ? (
+                  <>
+                    <Link
+                      href='/dashboard'
+                      className='block px-4 py-2 hover:bg-babyBlue'
+                    >
+                      Dashboard
+                    </Link>
+                    <button
+                      onClick={logout}
+                      className='text-left w-full block px-4 py-2 hover:bg-babyBlue'
+                    >
+                      Logout
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <Link
+                      href='/login'
+                      className='block px-4 py-2 hover:bg-babyBlue'
+                    >
+                      Login
+                    </Link>
+                    <Link
+                      href='/register'
+                      className='block px-4 py-2 hover:bg-babyBlue'
+                    >
+                      Register
+                    </Link>
+                  </>
+                )}
               </div>
             </div>
 
