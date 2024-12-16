@@ -10,15 +10,13 @@ import { finalPrice } from "@/utils/DiscountedPrice";
 interface ProductDetailsPageProps {
   product: ProductModel;
   discount: DiscountModel | null;
+  discountedPrice: number;
 }
 
-const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({ product,discount }) => {
+const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({ product,discount, discountedPrice }) => {
   const cartContext = useContext(CartContext);
   const router = useRouter();
   
-
-  const discountedPrice = finalPrice(product.price,Number(discount?.discount_percentage)||0);
-
   if (!cartContext) {
     throw new Error("CartContext is not available. Ensure CartProvider wraps the component.");
   }
@@ -175,10 +173,12 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     // const discount = await response_discount.json();
     const discount = response_discount.ok ? await response_discount.json() : null;
     console.log(product,discount);
+    const discountedPrice = finalPrice(product.price,Number(discount?.discount_percentage)||0);
+
 
     return {
       props: {
-        product, discount,
+        product, discount, discountedPrice
       },
     };
   } catch (error) {
