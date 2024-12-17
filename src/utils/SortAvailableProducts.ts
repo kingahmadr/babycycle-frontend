@@ -1,15 +1,8 @@
-// utils/sortProducts.ts
 import { ProductModel } from '@/models/Product';
 
-// Function to sort products, including out-of-stock handling
 export const sortProducts = (products: ProductModel[], sortBy: string) => {
   return products
     .sort((a, b) => {
-      // Sort out-of-stock products to the end
-      if (a.stock === 0 && b.stock !== 0) return 1;
-      if (a.stock !== 0 && b.stock === 0) return -1;
-
-      // If both are in stock or both out of stock, apply the sorting logic
       switch (sortBy) {
         case 'highest_price':
           return b.price - a.price
@@ -23,5 +16,5 @@ export const sortProducts = (products: ProductModel[], sortBy: string) => {
     })
     .map((product) => ({
       ...product
-    }));
-};
+    }))
+}

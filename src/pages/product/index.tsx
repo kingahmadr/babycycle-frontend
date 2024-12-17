@@ -1,5 +1,6 @@
 import { PrimaryButton } from '@/components/PrimaryButton';
 import ProductCard from '@/components/ProductCard'
+import Spinner from '@/components/Spinner';
 import useFetch from '@/hooks/useFetch';
 import { DataWithCount } from '@/models/DataWithCount';
 import { DiscountModel } from '@/models/Discount';
@@ -13,12 +14,12 @@ const ProductListing = () => {
   const [selectedOption, setSelectedOption] = useState('NEWEST')
   const [isOpen, setIsOpen] = useState(false);
   const [discounts, setDiscounts] = useState<{ [key: number]: DiscountModel | null }>({})
-  const [limit, setLimit] = useState(50)
+  const [limit, setLimit] = useState(20)
   const [offset, setOffset] = useState(0)
   const [sortBy, setSortBy] = useState('newest')
-  const [applyFilter, setApplyFilter] = useState(false)
   const [selectedCategories, setSelectedCategories] = useState<string[]>([])
   const [selectedWarranty, setSelectedWarranty] = useState<boolean | undefined>(undefined)
+  const [loading, setLoading] = useState(true)
 
     const {data: fetchedData } = useFetch<DataWithCount<ProductModel>>({
       endpoint: `https://api.babycycle.my.id/api/v1/products/sorting?limit=${limit}&offset=${offset}&sort_by=${sortBy}`
@@ -63,7 +64,8 @@ const ProductListing = () => {
 
     useEffect(() => {
       if (fetchedData?.data) {
-        fetchDiscounts(fetchedData.data);
+        fetchDiscounts(fetchedData.data)
+        setLoading(false)
       }
     }, [fetchedData]); 
 
@@ -262,27 +264,34 @@ const ProductListing = () => {
 
         </div>
         <div className='flex flex-wrap justify-between gap-6'>
-        {sortedData && sortedData.length > 0 ? (
-          sortedData.map((product, index) => {
-              const discountData = discounts[product.id]
-
-              return (
-                <ProductCard
-                  id={product.id}
-                  key={index}
-                  image_url={product.image_url}
-                  name={product.name}
-                  price={product.price}
-                  stock={product.stock}
-                  discount={discountData}
-                />
-              )
-            })
-          ) : (
-            <div className='w-full h-[500px] flex justify-center items-center'>
-              <span>No products available</span>
+          {loading ? (
+            <div className='w-full h-56 flex justify-center items-center'>
+                <Spinner />
             </div>
-          )}
+          ) : ( 
+            sortedData && sortedData.length > 0 ? (
+              sortedData.map((product, index) => {
+                  const discountData = discounts[product.id]
+
+                  return (
+                    <ProductCard
+                      id={product.id}
+                      key={index}
+                      image_url={product.image_url}
+                      name={product.name}
+                      price={product.price}
+                      stock={product.stock}
+                      discount={discountData}
+                    />
+                  )
+                })
+              ) : (
+                <div className='w-full h-[500px] flex justify-center items-center'>
+                  <span>No products available</span>
+                </div>
+              )
+            )}
+          
         </div>
         <div>
           <div className='flex justify-end space-x-6 py-8'>
