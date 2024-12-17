@@ -8,7 +8,7 @@ import { sortProducts } from '@/utils/SortAvailableProducts';
 import next from 'next';
 import { useEffect, useState } from 'react'
 
-function Index() {
+const ProductListing = () => {
 
   const [selectedOption, setSelectedOption] = useState('NEWEST')
   const [isOpen, setIsOpen] = useState(false);
@@ -268,6 +268,7 @@ function Index() {
 
               return (
                 <ProductCard
+                  id={product.id}
                   key={index}
                   image_url={product.image_url}
                   name={product.name}
@@ -303,4 +304,4 @@ function Index() {
   )
 }
 
-export default Index
+export default ProductListing
