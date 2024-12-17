@@ -29,7 +29,10 @@ const ListingForm: React.FC = () => {
   };
 
   const handleImageRemove = (index: number) => {
-    setImages((prev) => prev.filter((_, i) => i !== index));
+    const confirmation = confirm("Are you sure you want to delete this image?");
+    if (confirmation) {
+      setImages((prev) => prev.filter((_, i) => i !== index));
+    }
   };
 
   const handlePromptUpload = () => {
@@ -92,28 +95,28 @@ const ListingForm: React.FC = () => {
             onClick={handlePromptUpload}
           >
             {images[0] ? (
-              <img
-                src={URL.createObjectURL(images[0])}
-                alt="Uploaded"
-                className="w-full h-full object-cover rounded-lg"
-              />
+              <div className="relative w-full h-full">
+                <img
+                  src={URL.createObjectURL(images[0])}
+                  alt="Uploaded"
+                  className="w-full h-full object-cover rounded-lg"
+                />
+                <button
+                  className="absolute bottom-2 right-2 bg-red-500 text-white p-1 rounded-full hover:bg-red-600"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleImageRemove(0);
+                  }}
+                >
+                  <img
+                    src="/assets/remove.png"
+                    alt="Remove"
+                    className="w-6 h-6"
+                  />
+                </button>
+              </div>
             ) : (
               <p className="text-gray-500 text-lg">Select photos</p>
-            )}
-            {images[0] && (
-              <button
-                className="absolute bottom-2 right-2 hidden hover:block"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleImageRemove(0);
-                }}
-              >
-                <img
-                  src="/assets/remove.png"
-                  alt="Remove"
-                  className="w-6 h-6"
-                />
-              </button>
             )}
           </div>
 
@@ -126,28 +129,28 @@ const ListingForm: React.FC = () => {
                 onClick={handlePromptUpload}
               >
                 {images[index + 1] ? (
-                  <img
-                    src={URL.createObjectURL(images[index + 1])}
-                    alt="Uploaded"
-                    className="w-full h-full object-cover rounded-lg"
-                  />
+                  <div className="relative w-full h-full">
+                    <img
+                      src={URL.createObjectURL(images[index + 1])}
+                      alt="Uploaded"
+                      className="w-full h-full object-cover rounded-lg"
+                    />
+                    <button
+                      className="absolute bottom-2 right-2 bg-red-500 text-white p-1 rounded-full hover:bg-red-600"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleImageRemove(index + 1);
+                      }}
+                    >
+                      <img
+                        src="/assets/remove.png"
+                        alt="Remove"
+                        className="w-4 h-4"
+                      />
+                    </button>
+                  </div>
                 ) : (
                   <p className="text-gray-500 text-sm">+</p>
-                )}
-                {images[index + 1] && (
-                  <button
-                    className="absolute bottom-2 right-2 hidden hover:block"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleImageRemove(index + 1);
-                    }}
-                  >
-                    <img
-                      src="/assets/remove.png"
-                      alt="Remove"
-                      className="w-4 h-4"
-                    />
-                  </button>
                 )}
               </div>
             ))}
@@ -357,37 +360,37 @@ const ListingForm: React.FC = () => {
 
             {/* Terms */}
             <div className="flex items-center">
-              <label className="w-1/4"></label>
-              <div>
-                <label>
-                  <input
-                    type="checkbox"
-                    checked={termsChecked}
-                    onChange={(e) => setTermsChecked(e.target.checked)}
-                  />{" "}
-                  I have read the <a href="#" className="text-textBlue">Terms and Agreements policy</a>
-                </label>
-              </div>
+              <input
+                type="checkbox"
+                checked={termsChecked}
+                onChange={(e) => setTermsChecked(e.target.checked)}
+                className="mr-2"
+              />
+              <label>
+                I have read the{" "}
+                <a href="#" className="text-textBlue">
+                  Terms and Agreements policy
+                </a>
+              </label>
             </div>
 
             {/* Declaration */}
             <div className="flex items-center">
-              <label className="w-1/4"></label>
-              <div>
-                <label>
-                  <input
-                    type="checkbox"
-                    checked={declarationChecked}
-                    onChange={(e) => setDeclarationChecked(e.target.checked)}
-                  />{" "}
-                  I hereby declare that all information provided is accurate and valid.
-                </label>
-              </div>
+              <input
+                type="checkbox"
+                checked={declarationChecked}
+                onChange={(e) => setDeclarationChecked(e.target.checked)}
+                className="mr-2"
+              />
+              <label>
+                I hereby declare that all information provided is accurate and
+                valid.
+              </label>
             </div>
           </div>
 
-         {/* Submit Button */}
-         <div className="flex justify-center mt-6">
+          {/* Submit Button */}
+          <div className="flex justify-center mt-6">
             <button
               onClick={handleSubmit}
               className="bg-textBlue text-white px-6 py-2 rounded-md"

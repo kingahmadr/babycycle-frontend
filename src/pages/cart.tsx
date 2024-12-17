@@ -1,44 +1,65 @@
-import { useContext, useState } from "react";
+import { useContext, useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { CartContext } from "@/context/CartContext";
+import { useAuth } from "@/context/AuthContext";
 
 const CartPage: React.FC = () => {
   const cartContext = useContext(CartContext);
+  const { user } = useAuth();
 
   if (!cartContext) {
     throw new Error("CartContext is not available. Ensure CartProvider wraps the component.");
   }
 
-  const { cart, removeFromCart, increaseQuantity, decreaseQuantity } = cartContext;
-
+  const { cart, removeFromCart, increaseQuantity, decreaseQuantity, clearCart } = cartContext;
+  const [selectedAddress, setSelectedAddress] = useState<any>(null);
   const [selectedCardType, setSelectedCardType] = useState<string | null>(null);
 
   const subtotal = cart.reduce((total, item) => total + item.price * item.quantity, 0);
   const shipping = subtotal * 0.1; // 10% of subtotal
   const total = subtotal + shipping;
 
+  // Fetch selected address from localStorage or use fallback values
+  useEffect(() => {
+    const addressFromStorage = JSON.parse(localStorage.getItem("selectedAddress") || "{}");
+    if (addressFromStorage?.address) {
+      setSelectedAddress(addressFromStorage);
+    } else if (user?.address) {
+      // Use user's address from the AuthContext as fallback
+      setSelectedAddress({
+        name: user.username || "Guest",
+        phone: user.phone || "No phone number available",
+        address: user.address || "No address available",
+      });
+    } else {
+      // Default placeholder when no data is available
+      setSelectedAddress({
+        name: "Guest",
+        phone: "No phone number available",
+        address: "No address available",
+      });
+    }
+  }, [user]);
+
   const handleCheckout = async () => {
-    const userAddress = "Jalan Contoh"; //Placeholder
+    if (!user) {
+      alert("You must be logged in to checkout.");
+      return;
+    }
 
     const checkoutData = cart.map((item) => ({
-      product_id: parseInt(item.id,10),
+      product_id: parseInt(item.id, 10),
       quantity: item.quantity,
       total_price: item.price * item.quantity,
-      user_address: userAddress,
-      user_id: 22, //Placeholder
+      user_address: selectedAddress.address || "Unknown address",
+      user_id: user.id,
     }));
 
-    console.log(checkoutData, cartContext);
-    console.log("Checkout Data:", JSON.stringify(checkoutData));    
-    
     try {
       const response = await fetch("https://api.babycycle.my.id/api/v1/carts", {
         method: "POST",
-
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(checkoutData),
       });
 
@@ -47,12 +68,11 @@ const CartPage: React.FC = () => {
       }
 
       alert("Checkout Successful!");
-
+      clearCart();
     } catch (error) {
       console.error("Checkout Error:", error);
       alert("Failed to process checkout. Please try again later.");
     }
-
   };
 
   return (
@@ -63,11 +83,9 @@ const CartPage: React.FC = () => {
           {/* Address Section */}
           <div className="bg-white p-6 rounded-lg shadow-md flex flex-col justify-between">
             <div>
-              <p className="text-body-sm font-bold">Samuel Indra W.</p>
-              <p className="text-body-sm">08567425627</p>
-              <p className="text-body-sm">
-                Gang Masjid Jami Al Huda, Lewinutug, Kec. Citeureup, Kabupaten Bogor, Jawa Barat
-              </p>
+              <p className="text-body-sm font-bold">{selectedAddress?.name}</p>
+              <p className="text-body-sm">{selectedAddress?.phone}</p>
+              <p className="text-body-sm">{selectedAddress?.address}</p>
             </div>
             <div className="flex justify-end">
               <Link href="/ChangeAddress">
@@ -76,8 +94,8 @@ const CartPage: React.FC = () => {
             </div>
           </div>
 
-          {/* Product List */}
-          <div className="flex flex-col justify-between">
+            {/* Product List */}
+            <div className="flex flex-col justify-between">
             <div className="flex-1 space-y-4">
               {cart.map((item) => (
                 <div

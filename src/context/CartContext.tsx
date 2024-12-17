@@ -13,6 +13,7 @@ interface CartContextProps {
   removeFromCart: (id: string) => void;
   increaseQuantity: (id: string) => void;
   decreaseQuantity: (id: string) => void;
+  clearCart: () => void; // Added clearCart to the context
 }
 
 export const CartContext = createContext<CartContextProps | undefined>(
@@ -33,6 +34,7 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     localStorage.setItem("cart", JSON.stringify(cart));
   }, [cart]);
 
+  // Add a new item to the cart or update its quantity
   const addToCart = (item: CartItem) => {
     setCart((prevCart) => {
       const existingItem = prevCart.find((cartItem) => cartItem.id === item.id);
@@ -47,10 +49,12 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     });
   };
 
+  // Remove an item from the cart
   const removeFromCart = (id: string) => {
     setCart((prevCart) => prevCart.filter((cartItem) => cartItem.id !== id));
   };
 
+  // Increase the quantity of an item in the cart
   const increaseQuantity = (id: string) => {
     setCart((prevCart) =>
       prevCart.map((cartItem) =>
@@ -61,6 +65,7 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     );
   };
 
+  // Decrease the quantity of an item in the cart
   const decreaseQuantity = (id: string) => {
     setCart((prevCart) =>
       prevCart.map((cartItem) =>
@@ -71,9 +76,22 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     );
   };
 
+  // Clear the cart and remove it from localStorage
+  const clearCart = () => {
+    setCart([]);
+    localStorage.removeItem("cart");
+  };
+
   return (
     <CartContext.Provider
-      value={{ cart, addToCart, removeFromCart, increaseQuantity, decreaseQuantity }}
+      value={{
+        cart,
+        addToCart,
+        removeFromCart,
+        increaseQuantity,
+        decreaseQuantity,
+        clearCart, // Exposed clearCart
+      }}
     >
       {children}
     </CartContext.Provider>
