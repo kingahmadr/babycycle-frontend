@@ -70,11 +70,15 @@ const ChangeAddress: React.FC = () => {
     }
   };
 
-  return (
-    <div className="p-6 bg-babyBlue min-h-screen min-w-[1440]">
-      <h1 className="text-heading-lg font-bold mb-6">Change Address</h1>
 
-      <div className="space-y-4">
+
+  return (
+    <div className="bg-babyBlue flex items-center justify-center min-h-screen w-full">
+    <div className="p-6 w-full max-w-[1200px] space-y-4">
+
+      <h1 className="text-heading-xl font-bold mb-6">Change Address</h1>
+
+      <div className="w-[1200] space-y-4">
         {addresses.map((address) => (
           <div
             key={address.id}
@@ -111,6 +115,7 @@ const ChangeAddress: React.FC = () => {
               </Link>
             </div>
 
+      </div>
       </div>
 
       {/* Edit Modal */}

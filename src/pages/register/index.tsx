@@ -21,13 +21,6 @@ export default function Register() {
   const [loading, setLoading] = useState<boolean>(false)
   const [error, setError] = useState<string | null>(null)
 
-  // Using useFetch to submit the form data
-  // const { data, error } = useFetch({
-  //   endpoint: 'https://api.babycycle.my.id/api/v1/users/register',
-  //   method: 'POST',
-  //   body: form
-  // })
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
@@ -43,7 +36,7 @@ export default function Register() {
     }
     if (!validatePassword(form.password)) {
       setError(
-        'Password must be at least 8 characters long and include at least a number.'
+        'Password must be at least 8 characters long, include an uppercase letter, a number, and a special character.'
       )
       return
     }
@@ -61,7 +54,8 @@ export default function Register() {
       })
 
       if (!response.ok) {
-        throw new Error(`Error: ${response.status} ${response.statusText}`)
+        const responseJson = await response.json()
+        throw new Error(responseJson.error)
       }
 
       setMessage('User registered successfully!')
@@ -113,7 +107,7 @@ export default function Register() {
             </button>
           </form>
           {error && <p className='text-red-500 text-sm mb-4'>{error}</p>}
-          {message && <p className='text-center mt-4 text-sm'>{message}</p>}
+          {message && <p className='text-center mt-4 text-sm text-red-500'>{message}</p>}
           <p className='italic text-sm mt-4'>
             Already registered?{' '}
             <Link href='/login' className='text-buttonBlue'>

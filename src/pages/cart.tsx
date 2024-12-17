@@ -44,10 +44,10 @@ const CartPage: React.FC = () => {
   }, [user]);
 
   const handleCheckout = async () => {
-    if (!user) {
-      alert("You must be logged in to checkout.");
-      return;
-    }
+    // if (!user) {
+    //   alert("You must be logged in to checkout.");
+    //   return;
+    // }
 
     if (paymentMethod === "bank_transfer" && !bankTransferConfirmed) {
       alert("Please confirm that you have transferred successfully.");
@@ -66,7 +66,7 @@ const CartPage: React.FC = () => {
       quantity: item.quantity,
       total_price: item.price * item.quantity,
       user_address: selectedAddress.address || "Unknown address",
-      user_id: user.id,
+      user_id: 22,
     }));
     console.log("Checkout Data:", checkoutData);
     try {
@@ -83,7 +83,7 @@ const CartPage: React.FC = () => {
       // Submit Checkout Data
       const checkoutPayload = {
         checkout_id: checkoutId,
-        user_id: user.id,
+        user_id: 22,
         total_price: total,
         payment_method: paymentMethod,
         // ...(paymentMethod === "e_wallet" && eWalletDetails),
@@ -112,7 +112,7 @@ const CartPage: React.FC = () => {
 
 
   return (
-    <div className="bg-babyBlue min-h-screen min-w-[1440] flex flex-col">
+    <div className="bg-babyBlue min-h-screen w-full flex flex-col">
       <main className="flex-1 flex p-20 space-x-20">
        
         {/* Left Section */}
