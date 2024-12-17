@@ -46,9 +46,22 @@ const config: Config = {
       spacing: {
         buttonPadding: '12px 32px', // Padding for buttons
       },
+      keyframes: {
+        spin: {
+          to: { transform: 'rotate(360deg)' }
+        },
+        'linear-progress': {
+          '0%': { width: '0%' },
+          '100%': { width: '100%' }
+        }
+      }
     },
+    animation: {
+      spin: 'spin 1s linear infinite',
+      'linear-progress': 'linear-progress 2s linear infinite'
+    }
   },
-  plugins: [],
-};
+  plugins: []
+}
 
 export default config;
