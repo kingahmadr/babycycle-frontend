@@ -49,7 +49,8 @@ export default function EmailVerification() {
         })
 
         if (!response.ok) {
-          throw new Error(`Error: ${response.status} ${response.statusText}`)
+          const responseJson = await response.json()
+          throw new Error(responseJson.error)
         }
 
         setMessage('OTP sent to your email. Please check your inbox.')
@@ -68,7 +69,8 @@ export default function EmailVerification() {
         })
 
         if (!response.ok) {
-          throw new Error(`Error: ${response.status} ${response.statusText}`)
+          const responseJson = await response.json()
+          throw new Error(responseJson.message)
         }
 
         setMessage('Email verified successfully! You can now log in.')

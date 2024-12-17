@@ -1,77 +1,118 @@
-import { useState, FormEvent } from 'react';
+import { API_FORGOT_PASSWORD } from '@/constants/apis';
+import { useSearchParams } from 'next/navigation';
+import { useState, useEffect } from 'react';
 
 export default function ForgotPassword() {
-  const [email, setEmail] = useState<string>(''); // Email state with type
-  const [message, setMessage] = useState<string>(''); // Message state with type
-  const [loading, setLoading] = useState<boolean>(false); // Loading state with type
-  const [error, setError] = useState<Error | null>(null); // Error state with type
-
-  const handleForgotPassword = async (e: FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-
-    // Validate email
-    if (!email || !email.includes('@')) {
-      setMessage('Please enter a valid email address.');
-      setLoading(false);
-      return;
-    }
-
-    try {
-      const response = await fetch('https://api.babycycle.my.id/api/v1/users/forgot-password', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to send reset email');
+    const searchParams = useSearchParams()
+    const emailFromQuery = searchParams.get('email') || ''
+    const [getURL, setGetURL] = useState<string | null>(null)
+  
+    const [form, setForm] = useState({
+      email: emailFromQuery
+    })
+    const [isSuccess, setIsSuccess] = useState(false)
+  
+    const [message, setMessage] = useState<string | null>(null)
+    const [loading, setLoading] = useState<boolean>(false)
+  
+    // Effect to set step 2 if email exists in the query params
+    useEffect(() => {
+      if (emailFromQuery) {
+        // getResetURL()
+        setForm((prevForm) => ({ ...prevForm, email: emailFromQuery }))
       }
-
-      if (response.headers.get('Content-Type')?.includes('application/json')) {
-        const data = await response.json();
-        setMessage(data.message || 'Reset email sent successfully!');
-      } else {
-        setMessage('Password reset request sent, please check your email.');
-      }
-      setError(null); // Clear any previous errors
-    } catch (err: any) {
-      setError(err); // Store the error in state
-      setMessage(err.message || 'An error occurred');
-    } finally {
-      setLoading(false);
+    }, [emailFromQuery])
+    
+    // Handle input change
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      const { name, value } = e.target
+      setForm((prevForm) => ({ ...prevForm, [name]: value }))
     }
-  };
+  
+    const handleSubmit = async (e: React.FormEvent) => {
+      e.preventDefault()
+      setLoading(true)
+      setMessage(null)
+  
+      try {
+        let response
+     
+          // Send OTP request
+          response = await fetch(API_FORGOT_PASSWORD, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ email: form.email })
+          })
+  
+          if (!response.ok) {
+            const responseJson = await response.json()
+            throw new Error(responseJson.error)
+          }
 
-  return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-      <div className="bg-white p-6 rounded shadow-md w-full max-w-md">
-        <h1 className="text-xl font-semibold mb-4">Forgot Password</h1>
-        <p className="text-sm text-gray-600 mb-6">
-          Enter your email address to receive a password reset link.
-        </p>
-        <form onSubmit={handleForgotPassword}>
-          <input
-            type="email"
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            className="w-full p-3 border rounded mb-4"
-          />
-          <button
-            type="submit"
-            className="w-full bg-blue-500 text-white py-2 rounded"
-            disabled={loading}
-          >
-            {loading ? 'Sending...' : 'Send Reset Email'}
-          </button>
-        </form>
-        {message && <p className="text-center mt-4 text-sm text-gray-600">{message}</p>}
-        {error && <p className="text-center mt-4 text-sm text-red-600">Error: {error.message}</p>}
+        setMessage('Reset password link sent to your email.');
+        setIsSuccess(true)
+
+      } catch (error) {
+        setMessage(`An error occurred: ${error}`)
+      } finally {
+        setLoading(false)
+      }
+    }
+  
+    return (
+      <div className='w-full h-[calc(100vh-479px)] bg-gray-100 flex items-center justify-center'>
+        <div className='w-0 lg:w-1/2'></div>
+        <div className='p-6 rounded w-full lg:w-1/2 max-w-md'>
+          {isSuccess ? (
+            <>
+              <h1 className='text-4xl font-medium text-green-600 mb-4 tracking-widest'>
+                SUCCESS!
+              </h1>
+              <p className='text-sm font-medium text-gray-700 mb-4 tracking-widest'>
+                Please check your email for the reset URL.
+              </p>
+              <button
+                onClick={() => (window.location.href = '/login')}
+                className='w-full bg-buttonBlue hover:bg-textBlue text-white py-2 rounded transition-all duration-300'
+              >
+                Go to Login
+              </button>
+            </>
+          ) : (
+            <>
+              <h1 className='text-4xl font-medium text-textBlue mb-4 tracking-widest'>
+                INPUT <br /> YOUR EMAIL
+              </h1>
+              <p className='text-sm font-medium text-textBlue mb-4 tracking-widest'>
+                A reset link will be sent to your email.
+              </p>
+              <form onSubmit={handleSubmit}>
+                <input
+                  type='email'
+                  name='email'
+                  placeholder='Email'
+                  value={form.email}
+                  onChange={handleChange}
+                  required
+                  className='w-full p-3 border mb-4 focus:ring-2 focus:ring-buttonBlue focus:outline-none'
+                />
+                <button
+                  type='submit'
+                  className='w-full bg-buttonBlue hover:bg-textBlue text-white py-2 rounded transition-all duration-300'
+                  disabled={loading}
+                >
+                  {loading ? 'Loading...' : 'Send Reset Link'}
+                </button>
+              </form>
+              {message && (
+                <p className='text-center mt-4 text-sm text-red-500'>{message}</p>
+              )}
+            </>
+          )}
+        </div>
       </div>
-    </div>
-  );
+    )
 }
+
