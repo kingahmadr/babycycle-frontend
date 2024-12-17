@@ -1,17 +1,38 @@
-import '../styles/globals.css' // Ensure your styles are imported
+import '../styles/globals.css'
 import type { AppProps } from 'next/app'
 import Layout from '@/layouts'
-import { CartProvider } from "@/context/CartContext";
+import { AuthProvider } from '@/context/AuthContext'
+import { CartProvider } from '@/context/CartContext'
+import Head from 'next/head'
+import { useRouter } from 'next/router'
+import { getPageRouteTitle } from '@/utils/getPageRouteTitle'
+import AuthGuard from '@/components/AuthGuard'
+import { PROTECTED_ROUTES } from '@/constants/pages'
 
 const MyApp = ({ Component, pageProps }: AppProps) => {
+  const router = useRouter()
+  const dynamicTitle = getPageRouteTitle('Baby Cycle', router.pathname)
+
+  const isProtected = PROTECTED_ROUTES.includes(router.pathname)
+
   return (
-    <Layout>
+    <AuthProvider>
       <CartProvider>
-      <Component {...pageProps} />
+        <Layout>
+          <Head>
+            <title>{dynamicTitle}</title>
+          </Head>
+          {isProtected ? (
+            <AuthGuard>
+              <Component {...pageProps} />
+            </AuthGuard>
+          ) : (
+            <Component {...pageProps} />
+          )}
+        </Layout>
       </CartProvider>
-    </Layout>
+    </AuthProvider>
   )
 }
 
 export default MyApp
-

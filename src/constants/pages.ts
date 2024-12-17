@@ -4,3 +4,5 @@ export const PAGE_REGISTER = '/register'
 export const PAGE_LISTING = '/listing'
 
 export const PUBLIC_ROUTES = [PAGE_LANDING, PAGE_LOGIN, PAGE_REGISTER]
+
+export const PROTECTED_ROUTES = [PAGE_LISTING]
