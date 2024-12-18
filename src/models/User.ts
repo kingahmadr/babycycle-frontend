@@ -1,5 +1,9 @@
 export type UserRole = 'USER' | 'ADMIN'
 
+export interface UserData {
+  data: UserModel
+}
+
 export interface UserModel {
   id: number
   username: string
