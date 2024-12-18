@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 export default function ForgotPassword() {
     const searchParams = useSearchParams()
     const emailFromQuery = searchParams.get('email') || ''
-    const [getURL, setGetURL] = useState<string | null>(null)
+    // const [getURL, setGetURL] = useState<string | null>(null)
   
     const [form, setForm] = useState({
       email: emailFromQuery
@@ -35,29 +35,25 @@ export default function ForgotPassword() {
       setMessage(null)
   
       try {
-        let response
-     
-          // Send OTP request
-          response = await fetch(API_FORGOT_PASSWORD, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ email: form.email })
-          })
-  
-          if (!response.ok) {
-            const responseJson = await response.json()
-            throw new Error(responseJson.error)
-          }
-
+        const response = await fetch(API_FORGOT_PASSWORD, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ email: form.email }),
+        });
+      
+        if (!response.ok) {
+          const responseJson = await response.json();
+          throw new Error(responseJson.error);
+        }
+      
         setMessage('Reset password link sent to your email.');
-        setIsSuccess(true)
-
+        setIsSuccess(true);
       } catch (error) {
-        setMessage(`An error occurred: ${error}`)
+        setMessage(`An error occurred: ${error}`);
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
     }
   

@@ -86,9 +86,9 @@ const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({ product,discoun
           </div>
   
           <div className="flex items-center space-x-4 mb-4">
-            <p className="text-body-lg">{product.rating || 4.5} ⭐</p>
+            <p className="text-body-lg">{ 4.5} ⭐</p>
             <p className="text-body-md text-formGray">
-              ({product.reviews || 10} reviews)
+              ({ 10} reviews)
             </p>
           </div>
   
@@ -123,8 +123,8 @@ const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({ product,discoun
         <h2 className="text-heading-md text-center mb-8">Reviews</h2>
         <div className="flex space-x-8 mb-8">
           <div className="w-1/3 bg-gray-100 p-6 flex flex-col items-center">
-            <p className="text-heading-xl">{product.rating || 4.5} ⭐</p>
-            <p className="text-body-md">({product.reviews || 10} reviews)</p>
+            <p className="text-heading-xl">{ 4.5} ⭐</p>
+            <p className="text-body-md">({ 10 } reviews)</p>
           </div>
           <div className="w-2/3 space-y-6">
             {[1, 2, 3].map((i) => (
@@ -132,7 +132,7 @@ const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({ product,discoun
                 <div className="flex items-center space-x-4">
                   <p className="text-body-md text-formGray">{i + 2}/5 ⭐</p>
                   <p className="text-body-md">
-                    "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
+                  &quot;Lorem ipsum dolor sit amet, consectetur adipiscing elit.&quot;
                   </p>
                 </div>
               </div>
