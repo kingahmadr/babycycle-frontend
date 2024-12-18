@@ -16,7 +16,6 @@
   }
 } */
 
-
 /* Global Typography */
 html {
   margin: 0;
@@ -31,15 +30,27 @@ body {
 
   /* display:flex; 
   flex-direction:column; 
+<<<<<<< HEAD
   align-items:center;
   min-height:100vh; */
+=======
+  align-items:center; */
+>>>>>>> b5e787fd838086352e04f715a209154f7c8f9d49
 }
 
-h1, h2, h3, h4, h5, h6, p, span, label {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+span,
+label {
   color: var(--foreground); /* Use dark gray by default */
 }
 
-.body-width{
+.body-width {
   width: 1440px;
   padding: 0 72px;
 }
@@ -60,35 +71,35 @@ h1, h2, h3, h4, h5, h6, p, span, label {
   }
 
   /* Button Styles */
-.btn-primary {
-  @apply bg-buttonBlue text-white py-2 px-6 font-bold hover:bg-blue-600 transition duration-300;
-}
+  .btn-primary {
+    @apply bg-buttonBlue text-white py-2 px-6 font-bold hover:bg-blue-600 transition duration-300;
+  }
 
-.btn-secondary {
-  @apply bg-lightBackground text-buttonBlue py-2 px-6 font-bold hover:bg-blue-200 transition duration-300;
-}
+  .btn-secondary {
+    @apply bg-lightBackground text-buttonBlue py-2 px-6 font-bold hover:bg-blue-200 transition duration-300;
+  }
 
-.btn-danger {
-  @apply bg-dangerRed text-white py-2 px-6 font-bold hover:bg-red-700 transition duration-300;
-}
+  .btn-danger {
+    @apply bg-dangerRed text-white py-2 px-6 font-bold hover:bg-red-700 transition duration-300;
+  }
 
-.btn-disabled {
-  @apply bg-formGray text-textGray py-2 px-6 font-bold opacity-50 cursor-not-allowed;
-}
+  .btn-disabled {
+    @apply bg-formGray text-textGray py-2 px-6 font-bold opacity-50 cursor-not-allowed;
+  }
 
-/* Add to Cart Button */
-.btn-add-to-cart {
-  @apply bg-black text-white py-2 px-8 text-center font-bold text-body-md rounded-full hover:opacity-50 transition duration-300;
-  width: 500px; 
-  height: 45px; 
-}
+  /* Add to Cart Button */
+  .btn-add-to-cart {
+    @apply bg-black text-white py-2 px-8 text-center font-bold text-body-md rounded-full hover:opacity-50 transition duration-300;
+    width: 500px;
+    height: 45px;
+  }
 
-/* Buy Now Button */
-.btn-buy-now {
-  @apply bg-buttonBlue text-white py-2 px-8 text-center font-bold text-body-md rounded-full hover:bg-babyBlue hover:text-buttonBlue transition duration-300;
-  width: 500px; 
-  height: 45px; 
-}
+  /* Buy Now Button */
+  .btn-buy-now {
+    @apply bg-buttonBlue text-white py-2 px-8 text-center font-bold text-body-md rounded-full hover:bg-babyBlue hover:text-buttonBlue transition duration-300;
+    width: 500px;
+    height: 45px;
+  }
 
   /* Input Styles */
   .input {
@@ -106,13 +117,12 @@ h1, h2, h3, h4, h5, h6, p, span, label {
 
   .warranty-label {
     @apply bg-labelGreen text-white py-2 px-6 font-bold;
-  }  
+  }
 
   /* Card Component */
   .card {
     @apply bg-babyBlue p-6 rounded-lg shadow-md hover:shadow-lg transition duration-300;
   }
-
 }
 .border-card {
   @apply border border-formGray;
@@ -143,4 +153,3 @@ h1, h2, h3, h4, h5, h6, p, span, label {
   filter: saturate(0%);
   transition: all 0.1s step-end;
 }
-

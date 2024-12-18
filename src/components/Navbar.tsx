@@ -2,10 +2,11 @@ import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import SearchInput from './SearchInput'
-
+import { useAuth } from '@/context/AuthContext'
 
 const Navbar: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false)
+  const { isAuthenticated, logout } = useAuth()
 
   useEffect(() => {
     const handleScroll = () => {
@@ -64,18 +65,37 @@ const Navbar: React.FC = () => {
                 />
               </button>
               <div className='absolute hidden group-hover:block bg-white mt-(-2) shadow-lg rounded-lg'>
-                <Link
-                  href='/login'
-                  className='block px-4 py-2 hover:bg-babyBlue'
-                >
-                  Login
-                </Link>
-                <Link
-                  href='/register'
-                  className='block px-4 py-2 hover:bg-babyBlue'
-                >
-                  Register
-                </Link>
+                {isAuthenticated ? (
+                  <>
+                    <Link
+                      href='/dashboard'
+                      className='block px-4 py-2 hover:bg-babyBlue'
+                    >
+                      Dashboard
+                    </Link>
+                    <button
+                      onClick={logout}
+                      className='text-left w-full block px-4 py-2 hover:bg-babyBlue'
+                    >
+                      Logout
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <Link
+                      href='/login'
+                      className='block px-4 py-2 uppercase hover:bg-textBlue hover:text-white'
+                    >
+                      Login
+                    </Link>
+                    <Link
+                      href='/register'
+                      className='block px-4 py-2 uppercase hover:bg-textBlue hover:text-white'
+                    >
+                      Register
+                    </Link>
+                  </>
+                )}
               </div>
             </div>
 
@@ -119,34 +139,34 @@ const Navbar: React.FC = () => {
               >
                 Shop by Category
               </span>
-              <div className='absolute hidden group-hover:block bg-white shadow-lg rounded-lg'>
+              <div className='absolute hidden group-hover:block bg-white'>
                 <Link
                   href='/listing'
-                  className='block px-4 py-2 hover:bg-babyBlue'
+                  className='block px-4 py-2 uppercase hover:bg-textBlue hover:text-white'
                 >
                   All Products
                 </Link>
                 <Link
                   href='/category/clothing'
-                  className='block px-4 py-2 hover:bg-babyBlue'
+                  className='block px-4 py-2 uppercase hover:bg-textBlue hover:text-white'
                 >
                   Clothing
                 </Link>
                 <Link
                   href='/category/furniture'
-                  className='block px-4 py-2 hover:bg-babyBlue'
+                  className='block px-4 py-2 uppercase hover:bg-textBlue hover:text-white'
                 >
                   Furniture
                 </Link>
                 <Link
                   href='/category/stroller'
-                  className='block px-4 py-2 hover:bg-babyBlue'
+                  className='block px-4 py-2 uppercase hover:bg-textBlue hover:text-white'
                 >
                   Stroller & Carrier
                 </Link>
                 <Link
                   href='/category/toys'
-                  className='block px-4 py-2 hover:bg-babyBlue'
+                  className='block px-4 py-2 uppercase hover:bg-textBlue hover:text-white'
                 >
                   Toys
                 </Link>
