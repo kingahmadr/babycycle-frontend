@@ -4,7 +4,7 @@ import Image from "next/image";
 import { CartContext } from "@/context/CartContext";
 import { useAuth } from "@/context/AuthContext";
 import { API_CHECKOUT, API_CARTS, API_CHECKOUT_ITEM } from "@/constants/apis";
-import { formattedDate } from "./utils/getCheckoutTimestamp";
+import { formattedDate } from "@/utils/getCheckoutTimestamp";
 import { AddressModel } from "@/models/Address";
 
 const CartPage: React.FC = () => {
