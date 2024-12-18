@@ -14,10 +14,13 @@ interface ProductDetailsPageProps {
   image_url: string | null;
 }
 
-const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({ product,discount, discountedPrice }) => {
+const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({ product,discount }) => {
   const cartContext = useContext(CartContext);
   const router = useRouter();
   
+
+  const discountedPrice = finalPrice(product.price,Number(discount?.discount_percentage)||0);
+
   if (!cartContext) {
     throw new Error("CartContext is not available. Ensure CartProvider wraps the component.");
   }
@@ -87,9 +90,9 @@ const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({ product,discoun
           </div>
   
           <div className="flex items-center space-x-4 mb-4">
-            <p className="text-body-lg">{ 4.5} ⭐</p>
+            <p className="text-body-lg">{product.rating || 4.5} ⭐</p>
             <p className="text-body-md text-formGray">
-              ({ 10} reviews)
+              ({product.reviews || 10} reviews)
             </p>
           </div>
   
@@ -124,8 +127,8 @@ const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({ product,discoun
         <h2 className="text-heading-md text-center mb-8">Reviews</h2>
         <div className="flex space-x-8 mb-8">
           <div className="w-1/3 bg-gray-100 p-6 flex flex-col items-center">
-            <p className="text-heading-xl">{ 4.5} ⭐</p>
-            <p className="text-body-md">({ 10 } reviews)</p>
+            <p className="text-heading-xl">{product.rating || 4.5} ⭐</p>
+            <p className="text-body-md">({product.reviews || 10} reviews)</p>
           </div>
           <div className="w-2/3 space-y-6">
             {[1, 2, 3].map((i) => (
@@ -133,7 +136,7 @@ const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({ product,discoun
                 <div className="flex items-center space-x-4">
                   <p className="text-body-md text-formGray">{i + 2}/5 ⭐</p>
                   <p className="text-body-md">
-                  &quot;Lorem ipsum dolor sit amet, consectetur adipiscing elit.&quot;
+                    "Lorem ipsum dolor sit amet, consectetur adipiscing elit."
                   </p>
                 </div>
               </div>
@@ -174,12 +177,10 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     // const discount = await response_discount.json();
     const discount = response_discount.ok ? await response_discount.json() : null;
     console.log(product,discount);
-    const discountedPrice = finalPrice(product.price,Number(discount?.discount_percentage)||0);
-
 
     return {
       props: {
-        product, discount, discountedPrice
+        product, discount,
       },
     };
   } catch (error) {
