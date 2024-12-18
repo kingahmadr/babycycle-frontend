@@ -3,6 +3,8 @@ import Link from "next/link";
 import Image from "next/image";
 import { CartContext } from "@/context/CartContext";
 import { useAuth } from "@/context/AuthContext";
+import { API_CHECKOUT, API_CARTS, API_CHECKOUT_ITEM } from "@/constants/apis";
+import { formattedDate } from "./utils/getCheckoutTimestamp";
 
 const CartPage: React.FC = () => {
   const cartContext = useContext(CartContext);
@@ -59,44 +61,77 @@ const CartPage: React.FC = () => {
       return;
     }
 
-    const checkoutId = `CHK-${Date.now()}`;
+    const checkoutId = `CHK-${formattedDate}`;
 
-    const checkoutData = cart.map((item) => ({
+    const cartData = cart.map((item) => ({
       product_id: parseInt(item.id, 10),
       quantity: item.quantity,
       total_price: item.price * item.quantity,
       user_address: selectedAddress.address || "Unknown address",
-      user_id: 22,
+      checkout_order_id: checkoutId,
+      // user_id: 22,
     }));
-    console.log("Checkout Data:", checkoutData);
+    console.log("Cart Data:", cartData);
     try {
       setLoading(true);
 
       // Submit Cart Data
-      const cartResponse = await fetch("https://api.babycycle.my.id/api/v1/carts", {
+      const cartResponse = await fetch(API_CARTS, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(checkoutData),
+        headers: { 
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify(cartData),
       });
       if (!cartResponse.ok) throw new Error("Failed to submit cart data.");
-
+    
       // Submit Checkout Data
       const checkoutPayload = {
         checkout_id: checkoutId,
-        user_id: 22,
-        total_price: total,
+        // user_id: 22,
+        // total_price: total,
         payment_method: paymentMethod,
         // ...(paymentMethod === "e_wallet" && eWalletDetails),
       };
       
       console.log("Checkout Payload:", checkoutPayload);
 
-      const checkoutResponse = await fetch("https://api.babycycle.my.id/api/v1/checkout", {
+      const checkoutResponse = await fetch(API_CHECKOUT, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        },
         body: JSON.stringify(checkoutPayload),
       });
-      if (!checkoutResponse.ok) throw new Error("Failed to submit checkout details.");
+
+
+      if (!checkoutResponse.ok) {
+        const responseJson = await checkoutResponse.json()
+        throw new Error(responseJson.msg);
+      }
+
+      const responseCheckout= await checkoutResponse.json()
+      console.log("Checkout Response:", responseCheckout.message);
+
+      
+      // Submit Checkout Data
+      const checkoutItems = await fetch(API_CHECKOUT_ITEM, {
+        method: "POST",
+        headers: { 
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify(cartData),
+      });
+      if (!checkoutItems.ok) {
+        const responseJson = await checkoutItems.json()
+        throw new Error(responseJson.msg);
+      }
+      const responseCheckoutItems= await checkoutItems.json()
+      console.log("Checkout Items:", responseCheckoutItems);
+      
       alert("Checkout Successful!");
       clearCart();
     } catch (error) {
@@ -107,8 +142,6 @@ const CartPage: React.FC = () => {
     }
 
   };
-
-  
 
 
   return (
