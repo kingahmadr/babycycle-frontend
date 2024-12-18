@@ -8,6 +8,7 @@ import { DiscountModel } from '@/models/Discount'
 
 import { useRouter } from 'next/navigation'
 import Spinner from '@/components/Spinner'
+import { PAGE_LISTING } from '@/constants/pages'
 
 interface ProductsProps {
   newProducts: DataWithCount<ProductModel>,
@@ -70,7 +71,7 @@ const Home = ({ newProducts, saleProducts }: ProductsProps) => {
         <div className='w-1/2 flex flex-col justify-center items-center gap-6 z-50'>
           <span className='font-decor text-4xl'>Smart mom, shop recycle</span>
 
-            <PrimaryButton type='button' onClick={() => handleClick('/product')}>Explore</PrimaryButton>
+            <PrimaryButton type='button' onClick={() => handleClick(PAGE_LISTING)}>Explore</PrimaryButton>
 
         </div>
       </div>
@@ -79,7 +80,7 @@ const Home = ({ newProducts, saleProducts }: ProductsProps) => {
         <div className='w-[240px] h-[291px] flex flex-col gap-around'>
           <span className='h-1/2 uppercase text-6xl'>Sale & Promo</span>
           <div className='h-1/2 flex justify-center items-center'>
-            <PrimaryButton type='button' onClick={() => handleClick('/product')}>See All</PrimaryButton>
+            <PrimaryButton type='button' onClick={() => handleClick(PAGE_LISTING)}>See All</PrimaryButton>
           </div>
         </div>
         {loading ? (
@@ -116,7 +117,7 @@ const Home = ({ newProducts, saleProducts }: ProductsProps) => {
         <div className='w-[240px] h-[291px] flex flex-col gap-around'>
           <span className='h-1/2 uppercase text-6xl'>New Arrival</span>
           <div className='h-1/2 flex justify-center items-center'>
-            <PrimaryButton type='button' onClick={() => handleClick('/product')}>See All</PrimaryButton>
+            <PrimaryButton type='button' onClick={() => handleClick(PAGE_LISTING)}>See All</PrimaryButton>
           </div>
         </div>
       </div>
