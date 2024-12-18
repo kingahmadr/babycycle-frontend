@@ -73,6 +73,8 @@ const CartPage: React.FC = () => {
       // user_id: 22,
     }));
     console.log("Cart Data:", cartData);
+
+
     try {
       setLoading(true);
 
@@ -86,7 +88,8 @@ const CartPage: React.FC = () => {
         body: JSON.stringify(cartData),
       });
       if (!cartResponse.ok) throw new Error("Failed to submit cart data.");
-    
+
+       
       // Submit Checkout Data
       const checkoutPayload = {
         checkout_id: checkoutId,
@@ -97,42 +100,55 @@ const CartPage: React.FC = () => {
       };
       
       console.log("Checkout Payload:", checkoutPayload);
+      try {
+        // Submit Checkout Data
+        const checkoutResponse = await fetch(API_CHECKOUT, {
+          method: "POST",
+          headers: { 
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem('token')}`
+          },
+          body: JSON.stringify(checkoutPayload),
+        });
+        if (!checkoutResponse.ok) {
+          const responseJson = await checkoutResponse.json()
+          console.log(responseJson)
+          // throw new Error(responseJson);
+        }
+        const responseCheckout= await checkoutResponse.json()
+        console.log("Checkout Response:", responseCheckout.message);
+    
+      } catch (error) {
+        console.error("Error submitting cart data:", error);
+        return;
+      } 
 
-      const checkoutResponse = await fetch(API_CHECKOUT, {
-        method: "POST",
-        headers: { 
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem('token')}`
-        },
-        body: JSON.stringify(checkoutPayload),
-      });
+      try {
+        // Submit Checkout Data
+        const checkoutItems = await fetch(API_CHECKOUT_ITEM, {
+          method: "POST",
+          headers: { 
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem('token')}`
+          },
+          body: JSON.stringify(cartData),
+        });
+        if (!checkoutItems.ok) {
+          const responseJson = await checkoutItems.json()
+          console.log(responseJson)
+          throw new Error(responseJson);
 
-
-      if (!checkoutResponse.ok) {
-        const responseJson = await checkoutResponse.json()
-        throw new Error(responseJson.msg);
+        }
+        const responseCheckoutItems= await checkoutItems.json()
+        console.log("Checkout Items:", responseCheckoutItems);
+    
+      } catch (error) {
+        console.error("Error submitting cart data:", error);
+        return;
       }
 
-      const responseCheckout= await checkoutResponse.json()
-      console.log("Checkout Response:", responseCheckout.message);
+     
 
-      
-      // Submit Checkout Data
-      const checkoutItems = await fetch(API_CHECKOUT_ITEM, {
-        method: "POST",
-        headers: { 
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem('token')}`
-        },
-        body: JSON.stringify(cartData),
-      });
-      if (!checkoutItems.ok) {
-        const responseJson = await checkoutItems.json()
-        throw new Error(responseJson.msg);
-      }
-      const responseCheckoutItems= await checkoutItems.json()
-      console.log("Checkout Items:", responseCheckoutItems);
-      
       alert("Checkout Successful!");
       clearCart();
     } catch (error) {
