@@ -11,6 +11,7 @@ interface ProductDetailsPageProps {
   product: ProductModel;
   discount: DiscountModel | null;
   discountedPrice: number;
+  image_url: string | null;
 }
 
 const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({ product,discount, discountedPrice }) => {
@@ -50,7 +51,7 @@ const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({ product,discoun
         <div className="w-1/2">
           {/* Product Image */}
           <Image
-            src={product.image_url || "/assets/placeholder-large.png"} // Placeholder Image
+            src={product.image_url || "/assets/logo_main.png"} // Placeholder Image
             alt={product.name || "Item Image"}
             width={500}
             height={500}
@@ -60,7 +61,7 @@ const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({ product,discoun
             {[1, 2, 3].map((i) => (
               <Image
                 key={i}
-                src={"/assets/placeholder-small.png"} // Placeholder Small Images
+                src={"/assets/logo_main.png"} // Placeholder Small Images
                 alt="Item Thumbnail"
                 width={150}
                 height={150}
