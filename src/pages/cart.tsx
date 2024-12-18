@@ -238,7 +238,7 @@ const CartPage: React.FC = () => {
               ))}
             </div>
             <div className="flex py-6 justify-end">
-              <Link href="/listing">
+              <Link href="/product">
                 <button className="btn-primary w-30">Continue Shopping</button>
               </Link>
             </div>
