@@ -59,9 +59,9 @@ function Index() {
       setIsOpen(true)
     };
 
-    const [selectedOption, setSelectedOption] = useState('HIGHEST PRICE')
+    const [selectedOption, setSelectedOption] = useState<string>('HIGHEST PRICE')
   
-    const handleSelect = (option: any) => {
+    const handleSelect = (option: string) => {
       setSelectedOption(option)
       setIsOpen(false)
     };

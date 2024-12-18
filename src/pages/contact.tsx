@@ -39,7 +39,7 @@ export default function ContactUs() {
       setSuccessMessage("Your message has been sent successfully.");
       setForm({ email: user?.email || "", title: "", description: "" });
       setUseMainEmail(!!user?.email);
-    } catch (error) {
+    } catch  {
       setError("Failed to send your message. Please try again later.");
     } finally {
       setLoading(false);

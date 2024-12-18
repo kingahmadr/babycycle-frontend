@@ -5,6 +5,7 @@ import { CartContext } from "@/context/CartContext";
 import { useAuth } from "@/context/AuthContext";
 import { API_CHECKOUT, API_CARTS, API_CHECKOUT_ITEM } from "@/constants/apis";
 import { formattedDate } from "./utils/getCheckoutTimestamp";
+import { AddressModel } from "@/models/Address";
 
 const CartPage: React.FC = () => {
   const cartContext = useContext(CartContext);
@@ -16,7 +17,7 @@ const CartPage: React.FC = () => {
 
   const { cart, removeFromCart, increaseQuantity, decreaseQuantity, clearCart } = cartContext;
 
-  const [selectedAddress, setSelectedAddress] = useState<any>(null);
+  const [selectedAddress, setSelectedAddress] = useState<AddressModel>();
   const [selectedCardType, setSelectedCardType] = useState<string | null>(null);
   const [paymentMethod, setPaymentMethod] = useState<string>("credit_card");
   const [loading, setLoading] = useState(false);
@@ -67,7 +68,7 @@ const CartPage: React.FC = () => {
       product_id: parseInt(item.id, 10),
       quantity: item.quantity,
       total_price: item.price * item.quantity,
-      user_address: selectedAddress.address || "Unknown address",
+      user_address: selectedAddress?.address || "Unknown address",
       checkout_order_id: checkoutId,
       // user_id: 22,
     }));
