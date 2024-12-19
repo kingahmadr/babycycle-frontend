@@ -68,7 +68,7 @@ export default function Register() {
   }
 
   return (
-    <div className='w-full h-[calc(100vh-158px)] bg-[url(/Group_119.png)] flex items-center justify-center'>
+    <div className='w-full h-[calc(100vh-160px)] max-md:h-[calc(100vh-340px)] bg-[url(/Group_119.png)] max-md:bg-[url(/Hero2.png)] flex items-center justify-center'>
       <div className='w-0 lg:w-1/2'></div>
       <div className='p-6 rounded w-full lg:w-1/2 max-w-md'>
         <>
