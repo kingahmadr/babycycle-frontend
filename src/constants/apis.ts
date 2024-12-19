@@ -1,4 +1,5 @@
 export const API_URL = 'https://api.babycycle.my.id/api/v1'
+export const API_URL_LOCAL = 'http://127.0.0.1:5100/api/v1'
 export const API_LOGIN = `${API_URL}/auth/login`
 export const API_REGISTER = `${API_URL}/users/register`
 export const API_RESEND = `${API_URL}/users/resend_verification`
@@ -11,3 +12,6 @@ export const API_CHECKOUT_ITEM = `${API_URL}/checkout/items`
 // export const API_CHECKOUT = `http://127.0.0.1:5100/api/v1/checkout/now`
 // export const API_CHECKOUT_ITEM = `http://127.0.0.1:5100/api/v1/checkout/items`
 export const API_CARTS = `${API_URL}/carts`
+
+export const API_TRANSACTION = `${API_URL_LOCAL}/transactions`
+export const API_REVIEW = `${API_URL_LOCAL}/reviews`
