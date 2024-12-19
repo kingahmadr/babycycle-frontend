@@ -1,5 +1,7 @@
 import { PrimaryButton } from '@/components/PrimaryButton'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { TransactionModel } from '@/models/Transactions'
+import { API_TRANSACTION } from '@/constants/apis'
 
 function Index() {
 
@@ -7,7 +9,36 @@ function Index() {
 
     const handleTabClick = (tab: string) => {
         setActiveTab(tab)
+        // fetchTransactions()
     }
+
+    const [transactions, setTransactions] = useState<TransactionModel[]>()
+
+    const fetchTransactions = async () => {
+        try {
+            const response = await fetch(API_TRANSACTION, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                     Authorization: `Bearer ${localStorage.getItem('token')}`
+                }
+            })
+            const data = await response.json()
+            console.log(data)
+            
+            if (!response.ok) {
+                const errorData = await response.json()
+                console.log(errorData)
+                throw new Error(errorData)
+            }
+            setTransactions(data)
+        } catch (error) {
+            console.error('Error fetching transactions:', error)
+        }
+    }
+    useEffect(() => {
+        fetchTransactions()
+    }, [activeTab])
 
   return (
     <div className='body-width mb-[72px] max-md:w-full max-md:px-8'>
@@ -82,44 +113,49 @@ function Index() {
             )}
 
             {activeTab === 'transactionHistory' && (
-            <div className='p-6'>
-                <div className='w-full flex flex-col gap-6'>
-                    
-                    <div className='w-full flex justify-between text-xl'>
-                        <div>Find transaction</div>
-                    </div>
-
-                    <div className='w-full p-6 flex flex-col gap-8 border-4 border-borderGray rounded-xl text-xl'>
-                        <div className='w-full flex gap-8'>
-                            <div className='w-[154px] h-[154px] bg-slate-200'>
-                                <img className='w-full h-auto' src=''/>
+                transactions?.map((transaction, index) => (
+                
+                    <div key={index} className='p-6'>
+                        <div className='w-full flex flex-col gap-6'>
+                            
+                            <div className='w-full flex justify-between text-xl'>
+                                <div>Find transaction</div>
                             </div>
 
-                            <div className='w-2/3 flex flex-col gap-2'>
-                                <div className='w-full flex gap-4 items-center'>
-                                    <span>25 October 2024</span>
-                                    <div className='w-auto h-auto p-2 bg-lighterBabyBlue text-buttonBlue text-xs text-center'>Done</div>
+                            <div className='w-full p-6 flex flex-col gap-8 border-4 border-borderGray rounded-xl text-xl'>
+                                <div className='w-full flex gap-8'>
+                                    <div className='w-[154px] h-[154px] bg-slate-200'>
+                                        <img className='w-full h-auto' src=''/>
+                                    </div>
+
+                                    <div className='w-2/3 flex flex-col gap-2'>
+                                        <div className='w-full flex gap-4 items-center'>
+                                            <span>25 October 2024</span>
+                                            <div className='w-auto h-auto p-2 bg-lighterBabyBlue text-buttonBlue text-xs text-center'>{transaction.status}</div>
+                                        </div>
+                                        <span className='font-bold'>{transaction.name}</span>
+                                        <span className='font-bold'>quantity: {transaction.quantity}</span>
+
+                                        <div className='w-full flex gap-3 items-center'>
+                                            <img src='/Icon_shop.png'/>
+                                            <span className='text-buttonBlue'>BabyStuffID</span>
+                                        </div>
+                                    </div>
+
+                                    <div className='w-1/4 flex flex-col justify-center gap-2'>
+                                        <span>Total payment</span>
+                                        <span className='font-bold'>{transaction.total_price}</span>
+                                    </div>
                                 </div>
-                                <span className='font-bold'>Furnibest Stroller Baby Travel</span>
-                                <div className='w-full flex gap-3 items-center'>
-                                    <img src='/Icon_shop.png'/>
-                                    <span className='text-buttonBlue'>BabyStuffID</span>
+
+                                <div className='w-full flex justify-end gap-3'>
+                                    <PrimaryButton type='button'>Add Review +</PrimaryButton>
                                 </div>
                             </div>
 
-                            <div className='w-1/4 flex flex-col justify-center gap-2'>
-                                <span>Total payment</span>
-                                <span className='font-bold'>IDR 9999999</span>
-                            </div>
-                        </div>
-
-                        <div className='w-full flex justify-end gap-3'>
-                            <PrimaryButton type='button'>Add Review +</PrimaryButton>
                         </div>
                     </div>
-
-                </div>
-            </div>
+                 ))
             )}
 
             {activeTab === 'becomeSeller' && (
