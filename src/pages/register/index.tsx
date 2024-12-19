@@ -68,22 +68,7 @@ export default function Register() {
   }
 
   return (
-    <div className='w-full h-[calc(100vh-120px)] bg-babyBlue flex items-center justify-center relative -z-10'>
-      <img className='top-0 left-40 absolute z-[5]' src='/asset1_1_inv.png'/>
-      <img className='bottom-0 right-0 absolute z-[5] rotate-180' src='/asset1_1_inv.png'/>
-      <img className='top-0 right-0 absolute -z-[1]' src='/asset3_1.png'/>
-      <img
-            className='absolute top-[167px] left-[146px] z-[3]'
-            src='/image_3.png'
-          />
-      <img
-            className='absolute top-[125px] left-[104px] z-[1]'
-            src='/Rectangle_42.png'
-          />
-      <img className='bottom-0 left-0 absolute z-[5] rotate-180' src='/asset3_1.png'/>
-      <img className='bottom-0 left-[768px] absolute -z-10' src='/asset2_1_inv.png'/>
-      <img className='bottom-0 left-20 absolute -z-10' src='/asset2_1_inv2.png'/>
-
+    <div className='w-full h-[calc(100vh-158px)] bg-[url(/Group_119.png)] flex items-center justify-center'>
       <div className='w-0 lg:w-1/2'></div>
       <div className='p-6 rounded w-full lg:w-1/2 max-w-md'>
         <>
@@ -122,7 +107,7 @@ export default function Register() {
             </button>
           </form>
           {error && <p className='text-red-500 text-sm mb-4'>{error}</p>}
-          {message && <p className='text-center mt-4 text-sm text-red-500'>{message}</p>}
+          {message && <p className='text-center mt-4 text-sm text-green-500'>{message}</p>}
           <p className='italic text-sm mt-4'>
             Already registered?{' '}
             <Link href='/login' className='text-buttonBlue'>

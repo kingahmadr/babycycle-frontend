@@ -33,6 +33,13 @@ body {
   align-items:center; */
 }
 
+body {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  display: contents;
+}
+
 h1,
 h2,
 h3,
