@@ -80,7 +80,7 @@ const ChangeAddress: React.FC = () => {
       <div className="p-6 w-full max-w-[1200px] space-y-4">
         <h1 className="text-heading-xl font-bold mb-6">Change Address</h1>
 
-        <div className="w-[1200px] space-y-4">
+        <div className="space-y-4">
           {addresses.map((address) => (
             <div
               key={address.id}
