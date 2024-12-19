@@ -26,9 +26,9 @@ const ChangeAddress: React.FC = () => {
       const userAddresses: Address[] = [
         {
           id: "1",
-          name: user?.username || "Guest",
-          phone: user?.phone || "No phone number",
-          address: user?.address || "No address available",
+          name: user?.data.username || "Guest",
+          phone: user?.data.phone || "No phone number",
+          address: user?.data.address || "No address available",
         },
         {
           id: "2",
