@@ -6,45 +6,70 @@ import { DiscountModel } from "@/models/Discount";
 import { CartContext } from "@/context/CartContext";
 import Image from "next/image";
 import { finalPrice } from "@/utils/DiscountedPrice";
+import { useSnackbar } from "notistack";
 
 interface ProductDetailsPageProps {
   product: ProductModel;
   discount: DiscountModel | null;
-  discountedPrice: number;
-  image_url: string | null;
 }
 
-const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({ product,discount }) => {
+const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({
+  product,
+  discount,
+}) => {
   const cartContext = useContext(CartContext);
   const router = useRouter();
-  
+  const { enqueueSnackbar } = useSnackbar();
 
-  const discountedPrice = finalPrice(product.price,Number(discount?.discount_percentage)||0);
+  const discountedPrice = finalPrice(
+    product.price,
+    Number(discount?.discount_percentage) || 0
+  );
 
   if (!cartContext) {
-    throw new Error("CartContext is not available. Ensure CartProvider wraps the component.");
+    throw new Error(
+      "CartContext is not available. Ensure CartProvider wraps the component."
+    );
   }
 
   const { addToCart } = cartContext;
 
   const handleAddToCart = () => {
-    addToCart({
-      id: product.id.toString(),
-      name: product.name,
-      price: discountedPrice,
-      quantity: 1,
-    });
-    alert("Product has been added to the cart!");
+    try {
+      addToCart({
+        id: product.id.toString(),
+        name: product.name,
+        price: discountedPrice,
+        quantity: 1,
+      });
+
+      enqueueSnackbar("Product has been added to the cart!", { variant: "success" });
+    } catch (error) {
+      enqueueSnackbar("Failed to add product to the cart. Please try again.", {
+        variant: "error",
+      });
+    }
   };
 
   const handleBuyNow = () => {
-    addToCart({
-      id: product.id.toString(),
-      name: product.name,
-      price: discountedPrice,
-      quantity: 1,
-    });
-    router.push("/cart");
+    try {
+      addToCart({
+        id: product.id.toString(),
+        name: product.name,
+        price: discountedPrice,
+        quantity: 1,
+      });
+
+      router.push("/cart");
+
+      enqueueSnackbar("Product added to cart. Proceeding to checkout.", {
+        variant: "success",
+      });
+    } catch (error) {
+      enqueueSnackbar("Failed to add product to the cart. Please try again.", {
+        variant: "error",
+      });
+    }
   };
 
   return (
@@ -54,7 +79,7 @@ const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({ product,discoun
         <div className="w-1/2">
           {/* Product Image */}
           <Image
-            src={product.image_url || "/assets/logo_main.png"} // Placeholder Image
+            src={product.image_url || "/assets/placeholder_image.jpg"} // Placeholder Image
             alt={product.name || "Item Image"}
             width={500}
             height={500}
@@ -64,7 +89,7 @@ const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({ product,discoun
             {[1, 2, 3].map((i) => (
               <Image
                 key={i}
-                src={"/assets/logo_main.png"} // Placeholder Small Images
+                src={"/assets/placeholder_image.jpg"} // Placeholder Small Images
                 alt="Item Thumbnail"
                 width={150}
                 height={150}
