@@ -64,7 +64,7 @@ const Navbar: React.FC = () => {
                   className='cursor-pointer'
                 />
               </button>
-              <div className='absolute hidden group-hover:block bg-white mt-(-2) shadow-lg rounded-lg'>
+              <div className='absolute hidden group-hover:block bg-white mt-(-2) shadow-lg'>
                 {isAuthenticated ? (
                   <>
                     <Link

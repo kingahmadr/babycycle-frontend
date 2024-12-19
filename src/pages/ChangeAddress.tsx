@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useAuth } from "@/context/AuthContext";
+import { useSnackbar } from "notistack";
 
 interface Address {
   id: string;
@@ -13,6 +14,7 @@ interface Address {
 const ChangeAddress: React.FC = () => {
   const router = useRouter();
   const { user } = useAuth();
+  const { enqueueSnackbar } = useSnackbar();
 
   const [addresses, setAddresses] = useState<Address[]>([]);
   const [selectedAddressId, setSelectedAddressId] = useState<string>("");
@@ -66,62 +68,60 @@ const ChangeAddress: React.FC = () => {
       setAddresses((prev) =>
         prev.map((a) => (a.id === editAddress.id ? editAddress : a))
       );
-      setEditAddress(null);
+      // Show success Snackbar notification
+      enqueueSnackbar("Address updated successfully!", { variant: "success" });
+
+      setEditAddress(null); // Close the edit modal
     }
   };
 
-
-
   return (
     <div className="bg-babyBlue flex items-center justify-center min-h-screen w-full">
-    <div className="p-6 w-full max-w-[1200px] space-y-4">
+      <div className="p-6 w-full max-w-[1200px] space-y-4">
+        <h1 className="text-heading-xl font-bold mb-6">Change Address</h1>
 
-      <h1 className="text-heading-xl font-bold mb-6">Change Address</h1>
-
-      <div className="w-[1200] space-y-4">
-        {addresses.map((address) => (
-          <div
-            key={address.id}
-            className={`p-4 bg-white rounded-lg shadow-md ${
-              selectedAddressId === address.id ? "border-2 border-textBlue" : ""
-            } relative group`}
-          >
-            <div>
-              <p className="text-body-sm font-bold">{address.name}</p>
-              <p className="text-body-sm">{address.phone}</p>
-              <p className="text-body-sm">{address.address}</p>
-            </div>
-            <div className="flex justify-end">
+        <div className="space-y-4">
+          {addresses.map((address) => (
+            <div
+              key={address.id}
+              className={`p-4 bg-white rounded-lg shadow-md ${
+                selectedAddressId === address.id ? "border-2 border-textBlue" : ""
+              } relative group`}
+            >
+              <div>
+                <p className="text-body-sm font-bold">{address.name}</p>
+                <p className="text-body-sm">{address.phone}</p>
+                <p className="text-body-sm">{address.address}</p>
+              </div>
+              <div className="flex justify-end">
+                <button
+                  onClick={() => handleSelect(address.id)}
+                  className="btn-primary mt-4"
+                >
+                  Select
+                </button>
+              </div>
               <button
-                onClick={() => handleSelect(address.id)}
-                className="btn-primary mt-4"
+                onClick={() => handleEdit(address)}
+                className="absolute top-2 right-2 hidden group-hover:block text-textBlue"
               >
-                Select
+                Edit
               </button>
             </div>
-            <button
-              onClick={() => handleEdit(address)}
-              className="absolute top-2 right-2 hidden group-hover:block text-textBlue"
-            >
-              Edit
-            </button>
+          ))}
+
+          <div className="flex py-6 justify-end">
+            <Link href="/cart">
+              <button className="btn-primary w-30">Back to Cart</button>
+            </Link>
           </div>
-          
-        ))}
-
-              <div className="flex py-6 justify-end">
-              <Link href="/cart">
-                <button className="btn-primary w-30">Back to Cart</button>
-              </Link>
-            </div>
-
-      </div>
+        </div>
       </div>
 
       {/* Edit Modal */}
       {editAddress && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-          <div className="bg-white p-6 rounded-lg shadow-md">
+        <div className="modal-overlay">
+          <div className="modal-content">
             <h2 className="text-heading-md font-bold mb-4">Edit Address</h2>
             <input
               type="text"

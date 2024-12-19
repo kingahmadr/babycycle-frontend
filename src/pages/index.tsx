@@ -56,40 +56,61 @@ const Home = ({ newProducts, saleProducts }: ProductsProps) => {
   }
 
   return (
-    <div>
+    <>
 
-      <div className='h-[660px] bg-babyBlue flex -z-10 object-contain relative w full'>
-        <div className='w-1/2'>
-          <img className='absolute top-[55px] left-[180px] z-[3]' src='/image_2.png'/>
-          <img className='absolute top-[96px] left-[144px] z-[1]' src='/Rectangle_42.png'/>
-          <img className='absolute top-0 right-0 z-[5]' src='/asset3_1.png'/>
-          <img className='absolute' src='/asset2_2.png'/>
-          <img className='absolute bottom-0 right-0' src='/asset2_1.png'/>
-          <img className='absolute bottom-0 z-[5]' src='/asset1_1.png'/>
+      <div className='h-[660px] bg-babyBlue flex -z-10 object-contain relative w-full'>
+        <div className='w-full'>
+          <img
+            className='absolute top-[55px] left-[180px] z-[3]'
+            src='/image_2.png'
+          />
+          <img
+            className='absolute top-[96px] left-[144px] z-[1]'
+            src='/Rectangle_42.png'
+          />
+          <img className='absolute top-0 right-0 z-[5]' src='/asset3_1.png' />
+          <img className='absolute' src='/asset2_2.png' />
+          <img className='absolute bottom-0 right-0' src='/asset2_1.png' />
+          <img className='absolute bottom-0 z-[5]' src='/asset1_1.png' />
         </div>
-        
-        <div className='w-1/2 flex flex-col justify-center items-center gap-6 z-50'>
+
+        <div className='w-1/2 flex flex-col justify-center items-center gap-6 z-0'>
           <span className='font-decor text-4xl'>Smart mom, shop recycle</span>
-
-            <PrimaryButton type='button' onClick={() => handleClick(PAGE_LISTING)}>Explore</PrimaryButton>
-
+          <PrimaryButton type='button' onClick={() => handleClick(PAGE_LISTING)}>Explore</PrimaryButton>
         </div>
       </div>
 
-      <div className='flex gap-6 py-16'>
-        <div className='w-[240px] h-[291px] flex flex-col gap-around'>
-          <span className='h-1/2 uppercase text-6xl'>Sale & Promo</span>
-          <div className='h-1/2 flex justify-center items-center'>
-            <PrimaryButton type='button' onClick={() => handleClick(PAGE_LISTING)}>See All</PrimaryButton>
-          </div>
-        </div>
-        {loading ? (
-            <div className='w-full h-56 flex justify-center items-center'>
-                <Spinner />
+      <div className='body-width'>
+
+        <div className='flex gap-6 py-16'>
+          <div className='w-[240px] h-[291px] flex flex-col gap-around'>
+            <span className='h-1/2 uppercase text-6xl'>Sale & Promo</span>
+            <div className='h-1/2 flex justify-center items-center'>
+              <PrimaryButton type='button' onClick={() => handleClick(PAGE_LISTING)}>See All</PrimaryButton>
             </div>
-        ) : ( 
-          saleProducts && saleProducts.data.map((product, index)=>(
-          discounts[product.id] && discounts[product.id]?.is_active && product.stock !== 0 ?
+          </div>
+          {loading ? (
+              <div className='w-full h-56 flex justify-center items-center'>
+                  <Spinner />
+              </div>
+          ) : ( 
+            saleProducts && saleProducts.data.map((product, index)=>(
+            discounts[product.id] && discounts[product.id]?.is_active && product.stock !== 0 ?
+              <ProductCard
+                id={product.id}
+                key={index}
+                image_url={product.image_url}
+                name={product.name}
+                price={product.price}
+                stock={product.stock}
+                discount={discounts[product.id]}
+              /> : null
+            )
+          ))}
+          </div>
+
+        <div className='flex gap-6 py-16'>
+        {newProducts && newProducts.data.map((product, index)=>(
             <ProductCard
               id={product.id}
               key={index}
@@ -97,32 +118,18 @@ const Home = ({ newProducts, saleProducts }: ProductsProps) => {
               name={product.name}
               price={product.price}
               stock={product.stock}
-              discount={discounts[product.id]}
-            /> : null
-          )
-        ))}
-        </div>
-
-      <div className='flex gap-6 py-16'>
-      {newProducts && newProducts.data.map((product, index)=>(
-          <ProductCard
-            id={product.id}
-            key={index}
-            image_url={product.image_url}
-            name={product.name}
-            price={product.price}
-            stock={product.stock}
-          />
-        ))}        
-        <div className='w-[240px] h-[291px] flex flex-col gap-around'>
-          <span className='h-1/2 uppercase text-6xl'>New Arrival</span>
-          <div className='h-1/2 flex justify-center items-center'>
-            <PrimaryButton type='button' onClick={() => handleClick(PAGE_LISTING)}>See All</PrimaryButton>
+            />
+          ))}        
+          <div className='w-[240px] h-[291px] flex flex-col gap-around'>
+            <span className='h-1/2 uppercase text-6xl'>New Arrival</span>
+            <div className='h-1/2 flex justify-center items-center'>
+              <PrimaryButton type='button' onClick={() => handleClick(PAGE_LISTING)}>See All</PrimaryButton>
+            </div>
           </div>
         </div>
       </div>
 
-    </div>
+    </>
   )
 }
 

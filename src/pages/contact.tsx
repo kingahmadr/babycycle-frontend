@@ -1,8 +1,12 @@
 import { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
+import { useSnackbar } from "notistack";
+
 
 export default function ContactUs() {
   const { user } = useAuth();
+  const { enqueueSnackbar } = useSnackbar();
+
   const [form, setForm] = useState({
     email: user?.email || "", // Default to user's main email
     title: "",
@@ -26,7 +30,9 @@ export default function ContactUs() {
     e.preventDefault();
 
     if (!form.email || !form.title || !form.description) {
-      setError("All fields are required.");
+      enqueueSnackbar("All fields are required!", {
+        variant: "error",
+      });
       return;
     }
 
@@ -40,7 +46,9 @@ export default function ContactUs() {
       setForm({ email: user?.email || "", title: "", description: "" });
       setUseMainEmail(!!user?.email);
     } catch  {
-      setError("Failed to send your message. Please try again later.");
+      enqueueSnackbar("Failed to send message. Please try again later.", {
+        variant: "error",
+      });
     } finally {
       setLoading(false);
     }
