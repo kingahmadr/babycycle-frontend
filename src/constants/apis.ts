@@ -13,5 +13,5 @@ export const API_CHECKOUT_ITEM = `${API_URL}/checkout/items`
 // export const API_CHECKOUT_ITEM = `http://127.0.0.1:5100/api/v1/checkout/items`
 export const API_CARTS = `${API_URL}/carts`
 
-export const API_TRANSACTION = `${API_URL_LOCAL}/transactions`
-export const API_REVIEW = `${API_URL_LOCAL}/reviews`
+export const API_TRANSACTION = `${API_URL}/transactions`
+export const API_REVIEW = `${API_URL}/reviews`

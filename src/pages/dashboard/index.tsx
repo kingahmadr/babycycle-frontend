@@ -3,10 +3,12 @@ import { useAuth } from '@/context/AuthContext'
 import { useEffect, useState } from 'react'
 import { TransactionModel } from '@/models/Transactions'
 import { API_TRANSACTION } from '@/constants/apis'
+import { useRouter } from 'next/navigation'
 
 const UserDashboard = () => {
 
     const [activeTab, setActiveTab] = useState('personalData')
+    const router = useRouter()
 
     const handleTabClick = (tab: string) => {
         setActiveTab(tab)
@@ -44,6 +46,14 @@ const UserDashboard = () => {
     const { user } = useAuth()
     console.log(user)
 
+    const handleReviewPage = (productID: number) => {    
+        router.push(`/add_review/${productID}`)
+    }
+
+    const handleSellerDashboard = () => {    
+    router.push(`/seller_dashboard`)
+    }
+
   return (
     <div className='body-width mb-[72px] max-md:w-full max-md:px-8'>
         <div className='w-full flex justify-between items-center'>
@@ -52,7 +62,7 @@ const UserDashboard = () => {
             </div>
             {user?.data.is_seller === true ? 
                 <div>
-                    <PrimaryButton type='button'>Seller Dashboard</PrimaryButton>
+                    <PrimaryButton type='button' onClick={handleSellerDashboard}>Seller Dashboard</PrimaryButton>
                 </div>
                 : null
             }
@@ -65,7 +75,7 @@ const UserDashboard = () => {
                     <span className={`cursor-pointer ${activeTab === 'personalData'? 'text-black font-bold' : '' }`} onClick={() => handleTabClick('personalData')}>Personal Data</span>
                     <span className={`cursor-pointer ${activeTab === 'addressList'? 'text-black font-bold' : '' }`} onClick={() => handleTabClick('addressList')}>Address List</span>
                     <span className={`cursor-pointer ${activeTab === 'transactionHistory'? 'text-black font-bold' : '' }`} onClick={() => handleTabClick('transactionHistory')}>Transaction History</span>
-                    <span className={`cursor-pointer ${activeTab === 'becomeSeller'? 'text-black font-bold' : '' }`} onClick={() => handleTabClick('becomeSeller')}>Become a Seller</span>
+                    {user?.data.is_seller === false ? <span className={`cursor-pointer ${activeTab === 'becomeSeller'? 'text-black font-bold' : '' }`} onClick={() => handleTabClick('becomeSeller')}>Become a Seller</span> : null}
                 </div>
                 
             
@@ -166,7 +176,7 @@ const UserDashboard = () => {
                                 </div>
 
                                 <div className='w-full flex justify-end gap-3'>
-                                    <PrimaryButton type='button'>Add Review +</PrimaryButton>
+                                    <PrimaryButton type='button' onClick={() => handleReviewPage(transaction.product_id)}>Add Review +</PrimaryButton>
                                 </div>
                             </div>
 
