@@ -149,8 +149,8 @@ const ProductListing = () => {
     
 
   return (
-    <div className='body-width flex'>
-      <div className='w-72 uppercase py-3 flex flex-col gap-6'>
+    <div className='max-w-[1440px] px-[72px] max-md:px-6 flex max-md:flex-col'>
+      <div className='w-72 max-md:w-full uppercase py-3 flex flex-col max-md:flex-row gap-6 max-md:justify-between'>
         <div className='text-xl text-buttonBlue'>All Filters</div>
 
         <div className='flex flex-col gap-2 px-3'>
@@ -220,7 +220,7 @@ const ProductListing = () => {
 
 
       <div className='w-full'>
-        <div className='uppercase text-[14px] h-auto py-3 flex justify-end items-center'>
+        <div className='uppercase text-[14px] h-auto py-3 max-md:py-6 flex justify-end max-md:justify-start items-center'>
           <div className='flex items-center gap-3'>
 
             <span className='text-buttonBlue'>Sort By</span>
@@ -263,7 +263,7 @@ const ProductListing = () => {
         )}
 
         </div>
-        <div className='flex flex-wrap justify-between gap-6'>
+        <div className='grid grid-rows-5 grid-cols-4 gap-6 max-md:grid-cols-2 max-md:gap-3'>
           {loading ? (
             <div className='w-full h-56 flex justify-center items-center'>
                 <Spinner />

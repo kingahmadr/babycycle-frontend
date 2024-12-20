@@ -4,6 +4,7 @@ import { SecondaryButton } from '@/components/SecondaryButton'
 import { ReviewModel } from '@/models/Reviews'
 import { API_REVIEW } from '@/constants/apis'
 import { useRouter } from "next/router";
+import { enqueueSnackbar } from 'notistack'
 
 
 const AddReviewProduct = () => {
@@ -42,7 +43,9 @@ const AddReviewProduct = () => {
             throw new Error(data.message || 'Failed to create review'); // Provide meaningful error message
           }
       
-          console.log('Review created successfully:', data);
+          enqueueSnackbar('Review has been posted!', {
+            variant: "success",
+          });
           // Perform additional actions on success (e.g., updating UI)
           router.push('/dashboard')
         } catch (error) {
