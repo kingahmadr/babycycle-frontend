@@ -118,23 +118,23 @@ const SellerDashboard: React.FC = () => {
         console.error("No token found");
         return;
       }
-  
+
       const response = await fetch(`${API_URL}/sellers/products`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-  
+
       if (!response.ok) {
         throw new Error("Failed to fetch active listings");
       }
-  
+
       const result = await response.json();
       const productsArray = await Promise.all(
         result.map(async (product: any) => {
           let discount = 0;
           let rating: number | string = "No reviews yet"; // Adjust type here
-  
+
           try {
             // Fetch discount
             const discountResponse = await fetch(`${API_URL}/api/v1/discount/${product.id}`, {
@@ -146,7 +146,7 @@ const SellerDashboard: React.FC = () => {
             if (discountResult && discountResult.discount_percentage) {
               discount = parseFloat(discountResult.discount_percentage) || 0;
             }
-  
+
             // Fetch rating
             const reviewResponse = await fetch(`${API_URL}/reviews?product_id=${product.id}`, {
               headers: {
@@ -165,7 +165,7 @@ const SellerDashboard: React.FC = () => {
           } catch (error) {
             console.error("Error fetching discount or rating", error);
           }
-  
+
           return {
             ...product,
             discount,
@@ -174,10 +174,10 @@ const SellerDashboard: React.FC = () => {
           };
         })
       );
-  
+
       // Set products for display
       setProducts(productsArray);
-  
+
       // Update itemsListed in sellerPerformance
       setSellerPerformance((prev) => ({
         ...prev,
@@ -187,7 +187,6 @@ const SellerDashboard: React.FC = () => {
       console.error("Error fetching active listings", error);
     }
   };
-  
 
   const handleEditProduct = (product: Product) => {
     setProductDetails(product);
@@ -398,61 +397,99 @@ const SellerDashboard: React.FC = () => {
               </table>
             </div>
           )}
+
+          {activeTab === "Out of Stock" && (
+            <div className="p-6 rounded-lg">
+              <h3 className="text-heading-md font-bold mb-4">Out of Stock Products</h3>
+              {paginatedProducts.length === 0 ? (
+                <p className="text-gray-600">No out-of-stock products to display.</p>
+              ) : (
+                <table className="w-full text-left border-collapse mb-6 text-body-md">
+                  <thead>
+                    <tr>
+                      <th>Product Name</th>
+                      <th>Price</th>
+                      <th>Stock</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {paginatedProducts.map((product) => (
+                      <tr key={product.id}>
+                        <td>{product.name}</td>
+                        <td>IDR {product.price.toLocaleString()}</td>
+                        <td>{product.stock}</td>
+                        <td>
+                          <Image
+                            onClick={() => handleEditProduct(product)}
+                            src="/assets/edit.png"
+                            alt="Edit"
+                            width={20}
+                            height={20}
+                            className="cursor-pointer"
+                          />
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </div>
+          )}
         </div>
       </div>
 
       {/* Edit Modal */}
-      
       {showEditModal && productDetails && (
-  <div className="modal-overlay">
-  <div className="modal-content">
-      <h3 className="text-heading-md font-bold mb-4">Product Details</h3>
-      <div className="space-y-4">
-        {/* Product Name */}
-        <div>
-          <label className="block font-bold text-gray-700">Product name</label>
-          <input
-            type="text"
-            value={productDetails.name}
-            onChange={(e) => handleInputChange("name", e.target.value)}
-            className="w-full border p-2 rounded"
-          />
-        </div>
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <h3 className="text-heading-md font-bold mb-4">Product Details</h3>
+            <div className="space-y-4">
+              {/* Product Name */}
+              <div>
+                <label className="block font-bold text-gray-700">Product name</label>
+                <input
+                  type="text"
+                  value={productDetails.name}
+                  onChange={(e) => handleInputChange("name", e.target.value)}
+                  className="w-full border p-2 rounded"
+                />
+              </div>
 
-        {/* Price */}
-        <div>
-          <label className="block font-bold text-gray-700">Price (IDR)</label>
-          <input
-            type="number"
-            value={productDetails.price}
-            onChange={(e) => handleInputChange("price", parseFloat(e.target.value))}
-            className="w-full border p-2 rounded"
-          />
-        </div>
+              {/* Price */}
+              <div>
+                <label className="block font-bold text-gray-700">Price (IDR)</label>
+                <input
+                  type="number"
+                  value={productDetails.price}
+                  onChange={(e) => handleInputChange("price", parseFloat(e.target.value))}
+                  className="w-full border p-2 rounded"
+                />
+              </div>
 
-        {/* Quantity */}
-        <div>
-          <label className="block font-bold text-gray-700 mb-1">Quantity</label>
-          <div className="flex items-center space-x-2">
-            <button
-              type="button"
-              onClick={() =>
-                handleInputChange("stock", Math.max(1, Number(productDetails.stock) - 1))
-              }
-              className="bg-black text-white px-3 py-1 rounded-md"
-            >
-              -
-            </button>
-            <span>{productDetails.stock}</span>
-            <button
-              type="button"
-              onClick={() => handleInputChange("stock", Number(productDetails.stock) + 1)}
-              className="bg-black text-white px-3 py-1 rounded-md"
-            >
-              +
-            </button>
-          </div>
-        </div>
+              {/* Quantity */}
+              <div>
+                <label className="block font-bold text-gray-700 mb-1">Quantity</label>
+                <div className="flex items-center space-x-2">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      handleInputChange("stock", Math.max(1, Number(productDetails.stock) - 1))
+                    }
+                    className="bg-black text-white px-3 py-1 rounded-md"
+                  >
+                    -
+                  </button>
+                  <span>{productDetails.stock}</span>
+                  <button
+                    type="button"
+                    onClick={() => handleInputChange("stock", Number(productDetails.stock) + 1)}
+                    className="bg-black text-white px-3 py-1 rounded-md"
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
 
         {/* Category */}
         <div>
