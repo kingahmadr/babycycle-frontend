@@ -1,11 +1,14 @@
 import { PrimaryButton } from '@/components/PrimaryButton'
+import { useAuth } from '@/context/AuthContext'
 import { useEffect, useState } from 'react'
 import { TransactionModel } from '@/models/Transactions'
 import { API_TRANSACTION } from '@/constants/apis'
+import { useRouter } from 'next/navigation'
 
-function Index() {
+const UserDashboard = () => {
 
     const [activeTab, setActiveTab] = useState('personalData')
+    const router = useRouter()
 
     const handleTabClick = (tab: string) => {
         setActiveTab(tab)
@@ -40,18 +43,42 @@ function Index() {
         fetchTransactions()
     }, [activeTab])
 
+    const { user } = useAuth()
+    console.log(user)
+
+    const handleReviewPage = (productID: number) => {    
+        router.push(`/add_review/${productID}`)
+    }
+
+    const handleSellerDashboard = () => {    
+    router.push(`/seller_dashboard`)
+    }
+
   return (
     <div className='body-width mb-[72px] max-md:w-full max-md:px-8'>
-        <div className='py-6'>
-            <span className='text-3xl text-buttonBlue'>Hello, Username!</span>
-        </div>
-        <div className='h-auto border-[1px] rounded-[20px] border-buttonBlue'>
-            <div className='flex gap-14 px-6 py-8 text-2xl text-buttonBlue'>
-                <span className={`cursor-pointer ${activeTab === 'personalData'? 'text-black font-bold' : '' }`} onClick={() => handleTabClick('personalData')}>Personal Data</span>
-                <span className={`cursor-pointer ${activeTab === 'addressList'? 'text-black font-bold' : '' }`} onClick={() => handleTabClick('addressList')}>Address List</span>
-                <span className={`cursor-pointer ${activeTab === 'transactionHistory'? 'text-black font-bold' : '' }`} onClick={() => handleTabClick('transactionHistory')}>Transaction History</span>
-                <span className={`cursor-pointer ${activeTab === 'becomeSeller'? 'text-black font-bold' : '' }`} onClick={() => handleTabClick('becomeSeller')}>Become a Seller</span>
+        <div className='w-full flex justify-between items-center'>
+            <div className='py-6'>
+                <span className='text-3xl text-buttonBlue'>Hello, {user?.data.username!== null ? user?.data.username : 'You'}!</span>
             </div>
+            {user?.data.is_seller === true ? 
+                <div>
+                    <PrimaryButton type='button' onClick={handleSellerDashboard}>Seller Dashboard</PrimaryButton>
+                </div>
+                : null
+            }
+            
+        </div>
+        
+            <div className='h-auto border-[1px] rounded-[20px] border-buttonBlue'>
+            
+                <div className='flex gap-14 px-6 py-8 text-2xl text-buttonBlue'>
+                    <span className={`cursor-pointer ${activeTab === 'personalData'? 'text-black font-bold' : '' }`} onClick={() => handleTabClick('personalData')}>Personal Data</span>
+                    <span className={`cursor-pointer ${activeTab === 'addressList'? 'text-black font-bold' : '' }`} onClick={() => handleTabClick('addressList')}>Address List</span>
+                    <span className={`cursor-pointer ${activeTab === 'transactionHistory'? 'text-black font-bold' : '' }`} onClick={() => handleTabClick('transactionHistory')}>Transaction History</span>
+                    {user?.data.is_seller === false ? <span className={`cursor-pointer ${activeTab === 'becomeSeller'? 'text-black font-bold' : '' }`} onClick={() => handleTabClick('becomeSeller')}>Become a Seller</span> : null}
+                </div>
+                
+            
             <hr className='h-[3px] bg-buttonBlue'></hr>
 
             {activeTab === 'personalData' && (
@@ -70,9 +97,9 @@ function Index() {
                                 <span>Phone Number</span>
                             </div>
                             <div className='w-2/4 flex flex-col text-xl p-6 gap-8'>
-                                <span>name</span>
-                                <span>email</span>
-                                <span>phone number</span>
+                                <span>{user?.data.username !== null ? user?.data.username : '-'}</span>
+                                <span>{user?.data.email !== null ? user?.data.email : '-'}</span>
+                                <span>{user?.data.phone !== null ? user?.data.phone : '-'}</span>
                             </div>
                         </div>
                         <div className='w-full flex justify-end gap-8 text-xl'>
@@ -149,7 +176,7 @@ function Index() {
                                 </div>
 
                                 <div className='w-full flex justify-end gap-3'>
-                                    <PrimaryButton type='button'>Add Review +</PrimaryButton>
+                                    <PrimaryButton type='button' onClick={() => handleReviewPage(transaction.product_id)}>Add Review +</PrimaryButton>
                                 </div>
                             </div>
 
@@ -158,34 +185,41 @@ function Index() {
                  ))
             )}
 
-            {activeTab === 'becomeSeller' && (
-            <div className='w-full p-6 flex justify-center'>
-                <div className='w-[506px] flex flex-col gap-6 text-xl'>
+{user?.data.is_seller === false ? (
+    activeTab === 'becomeSeller' && (
+        <div className='w-full p-6 flex justify-center'>
+            <div className='w-[506px] flex flex-col gap-6 text-xl'>
 
-                    <div className='w-full space-y-1'>
-                        <label className='text-buttonBlue'>Shop Name</label>
-                        <input className='w-full h-10 border-2 border-formGray rounded-md' type='text'></input>
-                    </div>
-                    <div className='w-full space-y-1'>
-                        <label className='text-buttonBlue'>Description</label>
-                        <input className='w-full h-40 border-2 border-formGray rounded-md' type='textarea'></input>
-                    </div>
-                    <div className='w-full space-y-1'>
-                        <label className='text-buttonBlue'>Location</label>
-                        <input className='w-full h-10 border-2 border-formGray rounded-md' type='text'></input>
-                    </div>
-
-                    <div className='w-full flex justify-end'>
-                        <PrimaryButton type='submit'>Submit</PrimaryButton>
-                    </div>
-
+                <div className='w-full space-y-1'>
+                    <label className='text-buttonBlue'>Shop Name</label>
+                    <input className='w-full h-10 border-2 border-formGray rounded-md' type='text'></input>
                 </div>
+                <div className='w-full space-y-1'>
+                    <label className='text-buttonBlue'>Description</label>
+                    <input className='w-full h-40 border-2 border-formGray rounded-md' type='textarea'></input>
+                </div>
+                <div className='w-full space-y-1'>
+                    <label className='text-buttonBlue'>Location</label>
+                    <input className='w-full h-10 border-2 border-formGray rounded-md' type='text'></input>
+                </div>
+
+                <div className='w-full flex justify-end'>
+                    <PrimaryButton type='submit'>Submit</PrimaryButton>
+                </div>
+
             </div>
-            )}
+        </div>)
+        ):(
+            null
+        )
+        }
+
+
+            
 
         </div>
     </div>
   )
 }
 
-export default Index
+export default UserDashboard
