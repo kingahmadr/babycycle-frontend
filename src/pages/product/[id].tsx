@@ -161,7 +161,7 @@ const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({
   console.log(review);
 
   return (
-    <div className="py-12 px-4 bg-white max-w-[1440]">
+    <div className="py-12 px-4 bg-white xl:min-w-[1200] lg:min-w-[900] md:min-w-[500] sm:min-w-[250]">
       {/* Product Section */}
       <div className="flex flex-col lg:flex-row lg:space-x-12 mb-8 items-center">
         <div className="lg:w-1/2 p-6">
@@ -171,10 +171,10 @@ const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({
             alt={product.name || "Item Image"}
             width={500}
             height={500}
-            className="rounded-lg object-cover w-full max-w-[500px]"
+            className="rounded-lg object-cover w-full max-w-[800px]"
           />
         </div>
-        <div className="lg:w-1/2">
+        <div className="w-full">
           <h1 className="text-heading-xl mb-4 text-center lg:text-left">
             {product.name || "PRODUCT NAME"}
           </h1>
@@ -223,14 +223,14 @@ const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({
           </div>
 
           {/* Buttons */}
-          <div className="flex flex-col space-y-4 py-10">
+          <div className="flex flex-col lg:items-start md:items-center sm:items-center space-y-4 py-10">
             <button
-              className="btn-add-to-cart w-full "
+              className="btn-add-to-cart w-2/3 "
               onClick={handleAddToCart}
             >
               Add to Cart
             </button>
-            <button className="btn-buy-now w-full" onClick={handleBuyNow}>
+            <button className="btn-buy-now w-2/3" onClick={handleBuyNow}>
               Buy Now
             </button>
           </div>

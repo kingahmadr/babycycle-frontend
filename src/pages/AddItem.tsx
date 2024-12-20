@@ -5,7 +5,7 @@ import { API_URL } from "@/constants/apis";
 import axios from "axios";
 
 const ListingForm: React.FC = () => {
-  const [images, setImage] = useState<File>();
+  const [images, setImage] = useState<File | null>(null);
   const { enqueueSnackbar } = useSnackbar();
   const { user, isAuthenticated } = useAuth();
   const [imageUrl, setImageUrl] = useState<string>("");
@@ -28,47 +28,48 @@ const ListingForm: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const API_KEY = 'dce66a7b2cfd67c8a37ccaa5e1dc990b';
 
-  const handleImageUpload = async (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    if (event.target.files && event.target.files[0]) {
-      const file = event.target.files[0]
-      setImage(file)
-      // Upload to Imgbb
-      const formData = new FormData()
-      formData.append('image', file)
+  const handleImageUpload = async () => {
+    if (images) {
+      const formData = new FormData();
+      formData.append('image', images);
       const fixImageUrl = (url: string): string => {
-        return url.replace('https://i.ibb.co/', 'https://i.ibb.co.com/')
-      }
+        return url.replace('https://i.ibb.co/', 'https://i.ibb.co.com/');
+      };
       try {
         const response = await axios.post(
           `https://api.imgbb.com/1/upload?expiration=600&key=${API_KEY}`,
           formData
-        )
+        );
         if (response.data.success) {
-          let uploadedUrl = response.data.data.url
-          uploadedUrl = fixImageUrl(uploadedUrl)
-          setImageUrl(uploadedUrl)
+          let uploadedUrl = response.data.data.url;
+          uploadedUrl = fixImageUrl(uploadedUrl);
+          setImageUrl(uploadedUrl);
           enqueueSnackbar('Image uploaded successfully!', {
             variant: 'success'
-          })
+          });
+          return true;
         } else {
           enqueueSnackbar('Image upload failed. Please try again.', {
             variant: 'error'
-          })
+          });
+          return false;
         }
       } catch (error) {
-        console.error('Image upload error:', error)
+        console.error('Image upload error:', error);
         enqueueSnackbar('An error occurred while uploading the image.', {
           variant: 'error'
-        })
+        });
+        return false;
       }
-    } else {
-      enqueueSnackbar('You can only upload a maximum of 4 pictures.', {
-        variant: 'error'
-      })
     }
-  }
+    return false;
+  };
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && event.target.files[0]) {
+      setImage(event.target.files[0]); // Set the local state for displaying the image
+    }
+  };
 
   const handlePromptUpload = () => {
     const input = document.getElementById("imageInput") as HTMLInputElement;
@@ -76,10 +77,20 @@ const ListingForm: React.FC = () => {
   };
 
   const handleImageRemove = () => {
-    const confirmation = confirm("Are you sure you want to delete this image?");
-    if (confirmation) {
-      setImageUrl("");
-    }
+    enqueueSnackbar("Are you sure you want to delete this image?", {
+      variant: "warning",
+      action: (key) => (
+        <button
+          onClick={() => {
+            setImage(null);
+            setImageUrl("");
+            enqueueSnackbar("Image deleted successfully!", { variant: "success" });
+          }}
+        >
+          Confirm
+        </button>
+      ),
+    });
   };
 
   const handleQuantityChange = (amount: number) => {
@@ -126,6 +137,16 @@ const ListingForm: React.FC = () => {
         variant: "error",
       });
       return;
+    }
+
+    if (images) {
+      const imageUploaded = await handleImageUpload();
+      if (!imageUploaded) {
+        enqueueSnackbar("Failed to upload image. Please try again.", {
+          variant: "error",
+        });
+        return;
+      }
     }
 
     const productPayload = {
@@ -215,7 +236,7 @@ const ListingForm: React.FC = () => {
     setTermsChecked(false);
     setDeclarationChecked(false);
   };
-  
+
   return (
     <div className="p-8 mt-10 bg-white min-h-screen xl:min-w-[1440px] lg:min-w-[900px] md:min-w-[600]">
       <h2 className="text-heading-xl font-bold mb-8">What are you listing today?</h2>
@@ -223,16 +244,15 @@ const ListingForm: React.FC = () => {
 
         {/* Left Side - Picture Upload */}
         <div className="flex flex-col space-y-4 w-full lg:w-1/2">
-          
           {/* Main Image */}
           <div
-            className="bg-gray-300 relative max-w-[600] flex justify-center items-center cursor-pointer hover:bg-gray-400 rounded-lg"
+            className="bg-gray-300 relative max-w-[600] flex justify-center items-center cursor-pointer hover:bg-gray-400 rounded-lg min-h-[500] min-w-[500]"
             onClick={handlePromptUpload}
           >
             {images ? (
               <div className="relative w-full h-full">
                 <img
-                  src={URL.createObjectURL(images)}
+                  src={URL.createObjectURL(images)} // Display the selected image
                   alt="Uploaded"
                   className="w-full h-full object-cover rounded-lg"
                 />
@@ -254,7 +274,7 @@ const ListingForm: React.FC = () => {
             type="file"
             id="imageInput"
             accept="image/*"
-            onChange={handleImageUpload}
+            onChange={handleFileChange} // Updated to handle file selection
             className="hidden"
           />
         </div>

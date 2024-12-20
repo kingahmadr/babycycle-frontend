@@ -5,4 +5,4 @@ export const PAGE_LISTING = '/product'
 
 export const PUBLIC_ROUTES = [PAGE_LANDING, PAGE_LOGIN, PAGE_REGISTER]
 
-export const PROTECTED_ROUTES = []
+export const PROTECTED_ROUTES: string[] = ["/protected-route-1", "/protected-route-2"];
