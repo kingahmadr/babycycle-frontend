@@ -123,7 +123,7 @@ const UserDashboard = () => {
 
                     <div className='w-full p-6 flex flex-col gap-8 border-4 border-borderGray rounded-xl text-xl'>
                         <div className='w-full flex flex-col'>
-                            <span className='font-bold'>Adinda Maya</span>
+                            <span className='font-bold'>Mamadi</span>
                             <span>083674657890</span>
                             <span>Gang Masjid Jami Al Huda, Leuwinutug, Kec. Citeureup, Kabupaten Bogor, Jawa Barat</span>
                         </div>

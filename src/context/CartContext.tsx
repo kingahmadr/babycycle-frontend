@@ -18,6 +18,7 @@ interface CartContextProps {
   increaseQuantity: (id: string) => void;
   decreaseQuantity: (id: string) => void;
   clearCart: () => void; // Added clearCart to the context
+  fetchCart: () => void
 }
 
 export const CartContext = createContext<CartContextProps | undefined>(
@@ -52,7 +53,12 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         },
       });
       const data = await response.json();
-      setCart(Array.isArray(data) ? data : []);
+      if (data) {
+        setCart(Array.isArray(data) ? data : []);
+      }
+      else {
+        setCart([])
+      }
       console.log(data);
     } catch (error) {
       console.error("Error fetching cart:", error);
@@ -288,6 +294,7 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         increaseQuantity,
         decreaseQuantity,
         clearCart, // Exposed clearCart
+        fetchCart
       }}
     >
       {children}
