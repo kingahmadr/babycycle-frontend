@@ -7,6 +7,8 @@ import { CartContext } from "@/context/CartContext";
 import Image from "next/image";
 import { finalPrice } from "@/utils/DiscountedPrice";
 import { useSnackbar } from "notistack";
+import { API_CARTS } from "@/constants/apis";
+import { useAuth } from "@/context/AuthContext";
 
 interface ProductDetailsPageProps {
   product: ProductModel;
@@ -34,14 +36,55 @@ const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({
 
   const { addToCart } = cartContext;
 
-  const handleAddToCart = () => {
-    try {
-      addToCart({
-        id: product.id.toString(),
-        name: product.name,
-        price: discountedPrice,
-        quantity: 1,
+  const {isAuthenticated} = useAuth();
+
+  const handleAddToCart = async () =>{
+
+    if (!isAuthenticated) {
+      enqueueSnackbar("You must be logged in to add items to the cart.", {
+        variant: "error",
       });
+      router.push('/login');
+      return;
+    }
+
+    try {
+      
+      const response = await fetch(API_CARTS, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        body: JSON.stringify([
+          {
+            product_id: product.id.toString(),
+            name: product.name,
+            total_price: discountedPrice,
+            quantity: 1,
+          },
+        ]), // Send as an array
+      });
+      const productData = await response.json();
+
+      if (!response.ok) {
+        enqueueSnackbar("Failed to process add item to cart. Please try again.", {
+          variant: "error",
+        });
+        return;
+      }
+      
+      addToCart(productData);
+
+
+      // addToCart({
+      //   id: product.id.toString(),
+      //   name: product.name,
+      //   price: discountedPrice,
+      //   quantity: 1,
+      // });
+
+
 
       enqueueSnackbar("Product has been added to the cart!", { variant: "success" });
     } catch (error) {
@@ -53,14 +96,15 @@ const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({
 
   const handleBuyNow = () => {
     try {
-      addToCart({
-        id: product.id.toString(),
-        name: product.name,
-        price: discountedPrice,
-        quantity: 1,
-      });
+      // addToCart({
+      //   id: product.id.toString(),
+      //   name: product.name,
+      //   total_price: discountedPrice,
+      //   quantity: 1,
+      // });
 
-      router.push("/cart");
+      // router.push("/cart");
+      window.location.href = "/cart";
 
       enqueueSnackbar("Product added to cart. Proceeding to checkout.", {
         variant: "success",
