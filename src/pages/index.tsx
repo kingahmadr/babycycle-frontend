@@ -165,7 +165,7 @@ export const getStaticProps: GetStaticProps = async () => {
     newProducts = await response.json();
 
     const saleResponse = await fetch(
-      `https://api.babycycle.my.id/api/v1/products`
+      `https://api.babycycle.my.id/api/v1/products/sorting?limit=4&offset=0&sort_by=newest`
     );
     if (!saleResponse.ok) throw new Error("Failed to fetch sale products");
     saleProducts = await saleResponse.json();
