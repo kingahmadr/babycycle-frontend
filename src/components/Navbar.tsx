@@ -147,7 +147,7 @@ const Navbar: React.FC = () => {
                   All Products
                 </Link>
                 <Link
-                  href="/category/clothing"
+                  href="/product?category=clothing"
                   className="block px-4 py-2 uppercase hover:bg-textBlue hover:text-white"
                 >
                   Clothing
@@ -158,12 +158,12 @@ const Navbar: React.FC = () => {
                 >
                   Furniture
                 </Link>
-                <Link
+                {/* <Link
                   href="/category/stroller"
                   className="block px-4 py-2 uppercase hover:bg-textBlue hover:text-white"
                 >
                   Stroller & Carrier
-                </Link>
+                </Link> */}
                 <Link
                   href="/category/toys"
                   className="block px-4 py-2 uppercase hover:bg-textBlue hover:text-white"
