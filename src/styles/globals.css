@@ -33,6 +33,13 @@ body {
   align-items:center; */
 }
 
+body {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  display: contents;
+}
+
 h1,
 h2,
 h3,
@@ -147,4 +154,27 @@ label {
 .unsaturated {
   filter: saturate(0%);
   transition: all 0.1s step-end;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); /* Opaque grey background */
+  z-index: 50; /* Higher than the navbar */
+}
+
+.modal-content {
+  position: relative;
+  margin: 2rem auto;
+  top: 5%;
+  background-color: #fff;
+  padding: 2rem;
+  border-radius: 8px;
+  max-width: 1000px; 
+  max-height: 90vh; 
+  overflow-y: auto; /* Allows scrolling */
+  z-index: 100; 
 }

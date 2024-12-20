@@ -56,73 +56,78 @@ const Home = ({ newProducts, saleProducts }: ProductsProps) => {
   }
 
   return (
-    <div>
+    <>
 
-      <div className='h-[660px] bg-babyBlue flex -z-10 object-contain relative w full'>
-        <div className='w-1/2'>
-          <img className='absolute top-[55px] left-[180px] z-[3]' src='/image_2.png'/>
-          <img className='absolute top-[96px] left-[144px] z-[1]' src='/Rectangle_42.png'/>
-          <img className='absolute top-0 right-0 z-[5]' src='/asset3_1.png'/>
-          <img className='absolute' src='/asset2_2.png'/>
-          <img className='absolute bottom-0 right-0' src='/asset2_1.png'/>
-          <img className='absolute bottom-0 z-[5]' src='/asset1_1.png'/>
-        </div>
-        
-        <div className='w-1/2 flex flex-col justify-center items-center gap-6 z-50'>
-          <span className='font-decor text-4xl'>Smart mom, shop recycle</span>
-
-            <PrimaryButton type='button' onClick={() => handleClick(PAGE_LISTING)}>Explore</PrimaryButton>
-
-        </div>
-      </div>
-
-      <div className='flex gap-6 py-16'>
-        <div className='w-[240px] h-[291px] flex flex-col gap-around'>
-          <span className='h-1/2 uppercase text-6xl'>Sale & Promo</span>
-          <div className='h-1/2 flex justify-center items-center'>
-            <PrimaryButton type='button' onClick={() => handleClick(PAGE_LISTING)}>See All</PrimaryButton>
-          </div>
-        </div>
-        {loading ? (
-            <div className='w-full h-56 flex justify-center items-center'>
-                <Spinner />
+      <div className='w-full bg-babyBlue max-md:bg-transparent'>
+        <div className='h-[660px] bg-[url(/Hero.png)] max-md:bg-[url(/Hero2.png)] bg-no-repeat bg-center max-md:bg-left flex object-contain w-full'>  
+          <div className='w-full flex justify-end'>
+            <div className='w-1/2 max-md:w-full flex flex-col justify-center items-center gap-6'>
+              <span className='font-decor text-4xl'>Smart mom, shop recycle</span>
+              <PrimaryButton type='button' onClick={() => handleClick(PAGE_LISTING)}>Explore</PrimaryButton>
             </div>
-        ) : ( 
-          saleProducts && saleProducts.data.map((product, index)=>(
-          discounts[product.id] && discounts[product.id]?.is_active && product.stock !== 0 ?
-            <ProductCard
-              id={product.id}
-              key={index}
-              image_url={product.image_url}
-              name={product.name}
-              price={product.price}
-              stock={product.stock}
-              discount={discounts[product.id]}
-            /> : null
-          )
-        ))}
-        </div>
-
-      <div className='flex gap-6 py-16'>
-      {newProducts && newProducts.data.map((product, index)=>(
-          <ProductCard
-            id={product.id}
-            key={index}
-            image_url={product.image_url}
-            name={product.name}
-            price={product.price}
-            stock={product.stock}
-          />
-        ))}        
-        <div className='w-[240px] h-[291px] flex flex-col gap-around'>
-          <span className='h-1/2 uppercase text-6xl'>New Arrival</span>
-          <div className='h-1/2 flex justify-center items-center'>
-            <PrimaryButton type='button' onClick={() => handleClick(PAGE_LISTING)}>See All</PrimaryButton>
           </div>
         </div>
       </div>
 
-    </div>
+      <div className='max-w-[1440px]'>
+
+        <div className='w-full flex max-md:flex-col gap-6 justify-start items-center'>
+          <div className='w-[240px] max-md:w-full h-[291px] max-md:h-auto flex md:flex-col gap-around max-md:justify-between max-md:items-center'>
+            <span className='h-1/2 uppercase text-6xl max-md:text-5xl'>Sale & Promo</span>
+            <div className='h-1/2 flex justify-center items-center'>
+              <PrimaryButton type='button' onClick={() => handleClick(PAGE_LISTING)}>See All</PrimaryButton>
+            </div>
+          </div>
+          <div className='grid grid-rows-1 max-md:grid-rows-2 grid-cols-4 max-md:grid-cols-2 gap-6 py-16 max-md:py-4'>
+            {loading ? (
+                <div className='w-[200%] h-56 flex flex-wrap justify-center items-center'>
+                    <Spinner />
+                </div>
+            ) : ( 
+              saleProducts && saleProducts.data.map((product, index)=>(
+              discounts[product.id] && discounts[product.id]?.is_active && product.stock !== 0 ?
+                <ProductCard
+                  id={product.id}
+                  key={index}
+                  image_url={product.image_url}
+                  name={product.name}
+                  price={product.price}
+                  stock={product.stock}
+                  discount={discounts[product.id]}
+                /> 
+              : null
+              )
+            ))}
+
+          </div>
+          </div>
+
+        <div className='flex max-md:flex-col-reverse justify-between items-center gap-6'>
+        <div className='grid grid-rows-1 grid-cols-4 max-md:grid-rows-2 max-md:grid-cols-2 gap-6 py-16 max-md:py-4'>
+          {newProducts && newProducts.data.map((product, index)=>(
+              <ProductCard
+                id={product.id}
+                key={index}
+                image_url={product.image_url}
+                name={product.name}
+                price={product.price}
+                stock={product.stock}
+              />
+            ))} 
+          </div> 
+   
+          <div className='w-[240px] max-md:w-full h-[291px] max-md:h-auto flex md:flex-col gap-around max-md:justify-between max-md:items-center'>
+            <span className='h-1/2 uppercase text-6xl max-md:text-5xl'>New Arrival</span>
+            <div className='h-1/2 flex justify-center items-center'>
+              <PrimaryButton type='button' onClick={() => handleClick(PAGE_LISTING)}>See All</PrimaryButton>
+            </div>
+          </div>
+
+
+        </div>
+      </div>
+
+    </>
   )
 }
 
