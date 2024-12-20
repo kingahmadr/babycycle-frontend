@@ -1,9 +1,14 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { useSnackbar } from "notistack";
+import { useAuth } from "@/context/AuthContext";
+import { API_URL } from "@/constants/apis";
+import axios from "axios";
 
 const ListingForm: React.FC = () => {
-  const [images, setImages] = useState<File[]>([]);
+  const [images, setImage] = useState<File>();
   const { enqueueSnackbar } = useSnackbar();
+  const { user, isAuthenticated } = useAuth();
+  const [imageUrl, setImageUrl] = useState<string>("");
 
   const [productDetails, setProductDetails] = useState({
     name: "",
@@ -11,38 +16,70 @@ const ListingForm: React.FC = () => {
     quantity: 1,
     category: "Toys",
     description: "",
-    warranty: "",
+    warranty: "No",
     enablePromo: "No",
     discount: "",
     startDate: "",
     endDate: "",
   });
+
   const [termsChecked, setTermsChecked] = useState(false);
   const [declarationChecked, setDeclarationChecked] = useState(false);
   const [loading, setLoading] = useState(false);
+  const API_KEY = 'dce66a7b2cfd67c8a37ccaa5e1dc990b';
 
-  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     if (event.target.files && event.target.files[0]) {
-      if (images.length < 4) {
-        setImages([...images, event.target.files[0]]);
-      } else {
-        enqueueSnackbar("You can only upload a maximum of 4 pictures.", {
-          variant: "error",
-        });
+      const file = event.target.files[0]
+      setImage(file)
+      // Upload to Imgbb
+      const formData = new FormData()
+      formData.append('image', file)
+      const fixImageUrl = (url: string): string => {
+        return url.replace('https://i.ibb.co/', 'https://i.ibb.co.com/')
       }
+      try {
+        const response = await axios.post(
+          `https://api.imgbb.com/1/upload?expiration=600&key=${API_KEY}`,
+          formData
+        )
+        if (response.data.success) {
+          let uploadedUrl = response.data.data.url
+          uploadedUrl = fixImageUrl(uploadedUrl)
+          setImageUrl(uploadedUrl)
+          enqueueSnackbar('Image uploaded successfully!', {
+            variant: 'success'
+          })
+        } else {
+          enqueueSnackbar('Image upload failed. Please try again.', {
+            variant: 'error'
+          })
+        }
+      } catch (error) {
+        console.error('Image upload error:', error)
+        enqueueSnackbar('An error occurred while uploading the image.', {
+          variant: 'error'
+        })
+      }
+    } else {
+      enqueueSnackbar('You can only upload a maximum of 4 pictures.', {
+        variant: 'error'
+      })
     }
-  };
-
-  const handleImageRemove = (index: number) => {
-    const confirmation = confirm("Are you sure you want to delete this image?");
-    if (confirmation) {
-      setImages((prev) => prev.filter((_, i) => i !== index));
-    }
-  };
+  }
 
   const handlePromptUpload = () => {
     const input = document.getElementById("imageInput") as HTMLInputElement;
     input?.click();
+  };
+
+  const handleImageRemove = () => {
+    const confirmation = confirm("Are you sure you want to delete this image?");
+    if (confirmation) {
+      setImageUrl("");
+    }
   };
 
   const handleQuantityChange = (amount: number) => {
@@ -60,7 +97,21 @@ const ListingForm: React.FC = () => {
   };
 
   const handleSubmit = async () => {
-    const { name, price, category, description, warranty } = productDetails;
+    if (!isAuthenticated || !user?.data) {
+      enqueueSnackbar("You must be logged in to list a product.", {
+        variant: "error",
+      });
+      return;
+    }
+
+    if (!user?.data.is_seller) {
+      enqueueSnackbar("You must register as a seller to list products.", {
+        variant: "error",
+      });
+      return;
+    }
+
+    const { name, price, category, description, warranty, quantity } = productDetails;
 
     if (
       !name ||
@@ -77,27 +128,71 @@ const ListingForm: React.FC = () => {
       return;
     }
 
-    if (
-      productDetails.enablePromo === "Yes" &&
-      (!productDetails.discount || !productDetails.startDate || !productDetails.endDate)
-    ) {
-      enqueueSnackbar("Please complete all promo fields.", {
-        variant: "error",
-      });
-      return;
-    }
+    const productPayload = {
+      name,
+      price: parseFloat(price),
+      stock: quantity,
+      category,
+      descriptions: description,
+      is_warranty: warranty === "Yes",
+      image_url: imageUrl, // Added image_url to the payload
+    };
 
     try {
       setLoading(true);
-      enqueueSnackbar("Product submitted successfully!", {
-        variant: "success",
+      const productResponse = await fetch(`${API_URL}/products`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        body: JSON.stringify(productPayload),
       });
+
+      if (!productResponse.ok) {
+        const errorText = await productResponse.text();
+        console.error("Product creation failed:", errorText);
+        enqueueSnackbar("Failed to create product. Please try again.", {
+          variant: "error",
+        });
+        return;
+      }
+
+      const createdProduct = await productResponse.json();
+      enqueueSnackbar("Product added successfully!", { variant: "success" });
+
+      if (productDetails.enablePromo === "Yes") {
+        const discountPayload = {
+          product_id: createdProduct.id,
+          discount_percentage: parseFloat(productDetails.discount),
+          start_date: productDetails.startDate,
+          end_date: productDetails.endDate,
+          is_active: true,
+        };
+
+        const discountResponse = await fetch(`${API_URL}/discount`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+          body: JSON.stringify(discountPayload),
+        });
+
+        if (!discountResponse.ok) {
+          enqueueSnackbar("Failed to add discount. Please try again.", {
+            variant: "error",
+          });
+          return;
+        }
+
+        enqueueSnackbar("Discount added successfully!", { variant: "success" });
+      }
+
       resetForm();
     } catch (error) {
-      console.error("Error:", error);
-      enqueueSnackbar("Failed to submit product.", {
-        variant: "error",
-      });
+      console.error("Error submitting product or discount:", error);
+      enqueueSnackbar("Failed to submit product or discount.", { variant: "error" });
     } finally {
       setLoading(false);
     }
@@ -110,33 +205,34 @@ const ListingForm: React.FC = () => {
       quantity: 1,
       category: "Toys",
       description: "",
-      warranty: "",
+      warranty: "No",
       enablePromo: "No",
       discount: "",
       startDate: "",
       endDate: "",
     });
-    setImages([]);
+    setImageUrl("");
     setTermsChecked(false);
     setDeclarationChecked(false);
   };
-
+  
   return (
-    <div className="p-8 mt-10 bg-white min-h-screen max-w-[1440px]">
+    <div className="p-8 mt-10 bg-white min-h-screen xl:min-w-[1440px] lg:min-w-[900px] md:min-w-[600]">
       <h2 className="text-heading-xl font-bold mb-8">What are you listing today?</h2>
       <div className="flex flex-col lg:flex-row lg:space-x-8 space-y-8 lg:space-y-0">
 
         {/* Left Side - Picture Upload */}
         <div className="flex flex-col space-y-4 w-full lg:w-1/2">
+          
           {/* Main Image */}
           <div
-            className="bg-gray-300 relative w-full h-[300px] md:h-[400px] lg:h-[500px] flex justify-center items-center cursor-pointer hover:bg-gray-400 rounded-lg"
+            className="bg-gray-300 relative max-w-[600] flex justify-center items-center cursor-pointer hover:bg-gray-400 rounded-lg"
             onClick={handlePromptUpload}
           >
-            {images[0] ? (
+            {images ? (
               <div className="relative w-full h-full">
                 <img
-                  src={URL.createObjectURL(images[0])}
+                  src={URL.createObjectURL(images)}
                   alt="Uploaded"
                   className="w-full h-full object-cover rounded-lg"
                 />
@@ -144,55 +240,15 @@ const ListingForm: React.FC = () => {
                   className="absolute bottom-2 right-2 bg-red-500 text-white p-1 rounded-full hover:bg-red-600"
                   onClick={(e) => {
                     e.stopPropagation();
-                    handleImageRemove(0);
+                    handleImageRemove();
                   }}
                 >
-                  <img
-                    src="/assets/remove.png"
-                    alt="Remove"
-                    className="w-6 h-6"
-                  />
+                  Remove
                 </button>
               </div>
             ) : (
               <p className="text-gray-500 text-lg">Select photos</p>
             )}
-          </div>
-
-          {/* Thumbnails */}
-          <div className="flex space-x-4">
-            {[...Array(3)].map((_, index) => (
-              <div
-                key={index}
-                className="bg-gray-300 relative w-[100px] h-[100px] md:w-[150px] md:h-[150px] flex justify-center items-center cursor-pointer hover:bg-gray-400 rounded-lg"
-                onClick={handlePromptUpload}
-              >
-                {images[index + 1] ? (
-                  <div className="relative w-full h-full">
-                    <img
-                      src={URL.createObjectURL(images[index + 1])}
-                      alt="Uploaded"
-                      className="w-full h-full object-cover rounded-lg"
-                    />
-                    <button
-                      className="absolute bottom-2 right-2 bg-red-500 text-white p-1 rounded-full hover:bg-red-600"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleImageRemove(index + 1);
-                      }}
-                    >
-                      <img
-                        src="/assets/remove.png"
-                        alt="Remove"
-                        className="w-4 h-4"
-                      />
-                    </button>
-                  </div>
-                ) : (
-                  <p className="text-gray-500 text-sm">+</p>
-                )}
-              </div>
-            ))}
           </div>
           <input
             type="file"

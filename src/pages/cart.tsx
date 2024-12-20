@@ -42,11 +42,11 @@ const CartPage: React.FC = () => {
     const addressFromStorage = JSON.parse(localStorage.getItem("selectedAddress") || "{}");
     if (addressFromStorage?.address) {
       setSelectedAddress(addressFromStorage);
-    } else if (user?.address) {
+    } else if (user?.data.address) {
       setSelectedAddress({
-        name: user.username || "Guest",
-        phone: user.phone || "No phone number available",
-        address: user.address || "No address available",
+        name: user?.data.username || "Guest",
+        phone: user?.data.phone || "No phone number available",
+        address: user?.data.address || "No address available",
       });
     } else {
       setSelectedAddress({
