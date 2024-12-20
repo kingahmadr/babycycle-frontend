@@ -1,135 +1,287 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import { PrimaryButton } from "@/components/PrimaryButton";
 import Link from "next/link";
+import { API_URL } from "@/constants/apis";
+import { useAuth } from "@/context/AuthContext";
 
 interface Product {
-  id: string;
+  id: number;
   name: string;
   sku: string;
-  rating: number;
+  rating: number | string; // For "No reviews yet"
   price: number;
   discount: number;
   finalPrice: number;
-  stock: string;
+  stock: number;
   image_url: string | null;
   category: string | null;
   ageCategory: string | null;
   warranty: string | null;
   enablePromo: string | null;
-  startDate: Date | null;
-  endDate: Date | null;
+  startDate: string | null;
+  endDate: string | null;
   description: string | null;
 }
 
 const SellerDashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState("Active Listing");
-  const [activeProducts, setActiveProducts] = useState<Product[]>([
-    {
-      id: "1",
-      name: "Product Name",
-      sku: "123456789",
-      rating: 4.5,
-      price: 90000,
-      discount: 10,
-      finalPrice: 81000,
-      stock: "5",
-      image_url: "/assets/logo_main.png",
-      category: null,
-     ageCategory: null,
-    warranty: null,
-    enablePromo: null,
-    startDate: null,
-    endDate: null,
-    description: null,
-    },
-    {
-      id: "2",
-      name: "Product Name",
-      sku: "123456789",
-      rating: 4.5,
-      price: 90000,
-      discount: 10,
-      finalPrice: 81000,
-      stock: "5",
-      image_url: "/assets/logo_main.png",
-      category: null,
-     ageCategory: null,
-    warranty: null,
-    enablePromo: null,
-    startDate: null,
-    endDate: null,
-    description: null,
-    },
-  ]);
-
-  const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
-  const [currentPage, setCurrentPage] = useState(1);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [selectedProducts, setSelectedProducts] = useState<number[]>([]);
   const [showEditModal, setShowEditModal] = useState(false);
   const [productDetails, setProductDetails] = useState<Product | null>(null);
+  const [sellerPerformance, setSellerPerformance] = useState({
+    revenue: 0,
+    itemsSold: 0,
+    itemsListed: 0,
+    averageRating: 0,
+  });
 
-  const itemsPerPage = 10;
+  const { user } = useAuth();
 
-  const paginatedProducts = activeProducts.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
+  useEffect(() => {
+    if (user) {
+      fetchSellerPerformance();
+      fetchActiveListings();
+    }
+  }, [user]);
 
-  const handleTabClick = (tab: string) => {
-    setActiveTab(tab);
+  const fetchSellerPerformance = async () => {
+    if (typeof window === "undefined") return;
+
+    const token = localStorage.getItem("token");
+    if (!token) {
+      console.error("No token found");
+      return;
+    }
+
+    try {
+      const sellerResponse = await fetch(`${API_URL}/sellers`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const sellerResult = await sellerResponse.json();
+      const sellerData = sellerResult || [];
+
+      const currentSeller = sellerData.find(
+        (seller: any) => seller.user_id === user?.data.id
+      );
+
+      if (!currentSeller) {
+        console.error("Current seller not found for user ID:", user?.data.id);
+        setSellerPerformance({
+          revenue: 0,
+          itemsSold: 0,
+          itemsListed: 0,
+          averageRating: 0,
+        });
+        return;
+      }
+
+      const transactionResponse = await fetch(`${API_URL}/transactions`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const transactionResult = await transactionResponse.json();
+      const transactionData = transactionResult || [];
+
+      const sellerTransactions = transactionData.filter(
+        (transaction: any) => transaction.seller_id === currentSeller.id
+      );
+
+      const revenue = sellerTransactions.reduce(
+        (total: number, t: any) => total + t.total_price,
+        0
+      );
+
+      const itemsSold = sellerTransactions.reduce(
+        (total: number, t: any) => total + t.quantity,
+        0
+      );
+
+      setSellerPerformance((prev) => ({
+        ...prev,
+        revenue,
+        itemsSold,
+      })); // itemsListed will be set by fetchActiveListings
+    } catch (error) {
+      console.error("Error fetching seller performance:", error);
+    }
   };
 
-  const handleSelectProduct = (id: string) => {
-    setSelectedProducts((prev) =>
-      prev.includes(id) ? prev.filter((productId) => productId !== id) : [...prev, id]
-    );
+  const fetchActiveListings = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        console.error("No token found");
+        return;
+      }
+  
+      const response = await fetch(`${API_URL}/sellers/products`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+  
+      if (!response.ok) {
+        throw new Error("Failed to fetch active listings");
+      }
+  
+      const result = await response.json();
+      const productsArray = await Promise.all(
+        result.map(async (product: any) => {
+          let discount = 0;
+          let rating: number | string = "No reviews yet"; // Adjust type here
+  
+          try {
+            // Fetch discount
+            const discountResponse = await fetch(`${API_URL}/api/v1/discount/${product.id}`, {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            });
+            const discountResult = await discountResponse.json();
+            if (discountResult && discountResult.discount_percentage) {
+              discount = parseFloat(discountResult.discount_percentage) || 0;
+            }
+  
+            // Fetch rating
+            const reviewResponse = await fetch(`${API_URL}/reviews?product_id=${product.id}`, {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            });
+            const reviewResult = await reviewResponse.json();
+            if (reviewResult.length > 0) {
+              rating = parseFloat(
+                (
+                  reviewResult.reduce((acc: number, r: any) => acc + r.rating, 0) /
+                  reviewResult.length
+                ).toFixed(1)
+              );
+            }
+          } catch (error) {
+            console.error("Error fetching discount or rating", error);
+          }
+  
+          return {
+            ...product,
+            discount,
+            finalPrice: product.price - product.price * (discount / 100),
+            rating,
+          };
+        })
+      );
+  
+      // Set products for display
+      setProducts(productsArray);
+  
+      // Update itemsListed in sellerPerformance
+      setSellerPerformance((prev) => ({
+        ...prev,
+        itemsListed: productsArray.length,
+      }));
+    } catch (error) {
+      console.error("Error fetching active listings", error);
+    }
   };
+  
 
   const handleEditProduct = (product: Product) => {
     setProductDetails(product);
     setShowEditModal(true);
   };
 
-  const handleInputChange = (field: keyof Product, value: string | number) => {
+  const handleInputChange = (field: keyof Product, value: any) => {
     setProductDetails((prev) => prev && { ...prev, [field]: value });
   };
 
-  const handleUpdateProduct = () => {
+  const handleUpdateProduct = async () => {
     if (!productDetails) return;
 
-    setActiveProducts((prev) =>
-      prev.map((product) =>
-        product.id === productDetails.id ? productDetails : product
-      )
-    );
-    setShowEditModal(false);
-    alert("Product updated successfully!");
+    try {
+      const productResponse = await fetch(
+        `${API_URL}/products/${productDetails.id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+          body: JSON.stringify(productDetails),
+        }
+      );
+
+      if (!productResponse.ok) throw new Error("Failed to update product.");
+
+      // Update discount table
+      if (productDetails.enablePromo === "Yes") {
+        await fetch(`${API_URL}/discount`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+          body: JSON.stringify({
+            product_id: productDetails.id,
+            discount_percentage: productDetails.discount,
+            start_date: productDetails.startDate,
+            end_date: productDetails.endDate,
+          }),
+        });
+      }
+
+      fetchActiveListings();
+      setShowEditModal(false);
+      alert("Product updated successfully!");
+    } catch (error) {
+      console.error("Error updating product", error);
+    }
   };
+
+  const paginatedProducts = products.filter(
+    (product) =>
+      activeTab === "Active Listing"
+        ? product.stock > 0
+        : product.stock === 0
+  );
 
   return (
     <div className="body-width mb-[72px] max-md:w-full max-md:px-8">
       {/* Greeting Section */}
       <div className="py-6">
-        <span className="text-3xl text-buttonBlue">Hello, Seller Name!</span>
+        <span className="text-3xl text-buttonBlue">
+          Hello, {user?.data.username}!
+        </span>
       </div>
 
       {/* Transaction Summary */}
       <h2 className="text-heading-md font-bold mb-4">Shop Name’s Performance</h2>
-      <div className="h-auto border-[2px] border-textBlue rounded-[20px] bg-lightGray flex items-center justify-around p-6 mb-8 w-full">
+      <Link href="/seller-transaction" passHref>
+        <PrimaryButton type="button">Show Full Transactions</PrimaryButton>
+      </Link>
+
+      <div className="h-auto border-[2px] border-textBlue rounded-[20px] bg-lightGray flex items-center justify-around p-6 my-8 w-full">
         <div className="text-center">
-          <p className="text-heading-xl font-bold">IDR 5,78M</p>
+          <p className="text-heading-xl font-bold">
+            IDR {sellerPerformance.revenue.toLocaleString()}
+          </p>
           <p className="text-body-md">Lifetime revenue</p>
         </div>
         <div className="text-center">
-          <p className="text-heading-xl font-bold">12</p>
+          <p className="text-heading-xl font-bold">{sellerPerformance.itemsSold}</p>
           <p className="text-body-md">Items sold</p>
         </div>
         <div className="text-center">
-          <p className="text-heading-xl font-bold">50</p>
+          <p className="text-heading-xl font-bold">{sellerPerformance.itemsListed}</p>
           <p className="text-body-md">Items listed</p>
         </div>
         <div className="text-center">
-          <p className="text-heading-xl font-bold">4</p>
+          <p className="text-heading-xl font-bold">
+            {sellerPerformance.averageRating.toFixed(1)}
+          </p>
           <p className="text-body-md">Average Rating</p>
         </div>
       </div>
@@ -144,7 +296,7 @@ const SellerDashboard: React.FC = () => {
               className={`cursor-pointer ${
                 activeTab === tab ? "text-black font-bold" : ""
               }`}
-              onClick={() => handleTabClick(tab)}
+              onClick={() => setActiveTab(tab)}
             >
               {tab}
             </span>
@@ -163,12 +315,12 @@ const SellerDashboard: React.FC = () => {
                   className="w-366 p-2 border border-formGray rounded-md"
                 />
                 <Link href="/AddItem" passHref>
-  <PrimaryButton type="button">Add Item +</PrimaryButton>
-</Link>
+                  <PrimaryButton type="button">Add Item +</PrimaryButton>
+                </Link>
               </div>
 
               {/* Product Table */}
-              <table className="w-full text-left border-collapse mb-6">
+              <table className="w-full text-left border-collapse mb-6 text-body-md">
                 <thead>
                   <tr>
                     <th>
@@ -189,7 +341,7 @@ const SellerDashboard: React.FC = () => {
                     <th>Product Name</th>
                     <th>Rating</th>
                     <th>Price</th>
-                    <th>Disc</th>
+                    <th>Discount</th>
                     <th>Final Price</th>
                     <th>Stock</th>
                     <th>Action</th>
@@ -202,13 +354,19 @@ const SellerDashboard: React.FC = () => {
                         <input
                           type="checkbox"
                           checked={selectedProducts.includes(product.id)}
-                          onChange={() => handleSelectProduct(product.id)}
+                          onChange={() =>
+                            setSelectedProducts((prev) =>
+                              prev.includes(product.id)
+                                ? prev.filter((id) => id !== product.id)
+                                : [...prev, product.id]
+                            )
+                          }
                         />
                       </td>
                       <td>
-                        <div className="flex items-center">
+                        <div className="flex p-6 items-center">
                           <Image
-                            src={product.image_url || "/assets/logo_main.png"}
+                            src={product.image_url || "/assets/placeholder_image.jpg"}
                             alt={product.name}
                             width={50}
                             height={50}
@@ -216,23 +374,23 @@ const SellerDashboard: React.FC = () => {
                           />
                           <div className="ml-4">
                             <p className="font-bold">{product.name}</p>
-                            <p className="text-formGray text-sm">{product.sku}</p>
                           </div>
                         </div>
                       </td>
-                      <td>{product.rating}</td>
+                      <td>{typeof product.rating === "number" ? product.rating : "No reviews yet"}</td>
                       <td>IDR {product.price.toLocaleString()}</td>
                       <td>{product.discount}%</td>
                       <td>IDR {product.finalPrice.toLocaleString()}</td>
                       <td>{product.stock}</td>
                       <td>
-                          <Image onClick={() => handleEditProduct(product)}
-                            src="/assets/edit.png"
-                            alt="Edit"
-                            width={20}
-                            height={20}
-                            className="cursor-pointer"
-                          />
+                        <Image
+                          onClick={() => handleEditProduct(product)}
+                          src="/assets/edit.png"
+                          alt="Edit"
+                          width={20}
+                          height={20}
+                          className="cursor-pointer"
+                        />
                       </td>
                     </tr>
                   ))}
@@ -464,7 +622,6 @@ const SellerDashboard: React.FC = () => {
     </div>
   </div>
 )}
-
     </div>
   );
 };

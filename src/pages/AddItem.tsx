@@ -250,38 +250,6 @@ const ListingForm: React.FC = () => {
               <p className="text-gray-500 text-lg">Select photos</p>
             )}
           </div>
-
-          {/* <div
-            className="bg-gray-300 relative w-full h-[300px] md:h-[400px] lg:h-[500px] flex justify-center items-center cursor-pointer hover:bg-gray-400 rounded-lg"
-            onClick={handlePromptUpload}
-          >
-            {images[0] ? (
-              <div className="relative w-full h-full">
-                <img
-                  src={URL.createObjectURL(images[0])}
-                  alt="Uploaded"
-                  className="w-full h-full object-cover rounded-lg"
-                />
-                <button
-                  className="absolute bottom-2 right-2 bg-red-500 text-white p-1 rounded-full hover:bg-red-600"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleImageRemove(0);
-                  }}
-                >
-                  <img
-                    src="/assets/remove.png"
-                    alt="Remove"
-                    className="w-6 h-6"
-                  />
-                </button>
-              </div>
-            ) : (
-              <p className="text-gray-500 text-lg">Select photos</p>
-            )}
-          </div> */}
-
-
           <input
             type="file"
             id="imageInput"
