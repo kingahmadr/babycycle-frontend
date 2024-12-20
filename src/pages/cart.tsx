@@ -3,7 +3,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { CartContext } from "@/context/CartContext";
 import { useAuth } from "@/context/AuthContext";
-import { API_CHECKOUT, API_CARTS, API_CHECKOUT_ITEM } from "@/constants/apis";
+import { API_CHECKOUT, API_CHECKOUT_VALIDATION, API_CHECKOUT_ITEM, API_CARTS_CLEAR } from "@/constants/apis";
 import { formattedDate } from "@/utils/getCheckoutTimestamp";
 import { AddressModel } from "@/models/Address";
 import { useSnackbar } from "notistack";
@@ -26,9 +26,17 @@ const CartPage: React.FC = () => {
   const [bankTransferConfirmed, setBankTransferConfirmed] = useState(false);
   const [eWalletDetails, setEWalletDetails] = useState({ phone: "", email: "" });
 
-  const subtotal = cart.reduce((total, item) => total + item.price * item.quantity, 0);
-  const shipping = subtotal * 0.1;
-  const total = subtotal + shipping;
+  let subtotal = 0;
+  let shipping = 0;
+  let total = 0;
+  
+  if (cart && cart.length > 0) {
+    subtotal = cart.reduce((total, item) => total + item.price * item.quantity, 0);
+    shipping = subtotal * 0.1; // Calculate 10% of subtotal as shipping
+    total = subtotal + shipping;
+  }
+
+  // const [dataTemp, setDataTemp] = useState<any[]>([]);
 
   useEffect(() => {
     const addressFromStorage = JSON.parse(localStorage.getItem("selectedAddress") || "{}");
@@ -50,47 +58,61 @@ const CartPage: React.FC = () => {
   }, [user]);
 
   const handleCheckout = async () => {
-    if (paymentMethod === "bank_transfer" && !bankTransferConfirmed) {
-      enqueueSnackbar("Please confirm that you've transferred successfully.", {
-        variant: "error",
-      });
-      return;
-    }
-
-    if (paymentMethod === "e_wallet" && (!eWalletDetails.phone || !eWalletDetails.email)) {
-      enqueueSnackbar("Please fill in the details of your eWallet for payment deduction.", {
-        variant: "error",
-      });
-      return;
-    }
-
-    const checkoutId = `CHK-${formattedDate}`;
-    const cartData = cart.map((item) => ({
-      product_id: parseInt(item.id, 10),
-      quantity: item.quantity,
-      total_price: item.price * item.quantity,
-      user_address: selectedAddress?.address || "Unknown address",
-      checkout_order_id: checkoutId,
-    }));
-
+    console.log('cart', cart)
+    
     try {
+
       setLoading(true);
-
-      const cartResponse = await fetch(API_CARTS, {
-        method: "POST",
+      const response = await fetch(API_CHECKOUT_VALIDATION, {
+        method: 'GET',
         headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('token')}`
         },
-        body: JSON.stringify(cartData),
+        
       });
+  
+      const data = await response.json();
+      if (!response.ok) {
+        console.log("Validation Error:", data);
+  
+        // Combine error and product_name into a single message
+        const errorMessage = `${data.error || "Error occurred"} - ${
+          data.product_name || "Unknown product"
+        }`;
+  
+        enqueueSnackbar(errorMessage, {
+          variant: "error",
+        });
+        // setLoading(false);
+        return;
+      }
+      console.log('response', data);
 
-      if (!cartResponse.ok) {
-        enqueueSnackbar("Failed to checkout due to cart data submission failure", {
+      if (paymentMethod === "bank_transfer" && !bankTransferConfirmed) {
+        enqueueSnackbar("Please confirm that you've transferred successfully.", {
           variant: "error",
         });
         return;
       }
+  
+      if (paymentMethod === "e_wallet" && (!eWalletDetails.phone || !eWalletDetails.email)) {
+        enqueueSnackbar("Please fill in the details of your eWallet for payment deduction.", {
+          variant: "error",
+        });
+        return;
+      }
+  
+      const checkoutId = `CHK-${formattedDate}`;
+      const cartData = cart.map((item) => ({
+        product_id: parseInt(item.product_id, 10),
+        quantity: item.quantity,
+        total_price: item.price * item.quantity,
+        user_address: selectedAddress?.address || "Unknown address",
+        checkout_order_id: checkoutId,
+      }));
+
+      console.log('cartData', cartData)
 
       const checkoutPayload = {
         checkout_id: checkoutId,
@@ -105,6 +127,7 @@ const CartPage: React.FC = () => {
         },
         body: JSON.stringify(checkoutPayload),
       });
+
 
       if (!checkoutResponse.ok) {
         enqueueSnackbar("Failed to process checkout. Please try again.", {
@@ -121,25 +144,49 @@ const CartPage: React.FC = () => {
         },
         body: JSON.stringify(cartData),
       });
-
+      
+      const responseData = await checkoutItemsResponse.json(); // Parse response JSON
+      
       if (!checkoutItemsResponse.ok) {
-        enqueueSnackbar("Failed to process checkout items. Please try again.", {
+        // Display backend error message if available, or a fallback message
+        const errorMessage =
+          responseData ;
+        enqueueSnackbar(errorMessage, { variant: "error" });
+        return;
+      }
+      
+      // Display success message from backend or fallback
+      const successMessage =
+        responseData?.message || "Checkout items processed successfully!";
+      enqueueSnackbar(successMessage, { variant: "success" });
+
+      const clearCartResponse = await fetch(API_CARTS_CLEAR, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+
+      if (!clearCartResponse.ok) {
+        enqueueSnackbar("Failed to clear cart. Please try again.", {
           variant: "error",
         });
         return;
       }
+      enqueueSnackbar("Cart cleared successfully!", {
+        variant: "success",
+      })
+      window.location.href = "/cart";
 
-      enqueueSnackbar("Checkout Successful!", { variant: "success" });
-      clearCart();
     } catch (error) {
-      console.error("Checkout Error:", error);
-      enqueueSnackbar("Failed to process checkout. Please try again later.", {
-        variant: "error",
-      });
+      console.error('Validation failed:', error);
     } finally {
       setLoading(false);
     }
-  };
+      
+    
+  }
 
   return (
     <div className="bg-babyBlue min-h-screen w-full flex flex-col">
@@ -162,75 +209,75 @@ const CartPage: React.FC = () => {
 
           {/* Product List */}
           <div className="flex flex-col justify-between">
-            <div className="space-y-4">
-              {cart.map((item) => (
-                <div
-                  key={item.id}
-                  className="bg-white p-4 rounded-lg shadow-md flex flex-col sm:flex-row items-center justify-between gap-4"
-                >
-                  {/* Product Image and Details */}
-                  <div className="flex items-center gap-x-4 w-full sm:w-1/2">
-                    <Link href={`/product/${item.id}`} passHref>
-                      <Image
-                        src="/assets/placeholder_image.jpg"
-                        alt="Product Image"
-                        width={80}
-                        height={80}
-                        className="rounded-lg cursor-pointer"
-                      />
-                    </Link>
-                    <div>
-                      <Link href={`/product/${item.id}`} passHref>
-                        <h2 className="text-body-sm font-bold hover:text-textBlue hover:underline">
-                          {item.name}
-                        </h2>
+             <div className="space-y-4">
+                {Array.isArray(cart) && cart.map((item) => (
+                  <div
+                    key={item.id}
+                    className="bg-white p-4 rounded-lg shadow-md flex flex-col sm:flex-row items-center justify-between gap-4"
+                  >
+                    {/* Product Image and Details */}
+                    <div className="flex items-center gap-x-4 w-full sm:w-1/2">
+                      <Link href={`/product/${item.product_id}`} passHref>
+                        <Image
+                          src="/assets/placeholder_image.jpg"
+                          alt="Product Image"
+                          width={80}
+                          height={80}
+                          className="rounded-lg cursor-pointer"
+                        />
                       </Link>
-                      <p className="text-body-sm">
-                        Rp {item.price.toLocaleString()} / unit
-                      </p>
+                      <div>
+                        <Link href={`/product/${item.product_id}`} passHref>
+                          <h2 className="text-body-sm font-bold hover:text-textBlue hover:underline">
+                            {item.name}
+                          </h2>
+                        </Link>
+                        <p className="text-body-sm">
+                          Rp {item?.price ? item.price.toLocaleString() : "0"} / unit
+                        </p>
+                      </div>
                     </div>
-                  </div>
 
-                  {/* Qty Handler */}
-                  <div className="flex flex-row items-center space-x-2">
-                    <span>{item.quantity}</span>
-                    <div className="flex flex-col items-center space-y-1">
-                      <button onClick={() => increaseQuantity(item.id)}>
-                        <Image
-                          src="/assets/increase.png"
-                          alt="Increase"
-                          width={24}
-                          height={24}
-                        />
-                      </button>
-                      <button onClick={() => decreaseQuantity(item.id)}>
-                        <Image
-                          src="/assets/decrease.png"
-                          alt="Decrease"
-                          width={24}
-                          height={24}
-                        />
-                      </button>
+                    {/* Qty Handler */}
+                    <div className="flex flex-row items-center space-x-2">
+                      <span>{item.quantity}</span>
+                      <div className="flex flex-col items-center space-y-1">
+                        <button onClick={() => increaseQuantity(item.id)}>
+                          <Image
+                            src="/assets/increase.png"
+                            alt="Increase"
+                            width={24}
+                            height={24}
+                          />
+                        </button>
+                        <button onClick={() => decreaseQuantity(item.id)}>
+                          <Image
+                            src="/assets/decrease.png"
+                            alt="Decrease"
+                            width={24}
+                            height={24}
+                          />
+                        </button>
+                      </div>
                     </div>
-                  </div>
 
-                  {/* Total Price */}
-                  <div className="text-body-sm font-bold text-center w-full sm:w-1/4">
-                    Rp {(item.price * item.quantity).toLocaleString()}
-                  </div>
+                    {/* Total Price */}
+                    <div className="text-body-sm font-bold text-center w-full sm:w-1/4">
+                      Rp {(item.price * item.quantity).toLocaleString()}
+                    </div>
 
-                  {/* Remove Icon */}
-                  <button onClick={() => removeFromCart(item.id)}>
-                    <Image
-                      src="/assets/remove.png"
-                      alt="Remove"
-                      width={24}
-                      height={24}
-                    />
-                  </button>
-                </div>
-              ))}
-            </div>
+                    {/* Remove Icon */}
+                    <button onClick={() => removeFromCart(item.id)}>
+                      <Image
+                        src="/assets/remove.png"
+                        alt="Remove"
+                        width={24}
+                        height={24}
+                      />
+                    </button>
+                  </div>
+                ))}
+              </div>
             <div className="flex py-6 justify-end">
               <Link href="/product">
                 <button className="btn-primary w-full md:w-30">Continue Shopping</button>

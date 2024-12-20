@@ -8,10 +8,14 @@ export const API_ME = `${API_URL}/users/me`
 export const API_FORGOT_PASSWORD = `${API_URL}/users/forgot-password`
 export const API_RESET_PASSWORD = `${API_URL}/users/reset-password`
 export const API_CHECKOUT = `${API_URL}/checkout/now`
-export const API_CHECKOUT_ITEM = `${API_URL}/checkout/items`
+export const API_CHECKOUT_ITEM = `${API_URL_LOCAL}/checkout/items`
+export const API_CHECKOUT_VALIDATION = `${API_URL_LOCAL}/checkout/validate`
+export const API_CARTS_CLEAR = `${API_URL_LOCAL}/carts/clear`
 // export const API_CHECKOUT = `http://127.0.0.1:5100/api/v1/checkout/now`
 // export const API_CHECKOUT_ITEM = `http://127.0.0.1:5100/api/v1/checkout/items`
-export const API_CARTS = `${API_URL}/carts`
+export const API_CARTS = `${API_URL_LOCAL}/carts`
 
 export const API_TRANSACTION = `${API_URL_LOCAL}/transactions`
 export const API_REVIEW = `${API_URL_LOCAL}/reviews`
+
+export const API_GET_PRODUCT = `${API_URL}/products`
