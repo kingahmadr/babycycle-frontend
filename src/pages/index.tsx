@@ -54,6 +54,8 @@ const Home = ({ newProducts, saleProducts }: ProductsProps) => {
     }
   }, [saleProducts]);
 
+  console.log(saleProducts.data);
+
   const handleClick = (href: string) => {
     router.push(href);
   };
@@ -165,7 +167,7 @@ export const getStaticProps: GetStaticProps = async () => {
     newProducts = await response.json();
 
     const saleResponse = await fetch(
-      `https://api.babycycle.my.id/api/v1/products/sorting?limit=4&offset=0&sort_by=newest`
+      `https://api.babycycle.my.id/api/v1/products`
     );
     if (!saleResponse.ok) throw new Error("Failed to fetch sale products");
     saleProducts = await saleResponse.json();
