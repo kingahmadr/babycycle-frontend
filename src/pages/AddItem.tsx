@@ -3,12 +3,16 @@ import { useSnackbar } from "notistack";
 import { useAuth } from "@/context/AuthContext";
 import { API_URL } from "@/constants/apis";
 import axios from "axios";
+import { formattedDate } from "@/utils/getCheckoutTimestamp";
+import { formatDate } from "@/utils/formatDate";
+import { useRouter } from "next/navigation";
 
 const ListingForm: React.FC = () => {
   const [images, setImage] = useState<File | null>(null);
   const { enqueueSnackbar } = useSnackbar();
   const { user, isAuthenticated } = useAuth();
   const [imageUrl, setImageUrl] = useState<string>("");
+  const router = useRouter();
 
   const [productDetails, setProductDetails] = useState({
     name: "",
@@ -26,48 +30,52 @@ const ListingForm: React.FC = () => {
   const [termsChecked, setTermsChecked] = useState(false);
   const [declarationChecked, setDeclarationChecked] = useState(false);
   const [loading, setLoading] = useState(false);
-  const API_KEY = 'dce66a7b2cfd67c8a37ccaa5e1dc990b';
+  const API_KEY = "6577355fd16db2acfd3f9b1909b77125";
+  // const API_KEY = process.env.IMGBB_URL;
 
-  const handleImageUpload = async () => {
-    if (images) {
+  const handleImageUpload = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    if (event.target.files && event.target.files[0]) {
+      const file = event.target.files[0];
+      setImage(file);
+
+      // Upload to Imgbb
       const formData = new FormData();
-      formData.append('image', images);
+      formData.append("image", file);
+
       const fixImageUrl = (url: string): string => {
-        return url.replace('https://i.ibb.co/', 'https://i.ibb.co.com/');
+        return url.replace("https://i.ibb.co/", "https://i.ibb.co.com/");
       };
+
       try {
         const response = await axios.post(
           `https://api.imgbb.com/1/upload?expiration=600&key=${API_KEY}`,
           formData
         );
+
         if (response.data.success) {
           let uploadedUrl = response.data.data.url;
           uploadedUrl = fixImageUrl(uploadedUrl);
           setImageUrl(uploadedUrl);
-          enqueueSnackbar('Image uploaded successfully!', {
-            variant: 'success'
+          enqueueSnackbar("Image uploaded successfully!", {
+            variant: "success",
           });
-          return true;
         } else {
-          enqueueSnackbar('Image upload failed. Please try again.', {
-            variant: 'error'
+          enqueueSnackbar("Image upload failed. Please try again.", {
+            variant: "error",
           });
-          return false;
         }
       } catch (error) {
-        console.error('Image upload error:', error);
-        enqueueSnackbar('An error occurred while uploading the image.', {
-          variant: 'error'
+        console.error("Image upload error:", error);
+        enqueueSnackbar("An error occurred while uploading the image.", {
+          variant: "error",
         });
-        return false;
       }
-    }
-    return false;
-  };
-
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files && event.target.files[0]) {
-      setImage(event.target.files[0]); // Set the local state for displaying the image
+    } else {
+      enqueueSnackbar("You can only upload a maximum of 4 pictures.", {
+        variant: "error",
+      });
     }
   };
 
@@ -84,7 +92,9 @@ const ListingForm: React.FC = () => {
           onClick={() => {
             setImage(null);
             setImageUrl("");
-            enqueueSnackbar("Image deleted successfully!", { variant: "success" });
+            enqueueSnackbar("Image deleted successfully!", {
+              variant: "success",
+            });
           }}
         >
           Confirm
@@ -122,7 +132,8 @@ const ListingForm: React.FC = () => {
       return;
     }
 
-    const { name, price, category, description, warranty, quantity } = productDetails;
+    const { name, price, category, description, warranty, quantity } =
+      productDetails;
 
     if (
       !name ||
@@ -133,21 +144,24 @@ const ListingForm: React.FC = () => {
       !termsChecked ||
       !declarationChecked
     ) {
-      enqueueSnackbar("Please fill all required fields and check all required boxes.", {
-        variant: "error",
-      });
+      enqueueSnackbar(
+        "Please fill all required fields and check all required boxes.",
+        {
+          variant: "error",
+        }
+      );
       return;
     }
 
-    if (images) {
-      const imageUploaded = await handleImageUpload();
-      if (!imageUploaded) {
-        enqueueSnackbar("Failed to upload image. Please try again.", {
-          variant: "error",
-        });
-        return;
-      }
-    }
+    // if (images) {
+    //   const imageUploaded = await handleImageUpload();
+    //   if (!imageUploaded) {
+    //     enqueueSnackbar("Failed to upload image. Please try again.", {
+    //       variant: "error",
+    //     });
+    //     return;
+    //   }
+    // }
 
     const productPayload = {
       name,
@@ -181,41 +195,60 @@ const ListingForm: React.FC = () => {
 
       const createdProduct = await productResponse.json();
       enqueueSnackbar("Product added successfully!", { variant: "success" });
+      console.log("created productDetails", createdProduct);
 
       if (productDetails.enablePromo === "Yes") {
         const discountPayload = {
           product_id: createdProduct.id,
           discount_percentage: parseFloat(productDetails.discount),
-          start_date: productDetails.startDate,
-          end_date: productDetails.endDate,
+          start_date: formatDate(productDetails.startDate),
+          end_date: formatDate(productDetails.endDate),
           is_active: true,
         };
 
-        const discountResponse = await fetch(`${API_URL}/discount`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-          body: JSON.stringify(discountPayload),
-        });
+        console.log(discountPayload);
 
-        if (!discountResponse.ok) {
+        try {
+          const discountResponse = await fetch(`${API_URL}/discount`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+            body: JSON.stringify(discountPayload),
+          });
+
+          console.log(discountResponse);
+
+          if (!discountResponse.ok) {
+            const errorText = await discountResponse.text();
+            console.error("Discount creation failed:", errorText);
+            enqueueSnackbar("Failed to add discount. Please try again.", {
+              variant: "error",
+            });
+            return;
+          }
+
+          enqueueSnackbar("Discount added successfully!", {
+            variant: "success",
+          });
+        } catch (error) {
+          console.error("Discount creation failed:", error);
           enqueueSnackbar("Failed to add discount. Please try again.", {
             variant: "error",
           });
-          return;
         }
-
-        enqueueSnackbar("Discount added successfully!", { variant: "success" });
       }
 
       resetForm();
     } catch (error) {
       console.error("Error submitting product or discount:", error);
-      enqueueSnackbar("Failed to submit product or discount.", { variant: "error" });
+      enqueueSnackbar("Failed to submit product or discount.", {
+        variant: "error",
+      });
     } finally {
       setLoading(false);
+      router.push("/");
     }
   };
 
@@ -239,9 +272,10 @@ const ListingForm: React.FC = () => {
 
   return (
     <div className="p-8 mt-10 bg-white min-h-screen xl:min-w-[1440px] lg:min-w-[900px] md:min-w-[600]">
-      <h2 className="text-heading-xl font-bold mb-8">What are you listing today?</h2>
+      <h2 className="text-heading-xl font-bold mb-8">
+        What are you listing today?
+      </h2>
       <div className="flex flex-col lg:flex-row lg:space-x-8 space-y-8 lg:space-y-0">
-
         {/* Left Side - Picture Upload */}
         <div className="flex flex-col space-y-4 w-full lg:w-1/2">
           {/* Main Image */}
@@ -274,7 +308,7 @@ const ListingForm: React.FC = () => {
             type="file"
             id="imageInput"
             accept="image/*"
-            onChange={handleFileChange} // Updated to handle file selection
+            onChange={handleImageUpload} // Updated to handle file selection
             className="hidden"
           />
         </div>
@@ -285,7 +319,9 @@ const ListingForm: React.FC = () => {
           <div className="space-y-4">
             {/* Product Name */}
             <div className="flex flex-col lg:flex-row items-start lg:items-center">
-              <label className="w-full lg:w-1/4 text-textBlue">Product name</label>
+              <label className="w-full lg:w-1/4 text-textBlue">
+                Product name
+              </label>
               <input
                 type="text"
                 value={productDetails.name}
@@ -296,7 +332,9 @@ const ListingForm: React.FC = () => {
 
             {/* Price */}
             <div className="flex flex-col lg:flex-row items-start lg:items-center">
-              <label className="w-full lg:w-1/4 text-textBlue">Price (IDR)</label>
+              <label className="w-full lg:w-1/4 text-textBlue">
+                Price (IDR)
+              </label>
               <input
                 type="number"
                 value={productDetails.price}
@@ -333,11 +371,10 @@ const ListingForm: React.FC = () => {
                 onChange={(e) => handleInputChange("category", e.target.value)}
                 className="flex-1 border border-gray-300 rounded-md px-2 py-1"
               >
-                <option value="Toys">Toys</option>
-                <option value="Stroller">Stroller</option>
-                <option value="Carrier">Carrier</option>
-                <option value="Furniture">Furniture</option>
-                <option value="Others">Others</option>
+                <option value="clothing">Clothing</option>
+                <option value="toys">Toys</option>
+                <option value="furniture">Furniture</option>
+                <option value="others">Others</option>
               </select>
             </div>
 
@@ -346,7 +383,9 @@ const ListingForm: React.FC = () => {
               <label className="w-1/4 text-textBlue">Description</label>
               <textarea
                 value={productDetails.description}
-                onChange={(e) => handleInputChange("description", e.target.value)}
+                onChange={(e) =>
+                  handleInputChange("description", e.target.value)
+                }
                 className="flex-1 border border-gray-300 rounded-md px-2 py-1"
               ></textarea>
             </div>
@@ -360,7 +399,9 @@ const ListingForm: React.FC = () => {
                     type="radio"
                     value="Yes"
                     checked={productDetails.warranty === "Yes"}
-                    onChange={(e) => handleInputChange("warranty", e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange("warranty", e.target.value)
+                    }
                   />{" "}
                   Yes
                 </label>
@@ -369,7 +410,9 @@ const ListingForm: React.FC = () => {
                     type="radio"
                     value="No"
                     checked={productDetails.warranty === "No"}
-                    onChange={(e) => handleInputChange("warranty", e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange("warranty", e.target.value)
+                    }
                   />{" "}
                   No
                 </label>
@@ -387,7 +430,9 @@ const ListingForm: React.FC = () => {
                     type="radio"
                     value="Yes"
                     checked={productDetails.enablePromo === "Yes"}
-                    onChange={(e) => handleInputChange("enablePromo", e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange("enablePromo", e.target.value)
+                    }
                   />{" "}
                   Yes
                 </label>
@@ -396,7 +441,9 @@ const ListingForm: React.FC = () => {
                     type="radio"
                     value="No"
                     checked={productDetails.enablePromo === "No"}
-                    onChange={(e) => handleInputChange("enablePromo", e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange("enablePromo", e.target.value)
+                    }
                   />{" "}
                   No
                 </label>
@@ -407,6 +454,7 @@ const ListingForm: React.FC = () => {
             <div className="flex items-center">
               <label className="w-1/4 text-textBlue">Discount (%)</label>
               <input
+                min={1}
                 type="number"
                 value={productDetails.discount}
                 onChange={(e) => handleInputChange("discount", e.target.value)}

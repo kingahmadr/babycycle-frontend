@@ -236,7 +236,9 @@ const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({
           </div>
 
           <p className="text-body-md text-center lg:text-left">
-            {product.descriptions || "No description available."}
+            {product.descriptions
+              ? product.descriptions
+              : "No description available."}
           </p>
         </div>
       </div>
