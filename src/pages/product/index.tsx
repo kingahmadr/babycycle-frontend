@@ -55,37 +55,39 @@ const ProductListing = () => {
     fetchProduct();
   }, []);
 
-  const getDiscount = async (id: number) => {
-    const response = await fetch(
-      `https://api.babycycle.my.id/api/v1/discount/${id}`
-    );
-    // const response = await fetch(
-    //   `$`
-    // );
-    const discountData: DiscountModel = await response.json();
-    return discountData;
-  };
-
-  const fetchDiscounts = async (products: ProductModel[]) => {
-    const productDiscounts = await Promise.all(
-      products.map(async (product) => {
-        const discountData = await getDiscount(product.id);
-        return { id: product.id, discountData };
-      })
-    );
-
-    const discountMap: { [key: number]: DiscountModel | null } = {};
-    productDiscounts.forEach(({ id, discountData }) => {
-      discountMap[id] = discountData;
-    });
-    if (discountMap !== null) {
-      setDiscounts(discountMap);
+  const fetchDiscount = async () => {
+    try {
+      const response = await fetch(`${API_PRODUCT_WITH_COUNT}?category=discount`);
+  
+      if (!response.ok) {
+        throw new Error(`Failed to fetch discounts: ${response.statusText}`);
+      }
+  
+      // Extract the array properly
+      const responseData = await response.json();
+      const discountArray = responseData.data; // Adjust this based on actual response structure
+  
+      if (!Array.isArray(discountArray)) {
+        throw new Error("Expected discountArray to be an array");
+      }
+  
+      // Transform the array into the expected format
+      const discountMap: { [key: number]: DiscountModel | null } = {};
+      discountArray.forEach((discount) => {
+        discountMap[discount.id] = discount;
+      });
+  
+      setDiscounts(discountMap); // Set the transformed data into state
+      return discountMap;
+    } catch (error) {
+      console.error("Error fetching discounts:", error);
+      return {};
     }
   };
 
   useEffect(() => {
     if (fetchedData) {
-      fetchDiscounts(fetchedData);
+      fetchDiscount()
       setLoading(false);
     }
   }, [fetchedData]);
@@ -109,9 +111,6 @@ const ProductListing = () => {
       case "NEWEST":
         sortValue = "newest";
         break;
-      // case 'DISCOUNT':
-      //   sortValue = 'discount'
-      //   break
     }
     setSortBy(sortValue);
   };
@@ -177,7 +176,9 @@ const ProductListing = () => {
   const totalPages = Math.ceil((filteredData?.data?.length || 0) / limit);
   const currentPage = Math.floor(offset / limit) + 1;
 
-  console.log(fetchedData);
+  console.log('filtered data',filteredData);
+  console.log('fetched data',fetchedData);
+  console.log('discounts',discounts);
 
   return (
     <div className="max-w-[1440px] px-[72px] max-md:px-6 flex max-md:flex-col">
@@ -260,10 +261,6 @@ const ProductListing = () => {
             </label>
           </div>
         </div>
-
-        {/* <div className='pt-8'>
-          <PrimaryButton type='button'>Apply</PrimaryButton>
-        </div> */}
       </div>
 
       <div className="w-full">
@@ -301,10 +298,6 @@ const ProductListing = () => {
                   >
                     Newest
                   </li>
-                  {/* <li className="px-4 py-2 hover:bg-buttonBlue hover:text-white cursor-pointer"
-                    onClick={() => handleSelect('DISCOUNT')}>
-                  Discount
-                </li>          */}
                 </ul>
               </div>
             </div>
