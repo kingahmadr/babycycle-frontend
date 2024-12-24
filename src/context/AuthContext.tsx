@@ -7,7 +7,7 @@ import React, {
 } from 'react'
 import { useRouter } from 'next/router'
 import { API_LOGIN, API_ME } from '@/constants/apis'
-import { UserData, UserModel } from '@/models/User'
+import { UserData } from '@/models/User'
 
 interface AuthContextType {
   user: UserData | null
