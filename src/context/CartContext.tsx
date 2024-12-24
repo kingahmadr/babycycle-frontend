@@ -1,19 +1,20 @@
 import { API_CARTS } from "@/constants/apis";
 import { enqueueSnackbar } from "notistack";
 import React, { createContext, useState, useEffect, ReactNode } from "react";
+import { CartsModel } from "@/models/Carts";
 
-interface CartItem {
-  product_id: string;
-  id: string;
-  name: string;
-  price: number;
-  quantity: number;
-  total_price: number;
-}
+// interface CartItem {
+//   product_id: string;
+//   id: string;
+//   name: string;
+//   price: number;
+//   quantity: number;
+//   total_price: number;
+// }
 
 interface CartContextProps {
-  cart: CartItem[];
-  addToCart: (item: CartItem) => void;
+  cart: CartsModel[];
+  addToCart: (item: CartsModel) => void;
   removeFromCart: (id: string) => void;
   increaseQuantity: (id: string) => void;
   decreaseQuantity: (id: string) => void;
@@ -26,7 +27,7 @@ export const CartContext = createContext<CartContextProps | undefined>(
 );
 
 export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [cart, setCart] = useState<CartItem[]>([]);
+  const [cart, setCart] = useState<CartsModel[]>([]);
 
   // Load cart from localStorage on mount
   useEffect(() => {
@@ -81,7 +82,7 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   //   });
 
   // };
-  const addToCart = (item: CartItem) => {
+  const addToCart = (item: CartsModel) => {
     setCart((prevCart = []) => {
       const existingItem = prevCart.find((cartItem) => cartItem.id === item.id);
   
@@ -136,7 +137,7 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const increaseQuantity = async (id: string) => {
  
     setCart((prevCart) => {
-      let updatedItem: any;
+      let updatedItem: CartsModel;
         const newCart = prevCart.map((cartItem) => {
           if (cartItem.id === id) {
             updatedItem = { ...cartItem, quantity: cartItem.quantity + 1,
@@ -160,7 +161,7 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const cart = JSON.parse(cartFromStorage);
 
     // Update the item quantity
-    const updatedCart = cart.map((cartItem: any) => {
+    const updatedCart = cart.map((cartItem: CartsModel) => {
       if (cartItem.id === id) {
         return { ...cartItem, quantity: cartItem.quantity + 1,
          total_price: cartItem.price * (cartItem.quantity + 1),
@@ -169,7 +170,7 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       return cartItem;
     });
    
-    let updatedItem = updatedCart.find((item: any) => item.id === id);
+    const updatedItem = updatedCart.find((item: CartsModel) => item.id === id);
     if (!updatedItem) {
       console.error(`Cart item with ID ${id} not found`);
       return;
@@ -233,7 +234,7 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const cart = JSON.parse(cartFromStorage);
   
     // Update the item quantity in localStorage
-    const updatedCart = cart.map((cartItem: any) => {
+    const updatedCart = cart.map((cartItem: CartsModel) => {
       if (cartItem.id === id) {
         const newQuantity = Math.max(cartItem.quantity - 1, 1); // Ensure quantity >= 0
         return {
@@ -246,7 +247,7 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     });
   
     // Find the updated item
-    const updatedItem = updatedCart.find((item: any) => item.id === id);
+    const updatedItem = updatedCart.find((item: CartsModel) => item.id === id);
     if (!updatedItem) {
       console.error(`Cart item with ID ${id} not found`);
       return;

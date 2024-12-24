@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { PrimaryButton } from '@/components/PrimaryButton'
 import { SecondaryButton } from '@/components/SecondaryButton'
-import { ReviewModel } from '@/models/Reviews'
+// import { ReviewModel } from '@/models/Reviews'
 import { API_REVIEW } from '@/constants/apis'
 import { useRouter } from "next/router";
 import { enqueueSnackbar } from 'notistack'

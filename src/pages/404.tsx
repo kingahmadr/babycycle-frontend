@@ -8,7 +8,7 @@ const PageNotFound = () => {
         />
         <div className="w-full flex flex-col items-center text-center font-body text-secondary">
           <p className="font-bold text-3xl">404</p>
-          <p>We couldn't find this page, but we found this capybara for you!</p>
+          <p>We couldn&apos;t find this page, but we found this capybara for you!</p>
         </div>
       </div>
     </div>

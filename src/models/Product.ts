@@ -8,4 +8,6 @@ export interface ProductModel {
   price: number;
   stock: number;
   user_id: number;
+  discount_id: number;
+  discount_percentage: number;
 }

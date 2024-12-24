@@ -9,9 +9,9 @@ import { finalPrice } from "@/utils/DiscountedPrice";
 import { useSnackbar } from "notistack";
 import { API_CARTS, API_REVIEW } from "@/constants/apis";
 import { useAuth } from "@/context/AuthContext";
-import { ReviewData, ReviewModel } from "@/models/Reviews";
+import { ReviewData } from "@/models/Reviews";
 import { useParams } from "next/navigation";
-import { data } from "autoprefixer";
+// import { data } from "autoprefixer";
 
 interface ProductDetailsPageProps {
   product: ProductModel;
@@ -47,7 +47,7 @@ const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({
       // } else {
       //   setReview([]);
       // }
-    } catch (error) {
+    } catch {
       enqueueSnackbar("Failed to fetch review.", {
         variant: "error",
       });
@@ -65,7 +65,7 @@ const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({
     );
   }
 
-  const { addToCart, fetchCart } = cartContext;
+  const { fetchCart } = cartContext;
 
   const handleAddToCart = async () => {
     if (!isAuthenticated) {
@@ -92,7 +92,7 @@ const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({
           },
         ]), // Send as an array
       });
-      const productData = await response.json();
+      // const productData = await response.json();
 
       if (!response.ok) {
         enqueueSnackbar(
@@ -118,7 +118,7 @@ const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({
       enqueueSnackbar("Product has been added to the cart!", {
         variant: "success",
       });
-    } catch (error) {
+    } catch {
       enqueueSnackbar("Failed to add product to the cart. Please try again.", {
         variant: "error",
       });
@@ -140,7 +140,7 @@ const ProductDetailsPage: React.FC<ProductDetailsPageProps> = ({
       enqueueSnackbar("Product added to cart. Proceeding to checkout.", {
         variant: "success",
       });
-    } catch (error) {
+    } catch {
       enqueueSnackbar("Failed to add product to the cart. Please try again.", {
         variant: "error",
       });
