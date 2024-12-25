@@ -9,6 +9,7 @@ import { DiscountModel } from "@/models/Discount";
 import { useRouter } from "next/navigation";
 import Spinner from "@/components/Spinner";
 import { PAGE_LISTING } from "@/constants/pages";
+import { API_PRODUCT_WITH_COUNT } from "@/constants/apis";
 
 interface ProductsProps {
   newProducts: DataWithCount<ProductModel>;
@@ -21,36 +22,43 @@ const Home = ({ newProducts, saleProducts }: ProductsProps) => {
   const [discounts, setDiscounts] = useState<{
     [key: number]: DiscountModel | null;
   }>({});
-
-  const getDiscount = async (id: number) => {
-    const response = await fetch(
-      `https://api.babycycle.my.id/api/v1/discount/${id}`
-    );
-    const discountData: DiscountModel = await response.json();
-    return discountData;
-  };
-
-  const fetchDiscounts = async (products: ProductModel[]) => {
-    const productDiscounts = await Promise.all(
-      products.map(async (product) => {
-        const discountData = await getDiscount(product.id);
-        return { id: product.id, discountData };
-      })
-    );
-
-    const discountMap: { [key: number]: DiscountModel | null } = {};
-    productDiscounts.forEach(({ id, discountData }) => {
-      discountMap[id] = discountData;
-      setLoading(false);
-    });
-    if (discountMap !== null) {
-      setDiscounts(discountMap);
-    }
-  };
+    const fetchDiscount = async () => {
+      setLoading(true);
+      try {
+        const response = await fetch(`${API_PRODUCT_WITH_COUNT}?category=discount`);
+    
+        if (!response.ok) {
+          throw new Error(`Failed to fetch discounts: ${response.statusText}`);
+        }
+    
+        // Extract the array properly
+        const responseData = await response.json();
+        const discountArray = responseData.data; // Adjust this based on actual response structure
+    
+        if (!Array.isArray(discountArray)) {
+          throw new Error("Expected discountArray to be an array");
+        }
+    
+        // Transform the array into the expected format
+        const discountMap: { [key: number]: DiscountModel | null } = {};
+        discountArray.forEach((discount) => {
+          discountMap[discount.id] = discount;
+        });
+    
+        setDiscounts(discountMap); // Set the transformed data into state
+        return discountMap;
+      } catch (error) {
+        console.error("Error fetching discounts:", error);
+        return {};
+      } finally{
+        setLoading(false);
+      }
+    };
+  
 
   useEffect(() => {
     if (saleProducts?.data.length > 0) {
-      fetchDiscounts(saleProducts.data);
+      fetchDiscount();
     }
   }, [saleProducts]);
 
@@ -123,7 +131,12 @@ const Home = ({ newProducts, saleProducts }: ProductsProps) => {
 
         <div className="flex max-md:flex-col-reverse justify-between items-center gap-6">
           <div className="grid grid-rows-1 grid-cols-4 max-md:grid-rows-2 max-md:grid-cols-2 gap-6 py-16 max-md:py-4">
-            {newProducts &&
+            { loading ? (
+              <div className="w-[500%] max-md:w-[200%] h-56 flex flex-wrap justify-center items-center">
+                <Spinner />
+              </div>
+            ) : (
+            newProducts &&
               newProducts.data.map((product, index) => (
                 <ProductCard
                   id={product.id}
@@ -133,7 +146,7 @@ const Home = ({ newProducts, saleProducts }: ProductsProps) => {
                   price={product.price}
                   stock={product.stock}
                 />
-              ))}
+              )))}
           </div>
 
           <div className="w-[240px] max-md:w-full h-[291px] max-md:h-auto flex md:flex-col gap-around max-md:justify-between max-md:items-center">
@@ -161,13 +174,13 @@ export const getStaticProps: GetStaticProps = async () => {
 
   try {
     const response = await fetch(
-      `https://api.babycycle.my.id/api/v1/products/sorting?limit=4&offset=0&sort_by=newest`
+      `${API_PRODUCT_WITH_COUNT}?limit=4&offset=0&sort_by=newest`
     );
     if (!response.ok) throw new Error("Failed to fetch");
     newProducts = await response.json();
 
     const saleResponse = await fetch(
-      `https://api.babycycle.my.id/api/v1/products`
+      `${API_PRODUCT_WITH_COUNT}?limit=4&offset=0&category=discount`
     );
     if (!saleResponse.ok) throw new Error("Failed to fetch sale products");
     saleProducts = await saleResponse.json();
