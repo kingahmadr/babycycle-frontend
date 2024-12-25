@@ -250,7 +250,7 @@ const SellerDashboard: React.FC = () => {
 
 
   return (
-    <div className="body-width mb-[72px] max-md:w-full max-md:px-8">
+    <div className="body-width mb-[72px] max-md:w-full max-md:px-8 md:w-auto sm:w-[70%]">
       {/* Greeting Section */}
       <div className="py-6">
         <span className="text-3xl text-buttonBlue">
