@@ -17,7 +17,7 @@ const CartPage: React.FC = () => {
     throw new Error("CartContext is not available. Ensure CartProvider wraps the component.");
   }
 
-  const { cart, removeFromCart, increaseQuantity, decreaseQuantity, clearCart } = cartContext;
+  const { cart, removeFromCart, increaseQuantity, decreaseQuantity } = cartContext;
 
   const [selectedAddress, setSelectedAddress] = useState<AddressModel>();
   const [selectedCardType, setSelectedCardType] = useState<string | null>(null);

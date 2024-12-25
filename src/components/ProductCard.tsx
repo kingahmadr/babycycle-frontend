@@ -16,7 +16,7 @@ const ProductCard:React.FC<ProductCardProps> = ({id, name, image_url, price, sto
   return (
     <Link href={`/product/${id}`}>
 
-      <div className='w-[240px] h-[291px] flex flex-col relative'>
+      <div className='lg:w-full lg:h-[200px] flex flex-col relative md:w-auto md:h-[291px] xl:w-[200px] xl:h-[291px]'>
         { stock === 0 && (
           <div className='w-auto h-auto bg-black text-white text-xs rounded-xl absolute py-1 px-2 top-2 left-2 uppercase z-10'>
             Out of Stock
@@ -38,12 +38,12 @@ const ProductCard:React.FC<ProductCardProps> = ({id, name, image_url, price, sto
               className='w-full h-[227px] pb-2' 
               src={image_url? image_url: "https://dummyjson.com/image/400x200/008080/ffffff?text=Hello+Peter!&fontSize=16"}/> 
         )}
-              <div className=' w-full h-[64px] flex flex-col gap-1 items-end text-md'>
+              <div className=' w-full h-[64px] flex flex-col gap-1 items-end lg:text-md md:text-sm'>
                   <span className='uppercase'>{name}</span>
 
         { stock !== 0 ? (
 
-          <div className='w-full flex justify-end items-center space-x-2'>
+          <div className='w-full flex justify-end items-center space-x-2 md:text-sm lg:text-md py-2'>
             <span className={discount && discount.is_active? 'line-through text-xs' : 'no-underline'}>IDR {price}</span>
             { discount && discount.is_active && (
               <span className="text-dangerRed font-bold">

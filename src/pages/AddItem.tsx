@@ -3,7 +3,7 @@ import { useSnackbar } from "notistack";
 import { useAuth } from "@/context/AuthContext";
 import { API_URL } from "@/constants/apis";
 import axios from "axios";
-import { formattedDate } from "@/utils/getCheckoutTimestamp";
+// import { formattedDate } from "@/utils/getCheckoutTimestamp";
 import { formatDate } from "@/utils/formatDate";
 import { useRouter } from "next/navigation";
 
@@ -87,7 +87,7 @@ const ListingForm: React.FC = () => {
   const handleImageRemove = () => {
     enqueueSnackbar("Are you sure you want to delete this image?", {
       variant: "warning",
-      action: (key) => (
+      action: () => (
         <button
           onClick={() => {
             setImage(null);

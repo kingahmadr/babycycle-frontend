@@ -19,3 +19,5 @@ export const API_TRANSACTION = `${API_URL}/transactions`
 export const API_REVIEW = `${API_URL}/reviews`
 
 export const API_GET_PRODUCT = `${API_URL}/products`
+export const API_SEARCH = `${API_URL}/search/products`
+export const API_PRODUCT_WITH_COUNT = `${API_URL}/products/with/count`

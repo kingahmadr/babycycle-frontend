@@ -1,13 +1,17 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
-import Link from "next/link";
+// import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Spinner from "./Spinner";
+import { API_SEARCH } from "@/constants/apis";
+import { DataWithCount } from "@/models/DataWithCount";
+import { SearchModel } from "@/models/Searchs";
+
 
 const SearchInput = () => {
   const [isSearchActive, setIsSearchActive] = useState(false);
   const [query, setQuery] = useState("");
-  const [fetchedData, setFetchedData] = useState<any[]>([]);
+  const [fetchedData, setFetchedData] = useState<DataWithCount<SearchModel> | undefined>();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
@@ -21,22 +25,25 @@ const SearchInput = () => {
 
     return () => clearTimeout(delayDebounceFn);
   }, [query]);
-
   const fetchData = async (searchQuery: string) => {
-    setFetchedData([]);
+    setFetchedData({ total_count: 0, data: [] });
     setLoading(true);
     setError(null);
     try {
       const response = await fetch(
-        `https://api.babycycle.my.id/api/v1/search/products?query=${searchQuery}`
+        `${API_SEARCH}?query=${searchQuery}`
       );
       if (!response.ok) {
         throw new Error("Failed to fetch data");
       }
       const data = await response.json();
       setFetchedData(data.data);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("An unknown error occurred");
+      }
     } finally {
       setLoading(false);
     }
