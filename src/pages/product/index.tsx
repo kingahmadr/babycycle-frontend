@@ -18,9 +18,9 @@ const ProductListing = () => {
     [key: number]: DiscountModel | null;
   }>({});
   // const [limit, setLimit] = useState(20);
-  let limit = 0
+   let limit = 20
   const [offset, setOffset] = useState(0);
-  const [sortBy, setSortBy] = useState("newest");
+  // const [sortBy, setSortBy] = useState("newest");
   const [selectedCategories, setSelectedCategories] = useState<string[] | undefined>([]);
   const [selectedWarranty, setSelectedWarranty] = useState<boolean | undefined>(
     undefined
@@ -32,7 +32,8 @@ const ProductListing = () => {
   const fetchProduct = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`${API_PRODUCT_WITH_COUNT}`, {});
+      // const response = await fetch(`${API_PRODUCT_WITH_COUNT}?limit=${limit}&offset=${offset}`, {});
+      const response = await fetch(`${API_PRODUCT_WITH_COUNT}`);
 
       const data: DataWithCount<ProductModel> = await response.json();
 
@@ -115,15 +116,6 @@ const ProductListing = () => {
     setSortBy(sortValue);
   };
 
-  const handlePage = (direction: string) => {
-    const currentDataLength = filteredData?.data?.length || 0;
-  
-    if (direction === "next" && offset + limit < currentDataLength) {
-      setOffset((prev) => prev + limit);
-    } else if (direction === "prev" && offset > 0) {
-      setOffset((prev) => prev - limit);
-    }
-  };
   const fetchFilteredData = async ({
     category = "",
     is_warranty,
@@ -172,16 +164,34 @@ const ProductListing = () => {
   
     fetchFilteredData({ category: categoryParam, is_warranty: warranty });
   };
+  const handlePage = (direction: string) => {
+    const currentDataLength = filteredData?.data.length || fetchedData.length;
 
-  const totalPages = Math.ceil((filteredData?.data?.length || 0) / limit);
+    if (direction === "next" && offset + limit < currentDataLength) {
+      setOffset((prev) => prev + limit);
+    } else if (direction === "prev" && offset > 0) {
+      setOffset((prev) => prev - limit);
+    }
+  };
+
+  const totalPages = Math.ceil((filteredData?.data.length || fetchedData.length) / limit);
   const currentPage = Math.floor(offset / limit) + 1;
 
-  console.log('filtered data',filteredData);
-  console.log('fetched data',fetchedData);
-  console.log('discounts',discounts);
+  const currentPageData =
+    Array.isArray(filteredData?.data) && filteredData.data.length > 0
+      ? filteredData.data.slice(offset, offset + limit)
+      : fetchedData.slice(offset, offset + limit);
+
+  // console.log('filtered data',filteredData);
+  // console.log('fetched data',fetchedData);
+  // console.log('fetched data lenght',fetchedData.length);
+  // console.log('discounts',discounts);
+  console.log('current page data',currentPageData);
+  console.log('total pages',totalPages);
+  console.log('current page',currentPage);
 
   return (
-    <div className="max-w-[1440px] px-[72px] max-md:px-6 flex max-md:flex-col">
+    <div className="max-w-[1440px] px-[72px] max-md:px-6 flex max-md:flex-col w-full">
       <div className="w-72 max-md:w-full uppercase py-3 flex flex-col max-md:flex-row gap-6 max-md:justify-between">
         <div className="text-xl text-buttonBlue">All Filters</div>
 
@@ -310,41 +320,30 @@ const ProductListing = () => {
             ></div>
           )}
         </div>
-        <div className="grid lg:grid-rows-5 lg:grid-cols-4 max-md:grid-cols-2 md:grid-cols-2 md:gap-10 md:gap-y-10">
-              {loading ? (
-                <div className="w-[500%] h-[400%] flex justify-center items-center">
-                  <Spinner />
-                </div>
-              ) : (() => {
-                  // Determine current page data
-                  const currentPageData =
-                    Array.isArray(filteredData?.data) && filteredData.data.length > 0
-                      ? filteredData.data
-                      : fetchedData ;
-
-                  return currentPageData.length > 0 ? (
-                    currentPageData.map((product, index) => {
-                      const discountData = discounts[product.id];
-                      return (
-                        <ProductCard
-                          id={product.id}
-                          key={index}
-                          image_url={product.image_url}
-                          name={product.name}
-                          price={product.price}
-                          stock={product.stock}
-                          discount={discountData}
-                        />
-                      );
-                    })
-                  ) : (
-                    <div className="w-full h-[500px] flex justify-center items-center">
-                      <span>No products available</span>
-                    </div>
-                  );
-                })()}
-            </div>
-          <div className="flex justify-end space-x-6 py-8">
+          <div className="grid lg:grid-cols-4 max-md:grid-cols-2 md:grid-cols-2 md:gap-10 md:gap-y-10">
+            {loading ? (
+              <div className="w-[500%] h-[400%] flex justify-center items-center">
+                <Spinner />
+              </div>
+            ) : currentPageData.length > 0 ? (
+              currentPageData.map((product, index) => (
+                <ProductCard
+                  id={product.id}
+                  key={index}
+                  image_url={product.image_url}
+                  name={product.name}
+                  price={product.price}
+                  stock={product.stock}
+                  discount={discounts[product.id]}
+                />
+              ))
+            ) : (
+              <div className="w-full h-[500px] flex justify-center items-center">
+                <span>No products available</span>
+              </div>
+            )}
+          </div>
+          <div className="flex justify-end space-x-6 py-8 my-24">
             <div>
               <img
                 src="/Polygon_2.png"

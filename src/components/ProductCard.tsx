@@ -16,7 +16,7 @@ const ProductCard:React.FC<ProductCardProps> = ({id, name, image_url, price, sto
   return (
     <Link href={`/product/${id}`}>
 
-      <div className='lg:w-auto lg:h-[200px] flex flex-col relative md:w-auto md:h-[291px] xl:w-[200px] xl:h-[291px]'>
+      <div className='lg:w-full lg:h-[200px] flex flex-col relative md:w-auto md:h-[291px] xl:w-[200px] xl:h-[291px]'>
         { stock === 0 && (
           <div className='w-auto h-auto bg-black text-white text-xs rounded-xl absolute py-1 px-2 top-2 left-2 uppercase z-10'>
             Out of Stock
