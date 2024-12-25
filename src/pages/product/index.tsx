@@ -18,7 +18,6 @@ const ProductListing = () => {
     [key: number]: DiscountModel | null;
   }>({});
   // const [limit, setLimit] = useState(20);
-   let limit = 20
   const [offset, setOffset] = useState(0);
   // const [sortBy, setSortBy] = useState("newest");
   const [selectedCategories, setSelectedCategories] = useState<string[] | undefined>([]);
@@ -28,6 +27,9 @@ const ProductListing = () => {
   const [loading, setLoading] = useState(true);
   const [filteredData, setFilteredData] = useState<DataWithCount<ProductModel> | undefined>();
   const [fetchedData, setFetchedData] = useState<ProductModel[]>([]);
+  let limitPagination = 20
+  let limit = 0
+
 
   const fetchProduct = async () => {
     setLoading(true);
@@ -98,30 +100,50 @@ const ProductListing = () => {
     setIsOpen(true);
   };
 
-  const handleSelect = (option: any) => {
+  // const handleSelect = (option: any) => {
+  //   setSelectedOption(option);
+  //   setIsOpen(false);
+  //   let sortValue = "";
+  //   switch (option) {
+  //     case "HIGHEST PRICE":
+  //       sortValue = "highest_price";
+  //       break;
+  //     case "LOWEST PRICE":
+  //       sortValue = "lowest_price";
+  //       break;
+  //     case "NEWEST":
+  //       sortValue = "newest";
+  //       break;
+  //   }
+  //   // setSortBy(sortValue);
+  // };
+
+  const handleSelect = (option: string) => {
     setSelectedOption(option);
     setIsOpen(false);
     let sortValue = "";
     switch (option) {
       case "HIGHEST PRICE":
-        sortValue = "highest_price";
+        fetchFilteredData({ sort_by : "highest_price" });
         break;
-      case "LOWEST PRICE":
-        sortValue = "lowest_price";
+      case "LOWEST PRICE":  
+        fetchFilteredData({ sort_by : "lowest_price" });
         break;
       case "NEWEST":
-        sortValue = "newest";
+        fetchFilteredData({ sort_by : "newest" });
         break;
     }
-    setSortBy(sortValue);
+    // setSortBy(sortValue);
   };
 
   const fetchFilteredData = async ({
     category = "",
     is_warranty,
+    sort_by,
   }: {
     category?: string;
     is_warranty?: boolean;
+    sort_by?: string;
   }) => {
     try {
       setLoading(true); // Set loading before starting the fetch
@@ -131,6 +153,10 @@ const ProductListing = () => {
       queryParams.append("category", category); // Always include the category, even if empty
       if (is_warranty !== undefined) {
         queryParams.append("is_warranty", is_warranty.toString());
+      }
+
+      if (sort_by !== undefined) {
+        queryParams.append("sort_by", sort_by);
       }
       queryParams.append("limit", limit.toString());
       queryParams.append("offset", offset.toString());
@@ -164,23 +190,24 @@ const ProductListing = () => {
   
     fetchFilteredData({ category: categoryParam, is_warranty: warranty });
   };
+
   const handlePage = (direction: string) => {
     const currentDataLength = filteredData?.data.length || fetchedData.length;
 
-    if (direction === "next" && offset + limit < currentDataLength) {
-      setOffset((prev) => prev + limit);
+    if (direction === "next" && offset + limitPagination < currentDataLength) {
+      setOffset((prev) => prev + limitPagination);
     } else if (direction === "prev" && offset > 0) {
-      setOffset((prev) => prev - limit);
+      setOffset((prev) => prev - limitPagination);
     }
   };
 
-  const totalPages = Math.ceil((filteredData?.data.length || fetchedData.length) / limit);
-  const currentPage = Math.floor(offset / limit) + 1;
+  const totalPages = Math.ceil((filteredData?.data.length || fetchedData.length) / limitPagination);
+  const currentPage = Math.floor(offset / limitPagination) + 1;
 
   const currentPageData =
     Array.isArray(filteredData?.data) && filteredData.data.length > 0
-      ? filteredData.data.slice(offset, offset + limit)
-      : fetchedData.slice(offset, offset + limit);
+      ? filteredData.data.slice(offset, offset + limitPagination)
+      : fetchedData.slice(offset, offset + limitPagination);
 
   // console.log('filtered data',filteredData);
   // console.log('fetched data',fetchedData);
