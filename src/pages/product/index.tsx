@@ -310,7 +310,7 @@ const ProductListing = () => {
             ></div>
           )}
         </div>
-        <div className="grid grid-rows-5 grid-cols-4 gap-6 max-md:grid-cols-2 max-md:gap-3">
+        <div className="grid lg:grid-rows-5 lg:grid-cols-4 max-md:grid-cols-2 md:grid-cols-2 md:gap-10 md:gap-y-10">
               {loading ? (
                 <div className="w-[500%] h-[400%] flex justify-center items-center">
                   <Spinner />
