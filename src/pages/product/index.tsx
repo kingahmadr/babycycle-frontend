@@ -1,13 +1,9 @@
-// import { PrimaryButton } from "@/components/PrimaryButton";
 import ProductCard from "@/components/ProductCard";
 import Spinner from "@/components/Spinner";
 import { API_PRODUCT_WITH_COUNT } from "@/constants/apis";
-// import useFetch from "@/hooks/useFetch";
 import { DataWithCount } from "@/models/DataWithCount";
 import { DiscountModel } from "@/models/Discount";
 import { ProductModel } from "@/models/Product";
-// import { sortProducts } from "@/utils/SortAvailableProducts";
-// import next from "next";
 import { enqueueSnackbar } from "notistack";
 import { useEffect, useState } from "react";
 
@@ -17,9 +13,7 @@ const ProductListing = () => {
   const [discounts, setDiscounts] = useState<{
     [key: number]: DiscountModel | null;
   }>({});
-  // const [limit, setLimit] = useState(20);
   const [offset, setOffset] = useState(0);
-  // const [sortBy, setSortBy] = useState("newest");
   const [selectedCategories, setSelectedCategories] = useState<string[] | undefined>([]);
   const [selectedWarranty, setSelectedWarranty] = useState<boolean | undefined>(
     undefined
@@ -99,24 +93,6 @@ const ProductListing = () => {
   const toggleDropdown = () => {
     setIsOpen(true);
   };
-
-  // const handleSelect = (option: any) => {
-  //   setSelectedOption(option);
-  //   setIsOpen(false);
-  //   let sortValue = "";
-  //   switch (option) {
-  //     case "HIGHEST PRICE":
-  //       sortValue = "highest_price";
-  //       break;
-  //     case "LOWEST PRICE":
-  //       sortValue = "lowest_price";
-  //       break;
-  //     case "NEWEST":
-  //       sortValue = "newest";
-  //       break;
-  //   }
-  //   // setSortBy(sortValue);
-  // };
 
   const handleSelect = (option: string) => {
     setSelectedOption(option);

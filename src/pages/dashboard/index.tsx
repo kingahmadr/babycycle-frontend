@@ -51,7 +51,7 @@ const UserDashboard = () => {
     }
 
     const handleSellerDashboard = () => {    
-    router.push(`/seller_dashboard`)
+    router.push(`/seller-dashboard`)
     }
 
   return (

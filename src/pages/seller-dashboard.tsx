@@ -2,8 +2,10 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import { PrimaryButton } from "@/components/PrimaryButton";
 import Link from "next/link";
-import { API_URL } from "@/constants/apis";
+import { API_URL, API_URL_LOCAL } from "@/constants/apis";
 import { useAuth } from "@/context/AuthContext";
+import Spinner from "@/components/Spinner";
+
 
 interface Product {
   id: number;
@@ -25,6 +27,7 @@ interface Product {
 }
 
 const SellerDashboard: React.FC = () => {
+  const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("Active Listing");
   const [products, setProducts] = useState<Product[]>([]);
   const [selectedProducts, setSelectedProducts] = useState<number[]>([]);
@@ -36,13 +39,14 @@ const SellerDashboard: React.FC = () => {
     itemsListed: 0,
     averageRating: 0,
   });
-
+  const [offset, setOffset] = useState(0);
   const { user } = useAuth();
 
   useEffect(() => {
     if (user) {
       fetchSellerPerformance();
-      fetchActiveListings();
+      // fetchActiveListings();
+      fetchActiveListingsV2();
     }
   }, [user]);
 
@@ -56,7 +60,7 @@ const SellerDashboard: React.FC = () => {
     }
 
     try {
-      const sellerResponse = await fetch(`${API_URL}/sellers`, {
+      const sellerResponse = await fetch(`${API_URL_LOCAL}/sellers`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -111,82 +115,59 @@ const SellerDashboard: React.FC = () => {
     }
   };
 
-  const fetchActiveListings = async () => {
+  const fetchActiveListingsV2 = async () => {
     try {
+      setLoading(true);
       const token = localStorage.getItem("token");
       if (!token) {
         console.error("No token found");
         return;
       }
 
-      const response = await fetch(`${API_URL}/sellers/products`, {
+
+      const response = await fetch(`${API_URL_LOCAL}/sellers/products/v3`, {
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       });
-
+      const result = await response.json();
       if (!response.ok) {
         throw new Error("Failed to fetch active listings");
       }
-
-      const result = await response.json();
       const productsArray = await Promise.all(
-        result.map(async (product: any) => {
-          let discount = 0;
-          let rating: number | string = "No reviews yet"; // Adjust type here
+          result.map(async (product: any) => {
+            let discount = 0;
+            let rating: number | string = "No reviews yet"; // Adjust type here
 
-          try {
-            // Fetch discount
-            const discountResponse = await fetch(`${API_URL}/api/v1/discount/${product.id}`, {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            });
-            const discountResult = await discountResponse.json();
-            if (discountResult && discountResult.discount_percentage) {
-              discount = parseFloat(discountResult.discount_percentage) || 0;
-            }
-
-            // Fetch rating
-            const reviewResponse = await fetch(`${API_URL}/reviews?product_id=${product.id}`, {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            });
-            const reviewResult = await reviewResponse.json();
-            if (reviewResult.length > 0) {
-              rating = parseFloat(
-                (
-                  reviewResult.reduce((acc: number, r: any) => acc + r.rating, 0) /
-                  reviewResult.length
-                ).toFixed(1)
-              );
-            }
-          } catch (error) {
-            console.error("Error fetching discount or rating", error);
-          }
-
-          return {
-            ...product,
-            discount,
-            finalPrice: product.price - product.price * (discount / 100),
-            rating,
-          };
-        })
-      );
+            discount = parseFloat(product.discount_percentage) || 0;
+            rating = parseFloat(
+              (
+                result.reduce((acc: number, r: any) => acc + r.rating, 0) /
+                result.length
+              ).toFixed(1)
+            );
+            return {
+              ...product,
+              discount,
+              finalPrice: product.price - product.price * (discount / 100),
+              rating,
+            };
+          })
+        );
 
       // Set products for display
       setProducts(productsArray);
-
       // Update itemsListed in sellerPerformance
       setSellerPerformance((prev) => ({
         ...prev,
         itemsListed: productsArray.length,
       }));
     } catch (error) {
-      console.error("Error fetching active listings", error);
+      console.error("Error fetching active listings:", error);
+    } finally {
+      setLoading(false);
     }
-  };
+  }
 
   const handleEditProduct = (product: Product) => {
     setProductDetails(product);
@@ -232,7 +213,7 @@ const SellerDashboard: React.FC = () => {
         });
       }
 
-      fetchActiveListings();
+      fetchActiveListingsV2();
       setShowEditModal(false);
       alert("Product updated successfully!");
     } catch (error) {
@@ -246,6 +227,27 @@ const SellerDashboard: React.FC = () => {
         ? product.stock > 0
         : product.stock === 0
   );
+  
+  const handlePage = (direction: string) => {
+    const currentDataLength = products?.length || products.length;
+
+    if (direction === "next" && offset + limitPagination < currentDataLength) {
+      setOffset((prev) => prev + limitPagination);
+    } else if (direction === "prev" && offset > 0) {
+      setOffset((prev) => prev - limitPagination);
+    }
+  };
+
+  let limitPagination = 10;
+  const totalPages = Math.ceil((products?.length || products.length) / limitPagination);
+  const currentPage = Math.floor(offset / limitPagination) + 1;
+
+  const currentPageData =
+  Array.isArray(products) && products.length > 0
+    ? products.slice(offset, offset + limitPagination)
+    : products.slice(offset, offset + limitPagination);
+
+
 
   return (
     <div className="body-width mb-[72px] max-md:w-full max-md:px-8">
@@ -347,54 +349,94 @@ const SellerDashboard: React.FC = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {paginatedProducts.map((product) => (
-                    <tr key={product.id}>
-                      <td>
-                        <input
-                          type="checkbox"
-                          checked={selectedProducts.includes(product.id)}
-                          onChange={() =>
-                            setSelectedProducts((prev) =>
-                              prev.includes(product.id)
-                                ? prev.filter((id) => id !== product.id)
-                                : [...prev, product.id]
-                            )
-                          }
-                        />
-                      </td>
-                      <td>
-                        <div className="flex p-6 items-center">
-                          <Image
-                            src={product.image_url || "/assets/placeholder_image.jpg"}
-                            alt={product.name}
-                            width={50}
-                            height={50}
-                            className="rounded-md"
-                          />
-                          <div className="ml-4">
-                            <p className="font-bold">{product.name}</p>
-                          </div>
-                        </div>
-                      </td>
-                      <td>{typeof product.rating === "number" ? product.rating : "No reviews yet"}</td>
-                      <td>IDR {product.price.toLocaleString()}</td>
-                      <td>{product.discount}%</td>
-                      <td>IDR {product.finalPrice.toLocaleString()}</td>
-                      <td>{product.stock}</td>
-                      <td>
-                        <Image
-                          onClick={() => handleEditProduct(product)}
-                          src="/assets/edit.png"
-                          alt="Edit"
-                          width={20}
-                          height={20}
-                          className="cursor-pointer"
-                        />
+                  {loading ? (
+                      <tr>
+                      <td className="w-[450%] h-[400%] flex justify-center items-center">
+                        <Spinner />
                       </td>
                     </tr>
-                  ))}
+                 
+                  ) : currentPageData.length > 0 ? (
+                    currentPageData.map((product, index) => (
+                      <tr key={index}>
+                        <td>
+                          <input
+                            type="checkbox"
+                            checked={selectedProducts.includes(product.id)}
+                            onChange={() =>
+                              setSelectedProducts((prev) =>
+                                prev.includes(product.id)
+                                  ? prev.filter((id) => id !== product.id)
+                                  : [...prev, product.id]
+                              )
+                            }
+                          />
+                        </td>
+                        <td>
+                          <div className="flex p-6 items-center">
+                            <Image
+                              src={product.image_url || "/assets/placeholder_image.jpg"}
+                              alt={product.name}
+                              width={50}
+                              height={50}
+                              className="rounded-md"
+                            />
+                            <div className="ml-4">
+                              <p className="font-bold">{product.name}</p>
+                            </div>
+                          </div>
+                        </td>
+                        <td>{typeof product.rating === "number" ? product.rating : "No reviews yet"}</td>
+                        <td>IDR {product.price.toLocaleString()}</td>
+                        <td>{product.discount}%</td>
+                        <td>IDR {product.finalPrice.toLocaleString()}</td>
+                        <td>{product.stock}</td>
+                        <td>
+                          <Image
+                            onClick={() => handleEditProduct(product)}
+                            src="/assets/edit.png"
+                            alt="Edit"
+                            width={20}
+                            height={20}
+                            className="cursor-pointer"
+                          />
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan={8} className="text-center py-4">
+                        No products available
+                      </td>
+                    </tr>
+                  )}
                 </tbody>
               </table>
+              <div className="flex justify-end space-x-6 py-8 my-4">
+              <div>
+                <img
+                  src="/Polygon_2.png"
+                  onClick={() => handlePage("prev")}
+                  className={
+                    currentPage === 1 ? "cursor-not-allowed opacity-20" : ""
+                  }
+                />
+              </div>
+              <div>
+                Showing page {currentPage} from total of {totalPages} pages
+              </div>
+              <div>
+                <img
+                  src="/Polygon_3.png"
+                  onClick={() => handlePage("next")}
+                  className={
+                    currentPage === totalPages
+                      ? "cursor-not-allowed opacity-20"
+                      : ""
+                  }
+                />
+              </div>
+            </div>
             </div>
           )}
 
@@ -651,16 +693,14 @@ const SellerDashboard: React.FC = () => {
   >
     Save Changes
   </button>
-</div>
-
-
-        
+  </div>
+          
+        </div>
       </div>
     </div>
-  </div>
-)}
-    </div>
-  );
-};
+  )}
+      </div>
+    );
+  };
 
 export default SellerDashboard;
