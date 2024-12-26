@@ -5,6 +5,9 @@ import Link from "next/link";
 import { API_URL, API_URL_LOCAL } from "@/constants/apis";
 import { useAuth } from "@/context/AuthContext";
 import Spinner from "@/components/Spinner";
+import {SellerModel} from "@/models/Seller";
+import { TransactionModel } from "@/models/Transactions";
+import { SellerProductModel } from "@/models/SellerProduct";
 
 
 interface Product {
@@ -45,7 +48,6 @@ const SellerDashboard: React.FC = () => {
   useEffect(() => {
     if (user) {
       fetchSellerPerformance();
-      // fetchActiveListings();
       fetchActiveListingsV2();
     }
   }, [user]);
@@ -69,7 +71,7 @@ const SellerDashboard: React.FC = () => {
       const sellerData = sellerResult || [];
 
       const currentSeller = sellerData.find(
-        (seller: any) => seller.user_id === user?.data.id
+        (seller: SellerModel) => seller.user_id === user?.data.id
       );
 
       if (!currentSeller) {
@@ -92,16 +94,16 @@ const SellerDashboard: React.FC = () => {
       const transactionData = transactionResult || [];
 
       const sellerTransactions = transactionData.filter(
-        (transaction: any) => transaction.seller_id === currentSeller.id
+        (transaction: TransactionModel) => transaction.seller_id === currentSeller.id
       );
 
       const revenue = sellerTransactions.reduce(
-        (total: number, t: any) => total + t.total_price,
+        (total: number, t: TransactionModel) => total + t.total_price,
         0
       );
 
       const itemsSold = sellerTransactions.reduce(
-        (total: number, t: any) => total + t.quantity,
+        (total: number, t: TransactionModel) => total + t.quantity,
         0
       );
 
@@ -135,25 +137,32 @@ const SellerDashboard: React.FC = () => {
         throw new Error("Failed to fetch active listings");
       }
       const productsArray = await Promise.all(
-          result.map(async (product: any) => {
-            let discount = 0;
-            let rating: number | string = "No reviews yet"; // Adjust type here
-
-            discount = parseFloat(product.discount_percentage) || 0;
-            rating = parseFloat(
-              (
-                result.reduce((acc: number, r: any) => acc + r.rating, 0) /
-                result.length
-              ).toFixed(1)
-            );
-            return {
-              ...product,
-              discount,
-              finalPrice: product.price - product.price * (discount / 100),
-              rating,
-            };
-          })
-        );
+        result.map(async (product: SellerProductModel) => {
+          let discount = 0;
+          let rating: number | string = "No reviews yet"; // Adjust type here
+      
+          // Parse discount
+          discount = parseFloat(product.discount_percentage.toString()) || 0;
+      
+          // Calculate rating only for products with non-null ratings
+          const totalRatings = result.reduce((acc: number, r: SellerProductModel) => {
+            return acc + (r.rating !== null ? r.rating : 0);
+          }, 0);
+      
+          const ratingsCount = result.filter((r: SellerProductModel) => r.rating !== null).length;
+      
+          if (ratingsCount > 0) {
+            rating = parseFloat((totalRatings / ratingsCount).toFixed(1));
+          }
+      
+          return {
+            ...product,
+            discount,
+            finalPrice: product.price - product.price * (discount / 100),
+            rating,
+          };
+        })
+      );
 
       // Set products for display
       setProducts(productsArray);
@@ -174,7 +183,7 @@ const SellerDashboard: React.FC = () => {
     setShowEditModal(true);
   };
 
-  const handleInputChange = (field: keyof Product, value: any) => {
+  const handleInputChange = (field: keyof Product, value: Product[typeof field]) => {
     setProductDetails((prev) => prev && { ...prev, [field]: value });
   };
 
@@ -238,7 +247,7 @@ const SellerDashboard: React.FC = () => {
     }
   };
 
-  let limitPagination = 10;
+  const limitPagination = 10;
   const totalPages = Math.ceil((products?.length || products.length) / limitPagination);
   const currentPage = Math.floor(offset / limitPagination) + 1;
 
@@ -250,7 +259,7 @@ const SellerDashboard: React.FC = () => {
 
 
   return (
-    <div className="body-width mb-[72px] max-md:w-full max-md:px-8 md:w-auto sm:w-[70%]">
+    <div className="body-width mb-[72px] max-md:w-full max-md:px-8 md:w-[100%] sm:w-[70%]">
       {/* Greeting Section */}
       <div className="py-6">
         <span className="text-3xl text-buttonBlue">
@@ -321,7 +330,7 @@ const SellerDashboard: React.FC = () => {
               </div>
 
               {/* Product Table */}
-              <table className="w-full text-left border-collapse mb-6 text-body-md">
+              <table className="w-full text-left border-collapse mb-6 lg:text-body-md sm:text-xs">
                 <thead>
                   <tr>
                     <th>
@@ -339,7 +348,7 @@ const SellerDashboard: React.FC = () => {
                         checked={selectedProducts.length === paginatedProducts.length}
                       />
                     </th>
-                    <th>Product Name</th>
+                    <th className="p-10">Product Name</th>
                     <th>Rating</th>
                     <th>Price</th>
                     <th>Discount</th>
@@ -412,7 +421,7 @@ const SellerDashboard: React.FC = () => {
                   )}
                 </tbody>
               </table>
-              <div className="flex justify-end space-x-6 py-8 my-4">
+              <div className="flex justify-end space-x-6 py-8 my-4 sm:text-xs md:text-md lg:text-xl">
               <div>
                 <img
                   src="/Polygon_2.png"

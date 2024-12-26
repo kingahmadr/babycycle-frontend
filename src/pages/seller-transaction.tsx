@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { API_URL } from "@/constants/apis";
+import { TransactionModel } from "@/models/Transactions";
 
 const SellerTransactionDashboard: React.FC = () => {
-  const [transactions, setTransactions] = useState<any[]>([]);
+  const [transactions, setTransactions] = useState<TransactionModel[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const { user } = useAuth();
 
@@ -47,7 +48,7 @@ const SellerTransactionDashboard: React.FC = () => {
 
       const sellerResult = await sellerResponse.json();
       const sellerData = sellerResult || [];
-      const currentSeller = sellerData.find((seller: any) => seller.user_id === user?.data.id);
+      const currentSeller = sellerData.find((seller: TransactionModel) => seller.user_id === user?.data.id);
 
       if (!currentSeller) {
         console.error("Current seller not found");
@@ -57,7 +58,7 @@ const SellerTransactionDashboard: React.FC = () => {
       }
 
       const filteredTransactions = transactionData.filter(
-        (transaction: any) => transaction.seller_id === currentSeller.id
+        (transaction: TransactionModel) => transaction.seller_id === currentSeller.id
       );
 
       setTransactions(filteredTransactions);

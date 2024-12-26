@@ -21,8 +21,8 @@ const ProductListing = () => {
   const [loading, setLoading] = useState(true);
   const [filteredData, setFilteredData] = useState<DataWithCount<ProductModel> | undefined>();
   const [fetchedData, setFetchedData] = useState<ProductModel[]>([]);
-  let limitPagination = 20
-  let limit = 0
+  const limitPagination = 20
+  const limit = 0
 
 
   const fetchProduct = async () => {
@@ -97,7 +97,6 @@ const ProductListing = () => {
   const handleSelect = (option: string) => {
     setSelectedOption(option);
     setIsOpen(false);
-    let sortValue = "";
     switch (option) {
       case "HIGHEST PRICE":
         fetchFilteredData({ sort_by : "highest_price" });

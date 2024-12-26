@@ -2,8 +2,6 @@ import React, { useState } from "react";
 import { useSnackbar } from "notistack";
 import { useAuth } from "@/context/AuthContext";
 import { API_URL } from "@/constants/apis";
-import axios from "axios";
-// import { formattedDate } from "@/utils/getCheckoutTimestamp";
 import { formatDate } from "@/utils/formatDate";
 import { useRouter } from "next/navigation";
 import { uploadFile } from "@/utils/uploadFile";
@@ -31,33 +29,7 @@ const ListingForm: React.FC = () => {
   const [termsChecked, setTermsChecked] = useState(false);
   const [declarationChecked, setDeclarationChecked] = useState(false);
   const [loading, setLoading] = useState(false);
-  const API_KEY = "6577355fd16db2acfd3f9b1909b77125";
-  // const API_KEY = process.env.IMGBB_URL;
 
-
- 
-  // const handleFileChange: React.ChangeEventHandler<HTMLInputElement> = async (event) => {
-  //   if (event.target.files && event.target.files[0]) {
-  //     setImage(event.target.files[0]); // Update the state with the selected file
-  //   }
-  //   if (!images) { // Check if a file is selected
-  //     enqueueSnackbar("Please select a file to upload.", { variant: "warning" });
-  //     return;
-  //   }
-  
-  //   try {
-  //     const fileUrl = await uploadFile(
-  //       { fileName: images.name, file: images }, // Use the correct variable for the file
-  //       enqueueSnackbar
-  //     );
-  //     console.log("Uploaded file URL:", fileUrl);
-  //     enqueueSnackbar(`File available at: ${fileUrl}`, { variant: "info" });
-  //     console.log('URL',fileUrl)
-  //     setImageUrl(fileUrl);
-  //   } catch (error) {
-  //     console.error("Upload failed:", error);
-  //   }
-  // };
   const handleFileChange: React.ChangeEventHandler<HTMLInputElement> = async (event) => {
     if (event.target.files && event.target.files[0]) {
       const file = event.target.files[0]; // Get the selected file directly
@@ -77,55 +49,7 @@ const ListingForm: React.FC = () => {
     } else {
       enqueueSnackbar("Please select a file to upload.", { variant: "warning" });
     }
-  };
-
-  console.log(images)
-  
-  const handleImageUpload = async (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    if (event.target.files && event.target.files[0]) {
-      const file = event.target.files[0];
-      setImage(file);
-
-      // Upload to Imgbb
-      const formData = new FormData();
-      formData.append("image", file);
-
-      const fixImageUrl = (url: string): string => {
-        return url.replace("https://i.ibb.co/", "https://i.ibb.co.com/");
-      };
-
-      try {
-        const response = await axios.post(
-          `https://api.imgbb.com/1/upload?expiration=600&key=${API_KEY}`,
-          formData
-        );
-
-        if (response.data.success) {
-          let uploadedUrl = response.data.data.url;
-          uploadedUrl = fixImageUrl(uploadedUrl);
-          setImageUrl(uploadedUrl);
-          enqueueSnackbar("Image uploaded successfully!", {
-            variant: "success",
-          });
-        } else {
-          enqueueSnackbar("Image upload failed. Please try again.", {
-            variant: "error",
-          });
-        }
-      } catch (error) {
-        console.error("Image upload error:", error);
-        enqueueSnackbar("An error occurred while uploading the image.", {
-          variant: "error",
-        });
-      }
-    } else {
-      enqueueSnackbar("You can only upload a maximum of 4 pictures.", {
-        variant: "error",
-      });
-    }
-  };
+  };  
 
   const handlePromptUpload = () => {
     const input = document.getElementById("imageInput") as HTMLInputElement;

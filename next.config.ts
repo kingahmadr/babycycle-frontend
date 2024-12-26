@@ -11,6 +11,13 @@ const nextConfig: NextConfig = {
         pathname: '/**',
         search: '',
       },
+      {
+        protocol: 'https',
+        hostname: 's3-jak01.storageraya.com',
+        port: '',
+        pathname: '/**',
+        search: '',
+      },
     ],
   },
 };
