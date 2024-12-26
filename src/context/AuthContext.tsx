@@ -7,10 +7,10 @@ import React, {
 } from 'react'
 import { useRouter } from 'next/router'
 import { API_LOGIN, API_ME } from '@/constants/apis'
-import { UserModel } from '@/models/User'
+import { UserData } from '@/models/User'
 
 interface AuthContextType {
-  user: UserModel | null
+  user: UserData | null
   login: (email: string, password: string) => Promise<void>
   logout: () => void
   isAuthenticated: boolean
@@ -20,7 +20,7 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<UserModel | null>(null)
+  const [user, setUser] = useState<UserData | null>(null)
   const [loading, setLoading] = useState<boolean>(true)
   const router = useRouter()
 
@@ -47,6 +47,32 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setLoading(false)
     }
   }
+  useEffect(() => {
+    fetchUserProfile()
+  }, [])
+
+  // const fetchUserProfile = async () => {
+  //   try {
+  //     const response = await fetch(API_ME, {
+  //       method: 'GET',
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //         Authorization: `Bearer ${localStorage.getItem('token')}`
+  //       }
+  //     })
+  //     if (response.ok) {
+  //       const userData = await response.json()
+  //       setUser(userData)
+  //     } else {
+  //       setUser(null)
+  //     }
+  //   } catch (error) {
+  //     alert(error)
+  //     setUser(null)
+  //   } finally {
+  //     setLoading(false)
+  //   }
+  // }
 
   useEffect(() => {
     fetchUserProfile()

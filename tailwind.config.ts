@@ -8,6 +8,16 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      screens: {
+        'tablet': { 'max': '640px' },
+        // => @media (max-width: 640px) { ... }
+  
+        'laptop': { 'max': '1024px' },
+        // => @media (max-width: 1024px) { ... }
+  
+        'desktop': { 'max': '1280px' },
+        // => @media (max-width: 1280px) { ... }
+      },
       colors: {
         foreground: '#171717', // Define the foreground color here
         background: '#ffffff', // Optional: Ensure the background color is also defined

@@ -11,6 +11,7 @@ export const SnackbarVariantsProvider: React.FC<{ children: ReactNode }> = ({
         vertical: "top",
         horizontal: "center",
       }}
+      autoHideDuration={5000} // Automatically dismiss after 5 seconds
     >
       {children}
     </SnackbarProvider>
