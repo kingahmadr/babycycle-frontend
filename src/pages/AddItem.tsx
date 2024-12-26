@@ -6,6 +6,7 @@ import axios from "axios";
 // import { formattedDate } from "@/utils/getCheckoutTimestamp";
 import { formatDate } from "@/utils/formatDate";
 import { useRouter } from "next/navigation";
+import { uploadFile } from "@/utils/uploadFile";
 
 const ListingForm: React.FC = () => {
   const [images, setImage] = useState<File | null>(null);
@@ -33,6 +34,53 @@ const ListingForm: React.FC = () => {
   const API_KEY = "6577355fd16db2acfd3f9b1909b77125";
   // const API_KEY = process.env.IMGBB_URL;
 
+
+ 
+  // const handleFileChange: React.ChangeEventHandler<HTMLInputElement> = async (event) => {
+  //   if (event.target.files && event.target.files[0]) {
+  //     setImage(event.target.files[0]); // Update the state with the selected file
+  //   }
+  //   if (!images) { // Check if a file is selected
+  //     enqueueSnackbar("Please select a file to upload.", { variant: "warning" });
+  //     return;
+  //   }
+  
+  //   try {
+  //     const fileUrl = await uploadFile(
+  //       { fileName: images.name, file: images }, // Use the correct variable for the file
+  //       enqueueSnackbar
+  //     );
+  //     console.log("Uploaded file URL:", fileUrl);
+  //     enqueueSnackbar(`File available at: ${fileUrl}`, { variant: "info" });
+  //     console.log('URL',fileUrl)
+  //     setImageUrl(fileUrl);
+  //   } catch (error) {
+  //     console.error("Upload failed:", error);
+  //   }
+  // };
+  const handleFileChange: React.ChangeEventHandler<HTMLInputElement> = async (event) => {
+    if (event.target.files && event.target.files[0]) {
+      const file = event.target.files[0]; // Get the selected file directly
+  
+      try {
+        const fileUrl = await uploadFile(
+          { fileName: file.name, file }, // Use the selected file
+          enqueueSnackbar
+        );
+        console.log("Uploaded file URL:", fileUrl);
+        enqueueSnackbar(`File available at: ${fileUrl}`, { variant: "info" });
+        setImageUrl(fileUrl); // Update the image URL state
+        setImage(file);
+      } catch (error) {
+        console.error("Upload failed:", error);
+      }
+    } else {
+      enqueueSnackbar("Please select a file to upload.", { variant: "warning" });
+    }
+  };
+
+  console.log(images)
+  
   const handleImageUpload = async (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
@@ -152,16 +200,6 @@ const ListingForm: React.FC = () => {
       );
       return;
     }
-
-    // if (images) {
-    //   const imageUploaded = await handleImageUpload();
-    //   if (!imageUploaded) {
-    //     enqueueSnackbar("Failed to upload image. Please try again.", {
-    //       variant: "error",
-    //     });
-    //     return;
-    //   }
-    // }
 
     const productPayload = {
       name,
@@ -308,7 +346,8 @@ const ListingForm: React.FC = () => {
             type="file"
             id="imageInput"
             accept="image/*"
-            onChange={handleImageUpload} // Updated to handle file selection
+            // onChange={handleImageUpload} // Updated to handle file selection
+            onChange={handleFileChange}
             className="hidden"
           />
         </div>
