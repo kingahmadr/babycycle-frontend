@@ -9,5 +9,6 @@ export interface TransactionModel {
     user_id: number;
     name: string;
     created_at: string;
-    quantity: string
+    quantity: string;
+    is_reviewed: boolean;
 }

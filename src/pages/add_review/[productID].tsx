@@ -1,11 +1,12 @@
-import React, { useState } from 'react'
+import React, { use, useEffect, useState } from 'react'
 import { PrimaryButton } from '@/components/PrimaryButton'
 import { SecondaryButton } from '@/components/SecondaryButton'
 // import { ReviewModel } from '@/models/Reviews'
-import { API_REVIEW } from '@/constants/apis'
+import { API_REVIEW, API_GET_PRODUCT } from '@/constants/apis'
 import { useRouter } from "next/router";
 import { enqueueSnackbar } from 'notistack'
-
+import { useAuth } from '@/context/AuthContext';
+import { ProductModel } from '@/models/Product';
 
 const AddReviewProduct = () => {
 
@@ -13,20 +14,69 @@ const AddReviewProduct = () => {
     const [hoverRating, setHoverRating] = useState<number>(0)
     const [review, setReview] = useState('');
     const [loading, setLoading] = useState(false);
+    const [productData, setProductData] = useState<ProductModel[]>([]);
 
     const router = useRouter();
-    const { productID } = router.query
+    const { productID, checkoutID } = router.query
 
-    console.log(review)
+    // console.log(review)
+    // console.log(productID, checkoutID)
+
+    // const {isAuthenticated} = useAuth()
+
+    useEffect(() => {
+        // if (!isAuthenticated) {
+        //     enqueueSnackbar('You must be logged in to add a review', {
+        //         variant: "error",
+        //     })
+        //     router.push('/login')
+        // }
+
+        if (productID && checkoutID) {
+            fetchProduct(Number(productID))
+        }
+
+
+    }, [productID, checkoutID])
+
+    console.log('productData', productData)
+    console.log('product data name', (productData.length >= 0 && productData.map(product => product.price)));
+
+    const fetchProduct = async (id: number) => {
+        try {
+          const response = await fetch(`${API_GET_PRODUCT}/${id}`, {
+            method: 'GET',
+          });
+      
+          const data = await response.json();
+      
+          if (!response.ok) {
+            console.error('Error response:', data); // Log the error data
+            enqueueSnackbar(data.error || 'Failed to fetch product', {
+              variant: "error",
+            })
+            return
+            // throw new Error(data.error || 'Failed to fetch product'); // Provide meaningful error message
+          }
+          setProductData(data);
+      
+          // Perform additional actions on success (e.g., updating UI)
+        } catch (error) {
+          console.error('Error fetching product:', error);
+        }
+      };
 
     const reviewPayload = {
         product_id: productID,
         rating: rating,
         review: review,
+        checkout_order_id: checkoutID
     }
     const fetchCreateReview = async () => {
         setLoading(true);
+        console.log('reviewPayload', reviewPayload)
         try {
+
           const response = await fetch(`${API_REVIEW}`, {
             method: 'POST',
             headers: {
@@ -39,8 +89,12 @@ const AddReviewProduct = () => {
           const data = await response.json();
       
           if (!response.ok) {
-            console.error('Error response:', data); // Log the error data
-            throw new Error(data.message || 'Failed to create review'); // Provide meaningful error message
+            // console.error('Error response:', data); // Log the error data
+            enqueueSnackbar(data.error || 'Failed to create review', {
+              variant: "error",
+            })
+            return
+            // throw new Error(data.error || 'Failed to create review'); // Provide meaningful error message
           }
       
           enqueueSnackbar('Review has been posted!', {
@@ -71,6 +125,7 @@ const AddReviewProduct = () => {
     const handleChangeReview = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
         setReview(e.target.value); // Update state when the text area value changes
       };
+    
     const renderStars = () => {
         return [...Array(5)].map((_, index) => (
         <img
@@ -113,11 +168,22 @@ const AddReviewProduct = () => {
                                    <span className='text-buttonBlue'>BabyStuffID</span>
                                </div>
                            </div>
-   
-                           <div>
-                               <span className='text-3xl font-extrabold'>Furnibest Stroller Baby Travel</span>
-                           </div>
-   
+                           {Array.isArray(productData) && productData.length ? (
+                                productData.map((product, index) => (
+                                    <div key={index}>
+                                    <span className="text-3xl font-extrabold">{product.name || 'Placeholder Name'}</span>
+                                    </div>
+                                ))
+                                ) : (
+                                <div>
+                                    <span className="text-3xl font-extrabold">No products available</span>
+                                </div>
+                            )}
+
+                            {/* <div>
+                                <span className='text-3xl font-extrabold'>PlaceHolder Name</span>
+                                </div>
+                            */}
                            <div className='w-full flex flex-col gap-2'>
                                <span className='text-formGray text-xl'>How would you rate the product?</span>
                                <div className='w-auto flex space-x-1'>
@@ -142,7 +208,11 @@ const AddReviewProduct = () => {
                                    type='button'>
                                      {loading ? 'Loading...' : 'Add Review'}
                                 </PrimaryButton>
-                               <SecondaryButton type='button'>Cancel</SecondaryButton>
+                               <SecondaryButton 
+                                    type='button'
+                                    onClick={() => router.push('/dashboard')}
+                                    >Cancel                                 
+                                </SecondaryButton>
                            </div>
                        </div>
    

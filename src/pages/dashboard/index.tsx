@@ -46,9 +46,9 @@ const UserDashboard = () => {
     const { user } = useAuth()
     console.log(user)
 
-    const handleReviewPage = (productID: number) => {    
-        router.push(`/add_review/${productID}`)
-    }
+    const handleReviewPage = (productID: number, checkoutID: string) => {
+        router.push(`/add_review/${productID}?checkoutID=${checkoutID}`)
+      };
 
     const handleSellerDashboard = () => {    
     router.push(`/seller-dashboard`)
@@ -176,7 +176,12 @@ const UserDashboard = () => {
                                 </div>
 
                                 <div className='w-full flex justify-end gap-3'>
-                                    <PrimaryButton type='button' onClick={() => handleReviewPage(transaction.product_id)}>Add Review +</PrimaryButton>
+                                    <PrimaryButton 
+                                        type='button' 
+                                        onClick={() => handleReviewPage(transaction.product_id, transaction.checkout_id)}
+                                        disabled={transaction.is_reviewed == true}
+                                        >{transaction.is_reviewed == false ? "Add Review +" : "Already Reviewed"}
+                                    </PrimaryButton>
                                 </div>
                             </div>
 

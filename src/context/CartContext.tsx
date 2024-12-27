@@ -255,6 +255,7 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   
     // Save the updated cart back to localStorage
     localStorage.setItem("cart", JSON.stringify(updatedCart));
+    console.log(updatedItem);
   
     // Send the updated item to the backend
     try {
