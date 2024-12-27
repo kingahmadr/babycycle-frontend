@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { TransactionModel } from '@/models/Transactions'
 import { API_TRANSACTION } from '@/constants/apis'
 import { useRouter } from 'next/navigation'
+import { convertDate } from "@/utils/formatDate";
 
 const UserDashboard = () => {
 
@@ -44,10 +45,10 @@ const UserDashboard = () => {
     }, [activeTab])
 
     const { user } = useAuth()
-    console.log(user)
+    // console.log(user)
 
     const handleReviewPage = (productID: number, checkoutID: string) => {
-        router.push(`/add_review/${productID}?checkoutID=${checkoutID}`)
+        router.push(`/add_review/${productID}?checkout_id=${checkoutID}`)
       };
 
     const handleSellerDashboard = () => {    
@@ -152,12 +153,14 @@ const UserDashboard = () => {
                             <div className='w-full p-6 flex flex-col gap-8 border-4 border-borderGray rounded-xl text-xl'>
                                 <div className='w-full flex gap-8'>
                                     <div className='w-[154px] h-[154px] bg-slate-200'>
-                                        <img className='w-full h-auto' src=''/>
+                                        <img className='w-full h-full' src={transaction.image_url || "https://placehold.co/600x400"}
+                                             alt="https://placehold.co/600x400"
+                                        />
                                     </div>
 
                                     <div className='w-2/3 flex flex-col gap-2'>
                                         <div className='w-full flex gap-4 items-center'>
-                                            <span>25 October 2024</span>
+                                            <span>{convertDate(transaction.created_at)}</span>
                                             <div className='w-auto h-auto p-2 bg-lighterBabyBlue text-buttonBlue text-xs text-center'>{transaction.status}</div>
                                         </div>
                                         <span className='font-bold'>{transaction.name}</span>
@@ -165,13 +168,13 @@ const UserDashboard = () => {
 
                                         <div className='w-full flex gap-3 items-center'>
                                             <img src='/Icon_shop.png'/>
-                                            <span className='text-buttonBlue'>BabyStuffID</span>
+                                            <span className='text-buttonBlue'>{transaction.seller_details.name}</span>
                                         </div>
                                     </div>
 
                                     <div className='w-1/4 flex flex-col justify-center gap-2'>
                                         <span>Total payment</span>
-                                        <span className='font-bold'>{transaction.total_price}</span>
+                                        <span className='font-bold'>{transaction.total_price.toLocaleString()}</span>
                                     </div>
                                 </div>
 

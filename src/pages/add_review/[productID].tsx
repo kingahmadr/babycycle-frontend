@@ -1,76 +1,63 @@
-import React, { use, useEffect, useState } from 'react'
+import React, {useEffect, useState } from 'react'
 import { PrimaryButton } from '@/components/PrimaryButton'
 import { SecondaryButton } from '@/components/SecondaryButton'
 // import { ReviewModel } from '@/models/Reviews'
-import { API_REVIEW, API_GET_PRODUCT } from '@/constants/apis'
+import { API_REVIEW, API_GET_PRODUCT, API_TRANSACTION } from '@/constants/apis'
 import { useRouter } from "next/router";
 import { enqueueSnackbar } from 'notistack'
-import { useAuth } from '@/context/AuthContext';
+// import { useAuth } from '@/context/AuthContext';
 import { ProductModel } from '@/models/Product';
+import { GetServerSideProps } from 'next';
+import { TransactionModel } from '@/models/Transactions';
+import { convertDate } from "@/utils/formatDate";
 
-const AddReviewProduct = () => {
+
+
+interface ProductProps {
+    product: ProductModel
+}
+const AddReviewProduct: React.FC<ProductProps> = ({ product }) => {
 
     const [rating, setRating] = useState<number>(0)
     const [hoverRating, setHoverRating] = useState<number>(0)
     const [review, setReview] = useState('');
     const [loading, setLoading] = useState(false);
-    const [productData, setProductData] = useState<ProductModel[]>([]);
+    const [transactions, setTransactions] = useState<TransactionModel[]>()
 
     const router = useRouter();
-    const { productID, checkoutID } = router.query
+    const { productID, checkout_id } = router.query
 
-    // console.log(review)
-    // console.log(productID, checkoutID)
-
-    // const {isAuthenticated} = useAuth()
-
-    useEffect(() => {
-        // if (!isAuthenticated) {
-        //     enqueueSnackbar('You must be logged in to add a review', {
-        //         variant: "error",
-        //     })
-        //     router.push('/login')
-        // }
-
-        if (productID && checkoutID) {
-            fetchProduct(Number(productID))
-        }
-
-
-    }, [productID, checkoutID])
-
-    console.log('productData', productData)
-    console.log('product data name', (productData.length >= 0 && productData.map(product => product.price)));
-
-    const fetchProduct = async (id: number) => {
+    const fetchTransactions = async () => {
         try {
-          const response = await fetch(`${API_GET_PRODUCT}/${id}`, {
-            method: 'GET',
-          });
-      
-          const data = await response.json();
-      
-          if (!response.ok) {
-            console.error('Error response:', data); // Log the error data
-            enqueueSnackbar(data.error || 'Failed to fetch product', {
-              variant: "error",
+            const response = await fetch(`${API_TRANSACTION}/${productID}?checkout_id=${checkout_id}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                     Authorization: `Bearer ${localStorage.getItem('token')}`
+                }
             })
-            return
-            // throw new Error(data.error || 'Failed to fetch product'); // Provide meaningful error message
-          }
-          setProductData(data);
-      
-          // Perform additional actions on success (e.g., updating UI)
+            const data = await response.json()
+            console.log(data)
+            
+            if (!response.ok) {
+                const errorData = await response.json()
+                console.log(errorData)
+                throw new Error(errorData)
+            }
+            setTransactions(data)
         } catch (error) {
-          console.error('Error fetching product:', error);
+            console.error('Error fetching transactions:', error)
         }
-      };
+    }
+    useEffect(() => {
+        fetchTransactions()
+    }, [productID, checkout_id])
 
     const reviewPayload = {
         product_id: productID,
         rating: rating,
         review: review,
-        checkout_order_id: checkoutID
+        checkout_order_id: checkout_id
     }
     const fetchCreateReview = async () => {
         setLoading(true);
@@ -89,12 +76,10 @@ const AddReviewProduct = () => {
           const data = await response.json();
       
           if (!response.ok) {
-            // console.error('Error response:', data); // Log the error data
             enqueueSnackbar(data.error || 'Failed to create review', {
               variant: "error",
             })
             return
-            // throw new Error(data.error || 'Failed to create review'); // Provide meaningful error message
           }
       
           enqueueSnackbar('Review has been posted!', {
@@ -153,37 +138,30 @@ const AddReviewProduct = () => {
                    <div className='w-full flex gap-8'>
    
                        <div className='w-[222px] h-[222px]'>
-                           <img className='w-full h-full' src=''></img>
+                           <img className='w-full h-full' src={product.image_url || "https://placehold.co/600x400"} 
+                                alt={product.name || "https://placehold.co/600x400"}>
+                            
+                            </img>
                        </div>
    
                        <div className='w-4/5 flex flex-col gap-8'>
-   
-                           <div className='w-full flex justify-between'>
-                               <div className='w-full flex gap-3 items-center'>
-                                   <span>25 October 2024</span>
-                                   <div className='w-auto h-auto p-2 bg-lighterBabyBlue text-buttonBlue text-xs text-center'>Done</div>
-                               </div>
-                               <div className='w-full flex gap-3 justify-end items-center'>
-                                   <img src='/Icon_shop.png'/>
-                                   <span className='text-buttonBlue'>BabyStuffID</span>
-                               </div>
-                           </div>
-                           {Array.isArray(productData) && productData.length ? (
-                                productData.map((product, index) => (
-                                    <div key={index}>
-                                    <span className="text-3xl font-extrabold">{product.name || 'Placeholder Name'}</span>
-                                    </div>
-                                ))
-                                ) : (
-                                <div>
-                                    <span className="text-3xl font-extrabold">No products available</span>
+                       {transactions?.map((transaction, index) => (
+                            <div key={index} className='w-full flex justify-between'>
+                                <div className='w-full flex gap-3 items-center'>
+                                    <span>{convertDate(transaction.created_at)}</span>
+                                    <div className='w-auto h-auto p-2 bg-lighterBabyBlue text-buttonBlue text-xs text-center'>{transaction.status}</div>
                                 </div>
-                            )}
-
-                            {/* <div>
-                                <span className='text-3xl font-extrabold'>PlaceHolder Name</span>
+                                <div className='w-full flex gap-3 justify-end items-center'>
+                                    <img src='/Icon_shop.png'/>
+                                    <span className='text-buttonBlue'>{transaction.seller_details.name}</span>
                                 </div>
-                            */}
+                            </div>  
+                           
+                       ))}
+                            <div>
+                                <span className='text-3xl font-extrabold'>{product?.name || 'Placeholder Name'}</span>
+                            </div>
+                           
                            <div className='w-full flex flex-col gap-2'>
                                <span className='text-formGray text-xl'>How would you rate the product?</span>
                                <div className='w-auto flex space-x-1'>
@@ -225,6 +203,36 @@ const AddReviewProduct = () => {
 }
 
 export default AddReviewProduct
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const { productID } = context.params!;
+
+  try {
+    const response_product = await fetch(`${API_GET_PRODUCT}/${productID}`);
+
+    
+
+    if (!response_product.ok) {
+      return {
+        notFound: true,
+      };
+    }
+  
+    const product = await response_product.json();
+
+    return {
+      props: {
+        product,
+      },
+    };
+  } catch (error) {
+    console.error("Failed to fetch product details:", error);
+
+    return {
+      notFound: true,
+    };
+  }
+};
 
 
 

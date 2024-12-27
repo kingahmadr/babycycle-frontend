@@ -1,3 +1,4 @@
+import { SellerModel } from "./Seller";
 export interface TransactionModel {
     checkout_id: string;
     payment_method: string;
@@ -11,4 +12,7 @@ export interface TransactionModel {
     created_at: string;
     quantity: string;
     is_reviewed: boolean;
+    image_url: string | null;
+    seller_details: SellerModel
 }
+
