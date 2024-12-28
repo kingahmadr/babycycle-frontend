@@ -1,6 +1,8 @@
 export interface AddressModel {
     address: string;
-    phone: string;
+    contact: string;
     name: string;
+    is_main?: boolean;
+    id?: number
     
 }

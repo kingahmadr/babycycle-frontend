@@ -2,13 +2,20 @@ import { PrimaryButton } from '@/components/PrimaryButton'
 import { useAuth } from '@/context/AuthContext'
 import { useEffect, useState } from 'react'
 import { TransactionModel } from '@/models/Transactions'
-import { API_TRANSACTION } from '@/constants/apis'
+import { API_TRANSACTION, API_ADDRESSES } from '@/constants/apis'
 import { useRouter } from 'next/navigation'
 import { convertDate } from "@/utils/formatDate";
+import { SecondaryButton } from '@/components/SecondaryButton'
+import { enqueueSnackbar } from "notistack";
+import { AddressModel } from '@/models/Address'
+import { DataWithCount } from '@/models/DataWithCount'
+import  ModalsAddress from '@/components/ModalsAddress'
 
 const UserDashboard = () => {
 
     const [activeTab, setActiveTab] = useState('personalData')
+    const [showAddressModal, setShowAddressModal] = useState(false)
+    const [loading, setLoading] = useState(false)
     const router = useRouter()
 
     const handleTabClick = (tab: string) => {
@@ -16,6 +23,113 @@ const UserDashboard = () => {
     }
 
     const [transactions, setTransactions] = useState<TransactionModel[]>()
+    const [addresses, setAddresses] = useState<AddressModel[]>([]);
+
+    const [addressListData, setAddressListData] = useState<DataWithCount<AddressModel> | undefined>()
+
+    const getAddressById = async ( id: number) => {
+        try {
+            const response = await fetch(`${API_ADDRESSES}/${id}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${localStorage.getItem('token')}`,
+                },
+            });
+            if (!response.ok) {
+                const errorData = await response.json();
+                console.error('Error updating address:', errorData);
+                enqueueSnackbar(errorData.message || 'Failed to update address.', {
+                    variant: 'error',
+                });
+                return
+            }
+           
+            const data = await response.json();
+            setAddresses(data);
+            console.log('address data',data)
+            setShowAddressModal(true)
+            
+        } catch (error) {
+            console.error('Error updating address:', error);
+        }
+        
+      };
+    console.log('addresses',addresses)
+
+    const handleInputChange = (index: number, field: string, value: string) => {
+        setAddresses((prev) =>
+          prev.map((address, i) =>
+            i === index ? { ...address, [field]: value } : address
+          )
+        );
+      };
+
+    const fetchAddresesList = async () => {
+        try {
+            const response = await fetch(API_ADDRESSES, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${localStorage.getItem('token')}`,
+                },
+            });
+            if (!response.ok) {
+                const errorData = await response.json();
+                console.error('Error fetching addresses:', errorData);
+                return
+            }
+            const data = await response.json();
+            setAddressListData(data);
+        } catch (error) {
+            console.error('Error fetching addresses:', error);
+        }
+    };
+
+    const fetchAddresses = async () => {
+        try {
+          setLoading(true);
+      
+          // Validation to ensure all fields in the array are filled
+          for (const address of addresses) {
+            if (!address.name || !address.contact || !address.address) {
+              enqueueSnackbar('Please fill in all the fields for each address', { variant: 'error' });
+              return;
+            }
+          }
+      
+          // Perform the POST request
+          const response = await fetch(API_ADDRESSES, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${localStorage.getItem('token')}`,
+            },
+            body: JSON.stringify(addresses),
+          });
+      
+          if (!response.ok) {
+            const errorData = await response.json();
+            console.error('Error adding new addresses:', errorData);
+            enqueueSnackbar('Failed to add addresses. Please try again.', { variant: 'error' });
+            return;
+          }
+      
+          enqueueSnackbar('Addresses added successfully!', { variant: 'success' });
+      
+          // Mock delay (optional)
+          await new Promise((resolve) => setTimeout(resolve, 1000));
+      
+          // Reset the form and close the modal
+          setShowAddressModal(false);
+          setAddresses([]); // Clear the addresses array after successful submission
+        } catch (error) {
+          console.error('Error fetching addresses:', error);
+          enqueueSnackbar('An error occurred while adding the addresses.', { variant: 'error' });
+        } finally {
+          setLoading(false);
+        }
+      };
 
     const fetchTransactions = async () => {
         try {
@@ -50,6 +164,7 @@ const UserDashboard = () => {
     };
     useEffect(() => {
         fetchTransactions()
+        fetchAddresesList()
     }, [activeTab])
 
     const { user } = useAuth()
@@ -123,24 +238,103 @@ const UserDashboard = () => {
             {activeTab === 'addressList' && (
             <div className='p-6'>
                 <div className='w-full flex flex-col gap-6'>
-                    
                     <div className='w-full flex justify-between text-xl'>
                         <div>Find Address</div>
-                        <PrimaryButton type='button'>Add New Address +</PrimaryButton>
+                        <PrimaryButton
+                            type='button'
+                            onClick={() => setShowAddressModal(true)}
+                        >
+                            Add New Address +
+                        </PrimaryButton>
+
+                        {showAddressModal && (
+                            <div className="modal-overlay">
+                                <div className="modal-content">
+                                    <div className="w-[506px] mx-auto flex flex-col gap-6 text-xl">                                                                                  
+                                        <ModalsAddress
+                                            addresses={addresses}
+                                            handleInputChange={handleInputChange}
+                                            // onClose={() => setShowModal(false)}
+                                        />
+                                        <div className="w-full flex justify-end gap-4">
+                                            <PrimaryButton type="submit" onClick={fetchAddresses}>
+                                                {loading ? 'Loading...' : 'Submit'}
+                                            </PrimaryButton>
+                                            <SecondaryButton
+                                                onClick={() => setShowAddressModal(false)}
+                                                type="button"
+                                            >
+                                                Cancel
+                                            </SecondaryButton>
+                                        </div>
+                               
+                                     </div>
+                                </div>
+                            </div>
+                            )}
                     </div>
+                    <div className="w-full p-6 flex flex-col gap-8 border-4 border-borderGray rounded-xl text-xl">
+                    {Array.isArray(addressListData?.data) && addressListData.data.length > 0 ? (
+                        addressListData.data.map((address, index) => (
+                        <div key={index} className="w-full flex flex-col gap-4">
+                            <div className='gap-8 border-4 border-borderGray rounded-xl p-6'>
 
-                    <div className='w-full p-6 flex flex-col gap-8 border-4 border-borderGray rounded-xl text-xl'>
-                        <div className='w-full flex flex-col'>
-                            <span className='font-bold'>Mamadi</span>
-                            <span>083674657890</span>
-                            <span>Gang Masjid Jami Al Huda, Leuwinutug, Kec. Citeureup, Kabupaten Bogor, Jawa Barat</span>
-                        </div>
+                                <div className="w-full flex flex-col">
+                                    <span className="font-bold">{address.name}</span>
+                                    <span>{address.contact}</span>
+                                    <span>{address.address}</span>
+                                </div>
+                                <div className="w-full flex justify-end gap-3">
+                                    <PrimaryButton type="button" className={address.is_main ? 'btn-disabled' : ''} >
+                                       {address.is_main ? 'main address' : 'Set As Main'}
+                                    </PrimaryButton>
+                                    <PrimaryButton 
+                                        type="button"   
+                                        onClick={() => {
+                                            if (address?.id !== undefined) {
+                                                getAddressById(address.id);
+                                            } else {
+                                               enqueueSnackbar("Address not found.", { variant: "error" });
+                                            }
+                                        }}>
+                                        Change
+                                    </PrimaryButton>
+                                    {showAddressModal && (
+                                        <div className="modal-overlay">
+                                            <div className="modal-content">
+                                                <div className="w-[506px] mx-auto flex flex-col gap-6 text-xl">                                                                                  
+                                                    <ModalsAddress
+                                                        addresses={addresses}
+                                                        handleInputChange={handleInputChange}
+                                                        // onClose={() => setShowModal(false)}
+                                                    />
+                                                    <div className="w-full flex justify-end gap-4">
+                                                        <PrimaryButton type="submit" onClick={fetchAddresses}>
+                                                            {loading ? 'Loading...' : 'Submit'}
+                                                        </PrimaryButton>
+                                                        <SecondaryButton
+                                                            onClick={() => setShowAddressModal(false)}
+                                                            type="button"
+                                                        >
+                                                            Cancel
+                                                        </SecondaryButton>
+                                                    </div>
+                                        
+                                                </div>
+                                            </div>
+                                        </div>
+                                        )}
 
-                        <div className='w-full flex justify-end gap-3'>
-                            <PrimaryButton type='button'>Set As Main</PrimaryButton>
-                            <PrimaryButton type='button'>Change</PrimaryButton>
-                            <PrimaryButton type='button'>Delete</PrimaryButton>
+                                    <PrimaryButton type="button">
+                                        Delete
+                                    </PrimaryButton>
+                                </div>
+                            </div>
                         </div>
+                        ))
+                    ) : (
+                        <div>No address found</div>
+                    )}
                     </div>
 
                 </div>
