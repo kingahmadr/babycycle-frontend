@@ -1,11 +1,9 @@
 import React, {useEffect, useState } from 'react'
 import { PrimaryButton } from '@/components/PrimaryButton'
 import { SecondaryButton } from '@/components/SecondaryButton'
-// import { ReviewModel } from '@/models/Reviews'
 import { API_REVIEW, API_GET_PRODUCT, API_TRANSACTION } from '@/constants/apis'
 import { useRouter } from "next/router";
 import { enqueueSnackbar } from 'notistack'
-// import { useAuth } from '@/context/AuthContext';
 import { ProductModel } from '@/models/Product';
 import { GetServerSideProps } from 'next';
 import { TransactionModel } from '@/models/Transactions';

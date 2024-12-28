@@ -13,39 +13,46 @@ const UserDashboard = () => {
 
     const handleTabClick = (tab: string) => {
         setActiveTab(tab)
-        // fetchTransactions()
     }
 
     const [transactions, setTransactions] = useState<TransactionModel[]>()
 
     const fetchTransactions = async () => {
         try {
-            const response = await fetch(API_TRANSACTION, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                     Authorization: `Bearer ${localStorage.getItem('token')}`
-                }
-            })
-            const data = await response.json()
-            console.log(data)
-            
-            if (!response.ok) {
-                const errorData = await response.json()
-                console.log(errorData)
-                throw new Error(errorData)
-            }
-            setTransactions(data)
+          const response = await fetch(API_TRANSACTION, {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${localStorage.getItem('token')}`,
+            },
+          });
+      
+          // Check for non-200 status codes
+          if (!response.ok) {
+            const errorData = await response.json(); 
+            console.error('Error fetching transactions:', errorData);
+            return
+          }
+      
+          const data = await response.json(); 
+      
+          // Handle empty data
+          if (!data || data.length === 0) {
+            console.error('No transactions found for the specified user');
+            setTransactions([]); // Set to an empty array if no transactions found
+            return;
+          }
+      
+          setTransactions(data); // Set the fetched transactions to state
         } catch (error) {
-            console.error('Error fetching transactions:', error)
+          console.error('Error fetching transactions:', error);
         }
-    }
+    };
     useEffect(() => {
         fetchTransactions()
     }, [activeTab])
 
     const { user } = useAuth()
-    // console.log(user)
 
     const handleReviewPage = (productID: number, checkoutID: string) => {
         router.push(`/add_review/${productID}?checkout_id=${checkoutID}`)
@@ -141,7 +148,7 @@ const UserDashboard = () => {
             )}
 
             {activeTab === 'transactionHistory' && (
-                transactions?.map((transaction, index) => (
+                transactions && transactions.length > 0 && transactions?.map((transaction, index) => (
                 
                     <div key={index} className='p-6'>
                         <div className='w-full flex flex-col gap-6'>
@@ -221,10 +228,6 @@ const UserDashboard = () => {
             null
         )
         }
-
-
-            
-
         </div>
     </div>
   )

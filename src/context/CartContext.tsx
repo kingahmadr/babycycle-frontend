@@ -3,17 +3,9 @@ import { enqueueSnackbar } from "notistack";
 import React, { createContext, useState, useEffect, ReactNode } from "react";
 import { CartsModel } from "@/models/Carts";
 
-// interface CartItem {
-//   product_id: string;
-//   id: string;
-//   name: string;
-//   price: number;
-//   quantity: number;
-//   total_price: number;
-// }
-
 interface CartContextProps {
   cart: CartsModel[];
+  loadingCartContext: boolean;
   addToCart: (item: CartsModel) => void;
   removeFromCart: (id: string) => void;
   increaseQuantity: (id: string) => void;
@@ -28,6 +20,7 @@ export const CartContext = createContext<CartContextProps | undefined>(
 
 export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [cart, setCart] = useState<CartsModel[]>([]);
+  const [loadingCartContext, setLoadingCartContext] = useState<boolean>(false);
 
   // Load cart from localStorage on mount
   useEffect(() => {
@@ -53,7 +46,14 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error("Error fetching cart:", errorData);
+        return
+      }
       const data = await response.json();
+
       if (data) {
         setCart(Array.isArray(data) ? data : []);
       }
@@ -67,21 +67,6 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   }
   
-  // Add a new item to the cart or update its quantity
-  // const addToCart = (item: CartItem) => {
-  //   setCart((prevCart) => {
-  //     const existingItem = prevCart.find((cartItem) => cartItem.id === item.id);
-  //     if (existingItem) {
-  //       return prevCart.map((cartItem) =>
-  //         cartItem.id === item.id
-  //           ? { ...cartItem, quantity: cartItem.quantity + item.quantity }
-  //           : cartItem
-  //       );
-  //     }
-  //     return [...prevCart, item];
-  //   });
-
-  // };
   const addToCart = (item: CartsModel) => {
     setCart((prevCart = []) => {
       const existingItem = prevCart.find((cartItem) => cartItem.id === item.id);
@@ -181,6 +166,7 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
     // Send the updated item to the backend
     try {
+      setLoadingCartContext(true);
       const response = await fetch(`${API_CARTS}/${updatedItem.id}`, {
         method: "PUT",
         headers: {
@@ -198,8 +184,12 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           data.message || `Failed to update item with ID ${updatedItem.id}`
         );
       }
+      // Ensure loading remains true for at least 5 seconds
+    await new Promise((resolve) => setTimeout(resolve, 1000));
     } catch (error) {
       console.error("Error updating cart item:", error);
+    } finally {
+      setLoadingCartContext(false);
     }
   };
   
@@ -259,6 +249,7 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   
     // Send the updated item to the backend
     try {
+      setLoadingCartContext(true);
       const response = await fetch(`${API_CARTS}/${updatedItem.id}`, {
         method: "PUT",
         headers: {
@@ -276,8 +267,12 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           data.message || `Failed to update item with ID ${updatedItem.id}`
         );
       }
+      // Ensure loading remains true for at least 5 seconds
+    await new Promise((resolve) => setTimeout(resolve, 1000));
     } catch (error) {
       console.error("Error updating cart item:", error);
+    } finally {
+      setLoadingCartContext(false);
     }
   };
 
@@ -291,6 +286,7 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     <CartContext.Provider
       value={{
         cart,
+        loadingCartContext,
         addToCart,
         removeFromCart,
         increaseQuantity,
