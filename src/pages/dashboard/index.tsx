@@ -23,7 +23,13 @@ const UserDashboard = () => {
     }
 
     const [transactions, setTransactions] = useState<TransactionModel[]>()
-    const [addresses, setAddresses] = useState<AddressModel[]>([]);
+    const [addresses, setAddresses] = useState<AddressModel[]>([
+        {
+          address: '',
+          name: '',
+          contact: '',
+        },
+      ]);
 
     const [addressListData, setAddressListData] = useState<DataWithCount<AddressModel> | undefined>()
 
@@ -47,7 +53,6 @@ const UserDashboard = () => {
            
             const data = await response.json();
             setAddresses(data);
-            console.log('address data',data)
             setShowAddressModal(true)
             
         } catch (error) {
@@ -55,7 +60,6 @@ const UserDashboard = () => {
         }
         
       };
-    console.log('addresses',addresses)
 
     const handleInputChange = (index: number, field: string, value: string) => {
         setAddresses((prev) =>
@@ -122,7 +126,14 @@ const UserDashboard = () => {
       
           // Reset the form and close the modal
           setShowAddressModal(false);
-          setAddresses([]); // Clear the addresses array after successful submission
+          setAddresses([
+            {
+              address: '',
+              name: '',
+              contact: '',
+            }
+          ]); 
+          
         } catch (error) {
           console.error('Error fetching addresses:', error);
           enqueueSnackbar('An error occurred while adding the addresses.', { variant: 'error' });
@@ -130,6 +141,41 @@ const UserDashboard = () => {
           setLoading(false);
         }
       };
+    
+    const updateAddress = async (id: number) => {
+        try {
+            setLoading(true);
+            const response = await fetch(`${API_ADDRESSES}/${id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${localStorage.getItem('token')}`,
+                },
+                body: JSON.stringify(addresses),
+            });
+            if (!response.ok) {
+                const errorData = await response.json();
+                console.error('Error updating address:', errorData);
+                enqueueSnackbar(errorData.message || 'Failed to update address.', {
+                    variant: 'error',
+                });
+                return
+            }
+            enqueueSnackbar('Address updated successfully!', { variant: 'success' });
+        } catch (error) {
+            console.error('Error updating address:', error);
+        } finally {
+            setLoading(false);
+            setShowAddressModal(false);
+            setAddresses([
+                {
+                  address: '',
+                  name: '',
+                  contact: '',
+                }
+              ]); 
+        }
+    };
 
     const fetchTransactions = async () => {
         try {
@@ -242,7 +288,7 @@ const UserDashboard = () => {
                         <div>Find Address</div>
                         <PrimaryButton
                             type='button'
-                            onClick={() => setShowAddressModal(true)}
+                            onClick={() => {setShowAddressModal(true)}}
                         >
                             Add New Address +
                         </PrimaryButton>
@@ -261,7 +307,16 @@ const UserDashboard = () => {
                                                 {loading ? 'Loading...' : 'Submit'}
                                             </PrimaryButton>
                                             <SecondaryButton
-                                                onClick={() => setShowAddressModal(false)}
+                                                onClick={() => {
+                                                    setShowAddressModal(false); 
+                                                    setAddresses([
+                                                            {
+                                                                address: '',
+                                                                name: '',
+                                                                contact: '',
+                                                            }
+                                                        ]); 
+                                                        }}
                                                 type="button"
                                             >
                                                 Cancel
@@ -308,17 +363,35 @@ const UserDashboard = () => {
                                                         handleInputChange={handleInputChange}
                                                         // onClose={() => setShowModal(false)}
                                                     />
-                                                    <div className="w-full flex justify-end gap-4">
-                                                        <PrimaryButton type="submit" onClick={fetchAddresses}>
+                                                    {addresses.map((addressSelected, index) => (
+                                                        
+                                                    <div key = {index} className="w-full flex justify-end gap-4">
+                                                        <PrimaryButton type="submit" onClick={() => {
+                                                             if (addressSelected?.id !== undefined) {
+                                                                updateAddress(addressSelected.id);
+                                                            } else {
+                                                               enqueueSnackbar("Address not found.", { variant: "error" });
+                                                            }
+                                                        }}>
                                                             {loading ? 'Loading...' : 'Submit'}
                                                         </PrimaryButton>
                                                         <SecondaryButton
-                                                            onClick={() => setShowAddressModal(false)}
+                                                            onClick={() => {
+                                                                setShowAddressModal(false); 
+                                                                setAddresses([
+                                                                        {
+                                                                            address: '',
+                                                                            name: '',
+                                                                            contact: '',
+                                                                        }
+                                                                    ]); 
+                                                                    }}
                                                             type="button"
                                                         >
                                                             Cancel
                                                         </SecondaryButton>
                                                     </div>
+                                                    ))}
                                         
                                                 </div>
                                             </div>

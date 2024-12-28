@@ -51,9 +51,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     fetchUserProfile()
   }, [])
 
-  useEffect(() => {
-    fetchUserProfile()
-  }, [])
 
   const login = async (email: string, password: string) => {
     try {
