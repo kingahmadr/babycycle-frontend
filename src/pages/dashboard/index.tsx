@@ -2,7 +2,7 @@ import { PrimaryButton } from '@/components/PrimaryButton'
 import { useAuth } from '@/context/AuthContext'
 import { useEffect, useState } from 'react'
 import { TransactionModel } from '@/models/Transactions'
-import { API_TRANSACTION, API_ADDRESSES, API_ADDRESSES_MAIN} from '@/constants/apis'
+import { API_TRANSACTION, API_ADDRESSES, API_ADDRESSES_MAIN, API_PROFILE_IMAGE, API_UPDATE_PROFILE } from '@/constants/apis'
 import { useRouter } from 'next/navigation'
 import { convertDate } from "@/utils/formatDate";
 import { SecondaryButton } from '@/components/SecondaryButton'
@@ -10,16 +10,27 @@ import { enqueueSnackbar } from "notistack";
 import { AddressModel } from '@/models/Address'
 import { DataWithCount } from '@/models/DataWithCount'
 import  Modals from '@/components/Modals'
-import Spinner from '@/components/Spinner'
 import LoadingSpinner from '@/components/LoadingSpinner'
+import { uploadFile } from "@/utils/uploadFile";
+import { UserModel } from '@/models/User'
 
 const UserDashboard = () => {
 
+    const { user } = useAuth()
     const [activeTab, setActiveTab] = useState('personalData')
     const [showAddressModal, setShowAddressModal] = useState(false)
     const [showDeleteModal, setShowDeleteModal] = useState(false)
+    const [showUserProfileUpdateModal, setShowUserProfileUpdateModal] = useState(false)
     const [loading, setLoading] = useState(false)
     const [updatingAddressId, setUpdatingAddressId] = useState<number | null>(null);
+    const [imageUrl, setImageUrl] = useState<string>("");
+    const [images, setImage] = useState<File | null>(null);
+    const [profileData, setProfileData] = useState<UserModel>({
+        username: user?.data.username || "",
+        email: user?.data.email || "",
+        phone: user?.data.phone || "",
+      });
+
     const router = useRouter()
 
     const handleTabClick = (tab: string) => {
@@ -36,6 +47,52 @@ const UserDashboard = () => {
       ]);
 
     const [addressListData, setAddressListData] = useState<DataWithCount<AddressModel> | undefined>()
+
+    const handleFileChange: React.ChangeEventHandler<HTMLInputElement> = async (event) => {
+        if (event.target.files && event.target.files[0]) {
+            const file = event.target.files[0]; // Get the selected file directly
+        
+            try {
+            const fileUrl = await uploadFile(
+                { fileName: file.name, file }, // Use the selected file
+                enqueueSnackbar
+            );
+            console.log("Uploaded file URL:", fileUrl);
+            enqueueSnackbar(`File available at: ${fileUrl}`, { variant: "info" });
+            setImageUrl(fileUrl); // Update the image URL state
+            setImage(file);
+            } catch (error) {
+            console.error("Upload failed:", error);
+            }
+        } else {
+            enqueueSnackbar("Please select a file to upload.", { variant: "warning" });
+        }
+    };
+    const handlePromptUpload = () => {
+        const input = document.getElementById("imageInput") as HTMLInputElement;
+        input?.click();
+      };
+    
+      const handleImageRemove = () => {
+        enqueueSnackbar("Are you sure you want to delete this image?", {
+          variant: "warning",
+          action: () => (
+            <button
+              onClick={() => {
+                setImage(null);
+                setImageUrl("");
+                enqueueSnackbar("Image deleted successfully!", {
+                  variant: "success",
+                });
+              }}
+            >
+              Confirm
+            </button>
+          ),
+        });
+      };
+    
+    
 
     const getAddressById = async ( id: number) => {
         try {
@@ -72,6 +129,49 @@ const UserDashboard = () => {
           )
         );
       };
+    const handleProfileChange = (field: string, value: string) => {
+        setProfileData((prev) => ({
+            ...prev,
+            [field]: value,
+          }));
+      };
+    
+    const updateProfile = async () => {
+        try {
+            setLoading(true);
+            const response = await fetch(API_UPDATE_PROFILE, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${localStorage.getItem('token')}`,
+                },
+                body: JSON.stringify({ 
+                    username: profileData.username,
+                    email: profileData.email,
+                    phone: profileData.phone 
+                
+                }),
+            });
+            if (!response.ok) {
+                const errorData = await response.json();
+                console.error('Error updating profile:', errorData);
+                enqueueSnackbar(errorData.message || 'Failed to update profile.', {
+                    variant: 'error',
+                });
+                return
+            }
+            // const data = await response.json();
+            enqueueSnackbar('Profile updated successfully!', {
+                variant: 'success',
+            });
+            // setProfileData(data);
+        } catch (error) {
+            console.error('Error updating profile:', error);
+        } finally {
+            setLoading(false);
+            setShowUserProfileUpdateModal(false)
+        }
+    };
 
     const fetchAddresesList = async () => {
         try {
@@ -243,6 +343,36 @@ const UserDashboard = () => {
        
     }
 
+    const changeProfileImage = async () => {
+        try {
+            setLoading(true);
+            const response = await fetch(API_PROFILE_IMAGE, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${localStorage.getItem('token')}`,
+                },
+                body: JSON.stringify({
+                    profile_image: imageUrl
+                }),
+            });
+            if (!response.ok) {
+                const errorData = await response.json();
+                console.error('Error updating address:', errorData);
+                enqueueSnackbar(errorData.message || 'Failed to update address.', {
+                    variant: 'error',
+                });
+                return
+            }
+            enqueueSnackbar('Profile image updated successfully!', { variant: 'success' });
+        }
+        catch (error) {
+            console.error('Error updating address:', error);
+        } finally {
+            setLoading(false);
+        }
+    }
+
     const setAsMain = async (id: number) => {
         try {
             setLoading(true);
@@ -267,7 +397,6 @@ const UserDashboard = () => {
         } finally {
             setLoading(false);
         }
-        // console.log(id)
     }
 
     const fetchTransactions = async () => {
@@ -306,8 +435,7 @@ const UserDashboard = () => {
         fetchAddresesList()
     }, [activeTab, showAddressModal, loading])
 
-    const { user } = useAuth()
-
+    
     const handleReviewPage = (productID: number, checkoutID: string) => {
         router.push(`/add_review/${productID}?checkout_id=${checkoutID}`)
       };
@@ -347,8 +475,48 @@ const UserDashboard = () => {
             <div className='p-6'>
                 <div className='w-full flex'>
 
-                    <div className='w-[450px] h-[450px]'>
+                    {/* <div className='w-[450px] h-[450px]'>
                         <img className='w-full h-full' src=''></img>
+                    </div> */}
+                    <div className="flex flex-col space-y-4 w-full lg:w-1/2">
+                        {/* Main Image */}
+                        <div
+                            className="bg-gray-300 relative max-w-[600] flex justify-center items-center cursor-pointer hover:bg-gray-400 rounded-lg min-h-[500] min-w-[500]"
+                            onClick={handlePromptUpload}
+                            >
+                        {images ? (
+                            <div className="relative w-full h-full">
+                            <img
+                                src={URL.createObjectURL(images)} // Display the selected image
+                                alt=""
+                                className="w-full h-full object-cover rounded-lg"
+                            />
+                            <button
+                                className="absolute bottom-2 right-2 bg-red-500 text-white p-1 rounded-full hover:bg-red-600"
+                                onClick={(e) => {
+                                e.stopPropagation();
+                                handleImageRemove();
+                                }}
+                            >
+                                Remove
+                            </button>
+                            </div>
+                        ) : user?.data.profile_image ? (
+                            <img
+                                src={user?.data.profile_image} // Display the selected image
+                                className="w-full h-full object-cover rounded-lg"
+                            />
+                        ) :(
+                            <p className="text-gray-500 text-lg">Select photos</p>
+                        )}
+                        </div>
+                        <input
+                        type="file"
+                        id="imageInput"
+                        accept="image/*"
+                        onChange={handleFileChange}
+                        className="hidden"
+                        />
                     </div>
 
                     <div className='w-3/5 flex flex-col justify-between'>
@@ -365,8 +533,36 @@ const UserDashboard = () => {
                             </div>
                         </div>
                         <div className='w-full flex justify-end gap-8 text-xl'>
-                            <PrimaryButton type='button'>Change Profile Picture</PrimaryButton>
-                            <PrimaryButton type='button'>Change Data</PrimaryButton>
+                            <PrimaryButton 
+                                    type='button'
+                                    onClick={changeProfileImage}
+                                    >{loading ? 'Loading...' : 'Change Profile Image'}
+                            </PrimaryButton>
+                            <PrimaryButton onClick={() => {setShowUserProfileUpdateModal(true)}} type='button'>Change Data</PrimaryButton>
+                            {showUserProfileUpdateModal && (
+                                <div className="modal-overlay">
+                                    <div className="modal-content-flexible bg-white top-[40%]">
+                                        {!loading ? (
+                                            <div className="w-[506px] mx-auto flex flex-col gap-6 text-xl">
+                                            <Modals 
+                                            type="userProfile" 
+                                            profile_data={{
+                                                username: profileData.username || "",
+                                                email: profileData.email || "",
+                                                phone: profileData.phone || "",
+                                            }}
+                                            handleInputChange={handleProfileChange}
+                                            onCancel={() => setShowUserProfileUpdateModal(false)}
+                                            onConfirm={updateProfile}
+                                            />
+                                        </div>
+                                        ) : (
+                                            <LoadingSpinner className='w-[100px] h-[100px] mx-auto'/>
+                                        )}   
+                                            
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     </div>
 
@@ -519,7 +715,7 @@ const UserDashboard = () => {
                                     </PrimaryButton>
                                     {showDeleteModal && (
                                         <div className="modal-overlay">
-                                            <div className="modal-content-confirmation top-[40%]">
+                                            <div className="modal-content-flexible top-[40%]">
                                                 {!loading ? (
                                                     addresses.map((addressSelected, index) => (
                                                         <div className="w-[506px] mx-auto flex flex-col gap-6 text-xl bg-white p-6 rounded-xl">

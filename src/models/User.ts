@@ -5,17 +5,18 @@ export interface UserData {
 }
 
 export interface UserModel {
-  id: number
-  username: string
-  email: string
-  password: string
-  role: UserRole
+  id?: number
+  username?: string
+  email?: string
+  password?: string
+  role?: UserRole
   address?: string
   phone?: string
-  is_seller: boolean
-  is_verified: boolean
-  created_at: string
-  updated_at: string
+  is_seller?: boolean
+  is_verified?: boolean
+  created_at?: string
+  updated_at?: string
+  profile_image?: string
 }
 
 export type UserRegisterModel = Pick<

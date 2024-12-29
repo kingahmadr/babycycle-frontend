@@ -179,7 +179,7 @@ label {
   z-index: 100; 
 }
 
-.modal-content-confirmation {
+.modal-content-flexible {
   position: relative;
   margin: 2rem auto;
   /* background-color: #fff; */

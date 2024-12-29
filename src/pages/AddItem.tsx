@@ -237,43 +237,42 @@ const ListingForm: React.FC = () => {
       <h2 className="text-heading-xl font-bold mb-8">
         What are you listing today?
       </h2>
-      <div className="flex flex-col lg:flex-row lg:space-x-8 space-y-8 lg:space-y-0">
-        {/* Left Side - Picture Upload */}
-        <div className="flex flex-col space-y-4 w-full lg:w-1/2">
-          {/* Main Image */}
-          <div
-            className="bg-gray-300 relative max-w-[600] flex justify-center items-center cursor-pointer hover:bg-gray-400 rounded-lg min-h-[500] min-w-[500]"
-            onClick={handlePromptUpload}
-          >
-            {images ? (
-              <div className="relative w-full h-full">
-                <img
-                  src={URL.createObjectURL(images)} // Display the selected image
-                  alt="Uploaded"
-                  className="w-full h-full object-cover rounded-lg"
-                />
-                <button
-                  className="absolute bottom-2 right-2 bg-red-500 text-white p-1 rounded-full hover:bg-red-600"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleImageRemove();
-                  }}
-                >
-                  Remove
-                </button>
-              </div>
-            ) : (
-              <p className="text-gray-500 text-lg">Select photos</p>
-            )}
-          </div>
-          <input
-            type="file"
-            id="imageInput"
-            accept="image/*"
-            // onChange={handleImageUpload} // Updated to handle file selection
-            onChange={handleFileChange}
-            className="hidden"
-          />
+        <div className="flex flex-col lg:flex-row lg:space-x-8 space-y-8 lg:space-y-0">
+          {/* Left Side - Picture Upload */}
+          <div className="flex flex-col space-y-4 w-full lg:w-1/2">
+            {/* Main Image */}
+            <div
+              className="bg-gray-300 relative max-w-[600] flex justify-center items-center cursor-pointer hover:bg-gray-400 rounded-lg min-h-[500] min-w-[500]"
+              onClick={handlePromptUpload}
+            >
+              {images ? (
+                <div className="relative w-full h-full">
+                  <img
+                    src={URL.createObjectURL(images)} // Display the selected image
+                    alt="Uploaded"
+                    className="w-full h-full object-cover rounded-lg"
+                  />
+                  <button
+                    className="absolute bottom-2 right-2 bg-red-500 text-white p-1 rounded-full hover:bg-red-600"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleImageRemove();
+                    }}
+                  >
+                    Remove
+                  </button>
+                </div>
+              ) : (
+                <p className="text-gray-500 text-lg">Select photos</p>
+              )}
+            </div>
+            <input
+              type="file"
+              id="imageInput"
+              accept="image/*"
+              onChange={handleFileChange}
+              className="hidden"
+            />
         </div>
 
         {/* Right Side - Form */}
