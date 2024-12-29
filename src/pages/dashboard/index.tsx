@@ -2,7 +2,7 @@ import { PrimaryButton } from '@/components/PrimaryButton'
 import { useAuth } from '@/context/AuthContext'
 import { useEffect, useState } from 'react'
 import { TransactionModel } from '@/models/Transactions'
-import { API_TRANSACTION, API_ADDRESSES } from '@/constants/apis'
+import { API_TRANSACTION, API_ADDRESSES, API_ADDRESSES_MAIN} from '@/constants/apis'
 import { useRouter } from 'next/navigation'
 import { convertDate } from "@/utils/formatDate";
 import { SecondaryButton } from '@/components/SecondaryButton'
@@ -16,6 +16,7 @@ const UserDashboard = () => {
     const [activeTab, setActiveTab] = useState('personalData')
     const [showAddressModal, setShowAddressModal] = useState(false)
     const [loading, setLoading] = useState(false)
+    const [updatingAddressId, setUpdatingAddressId] = useState<number | null>(null);
     const router = useRouter()
 
     const handleTabClick = (tab: string) => {
@@ -177,6 +178,33 @@ const UserDashboard = () => {
         }
     };
 
+    const setAsMain = async (id: number) => {
+        try {
+            setLoading(true);
+            const response = await fetch(`${API_ADDRESSES_MAIN}/${id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${localStorage.getItem('token')}`,
+                },
+            });
+            if (!response.ok) {
+                const errorData = await response.json();
+                console.error('Error set address as main:', errorData);
+                enqueueSnackbar(errorData.message || 'Error set address as main.', {
+                    variant: 'error',
+                });
+                return
+            }
+            enqueueSnackbar('Address set as main!', { variant: 'success' });
+        } catch (error) {
+            console.error('Error updating address:', error);
+        } finally {
+            setLoading(false);
+        }
+        // console.log(id)
+    }
+
     const fetchTransactions = async () => {
         try {
           const response = await fetch(API_TRANSACTION, {
@@ -211,7 +239,7 @@ const UserDashboard = () => {
     useEffect(() => {
         fetchTransactions()
         fetchAddresesList()
-    }, [activeTab])
+    }, [activeTab, showAddressModal, loading])
 
     const { user } = useAuth()
 
@@ -340,8 +368,22 @@ const UserDashboard = () => {
                                     <span>{address.address}</span>
                                 </div>
                                 <div className="w-full flex justify-end gap-3">
-                                    <PrimaryButton type="button" className={address.is_main ? 'btn-disabled' : ''} >
-                                       {address.is_main ? 'main address' : 'Set As Main'}
+                                    <PrimaryButton 
+                                        onClick={() => {
+                                            if (address?.id !== undefined) {
+                                                setUpdatingAddressId(address.id); // Set the updating address ID
+                                                setAsMain(address.id)
+                                            }
+                                        }}
+                                        type="button" 
+                                        className={address?.is_main ? 'btn-disabled' : ''} 
+                                        disabled={address?.is_main || updatingAddressId === address?.id} // Disable if already main or updating this address
+                                    >
+                                        {updatingAddressId === address?.id && loading
+                                            ? 'Loading...' 
+                                            : address?.is_main 
+                                                ? 'Main Address' 
+                                                : 'Set As Main'}
                                     </PrimaryButton>
                                     <PrimaryButton 
                                         type="button"   

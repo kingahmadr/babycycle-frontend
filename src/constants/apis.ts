@@ -21,3 +21,4 @@ export const API_SEARCH = `${API_URL}/search/products`
 export const API_PRODUCT_WITH_COUNT = `${API_URL}/products/with/count`
 
 export const API_ADDRESSES = `${API_URL_LOCAL}/addresses`
+export const API_ADDRESSES_MAIN = `${API_ADDRESSES}/set-as-main`
