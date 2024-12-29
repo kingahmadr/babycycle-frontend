@@ -1,7 +1,6 @@
 import React from 'react';
 import { PrimaryButton } from './PrimaryButton';
 import { SecondaryButton } from './SecondaryButton';
-import { UserModel } from '@/models/User';
 
 interface Address {
   name: string;

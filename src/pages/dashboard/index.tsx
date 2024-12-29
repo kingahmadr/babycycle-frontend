@@ -718,7 +718,7 @@ const UserDashboard = () => {
                                             <div className="modal-content-flexible top-[40%]">
                                                 {!loading ? (
                                                     addresses.map((addressSelected, index) => (
-                                                        <div className="w-[506px] mx-auto flex flex-col gap-6 text-xl bg-white p-6 rounded-xl">
+                                                        <div key={index} className="w-[506px] mx-auto flex flex-col gap-6 text-xl bg-white p-6 rounded-xl">
                                                             <Modals
                                                             key={index}
                                                             type="confirmation"
