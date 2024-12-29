@@ -24,21 +24,23 @@ export default function Register() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    if (!validateEmail(form.email)) {
-      setError('Please enter a valid email.')
-      return
+    if (!validateEmail(form.email ?? "")) {
+      setError("Please enter a valid email.");
+      return;
     }
-    if (!validateUsername(form.username)) {
+    
+    if (!validateUsername(form.username ?? "")) {
       setError(
-        'Username must be 3-20 characters and contain only letters, numbers, and underscores.'
-      )
-      return
+        "Username must be 3-20 characters and contain only letters, numbers, and underscores."
+      );
+      return;
     }
-    if (!validatePassword(form.password)) {
+    
+    if (!validatePassword(form.password ?? "")) {
       setError(
-        'Password must be at least 8 characters long, include an uppercase letter, a number, and a special character.'
-      )
-      return
+        "Password must be at least 8 characters long, include an uppercase letter, a number, and a special character."
+      );
+      return;
     }
 
     setError(null)

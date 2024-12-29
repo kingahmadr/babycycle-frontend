@@ -45,13 +45,13 @@ const CartPage: React.FC = () => {
     } else if (user?.data.address) {
       setSelectedAddress({
         name: user?.data.username || "Guest",
-        phone: user?.data.phone || "No phone number available",
+        contact: user?.data.phone || "No phone number available",
         address: user?.data.address || "No address available",
       });
     } else {
       setSelectedAddress({
         name: "Guest",
-        phone: "No phone number available",
+        contact: "No phone number available",
         address: "No address available",
       });
     }
@@ -197,7 +197,7 @@ const CartPage: React.FC = () => {
           <div className="bg-white p-4 lg:p-6 rounded-lg shadow-md flex flex-col justify-between">
             <div>
               <p className="text-body-sm font-bold">{selectedAddress?.name}</p>
-              <p className="text-body-sm">{selectedAddress?.phone}</p>
+              <p className="text-body-sm">{selectedAddress?.contact}</p>
               <p className="text-body-sm">{selectedAddress?.address}</p>
             </div>
             <div className="flex justify-end">
