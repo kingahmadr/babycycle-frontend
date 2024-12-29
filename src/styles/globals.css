@@ -178,3 +178,18 @@ label {
   overflow-y: auto; /* Allows scrolling */
   z-index: 100; 
 }
+
+.modal-content-flexible {
+  position: relative;
+  margin: 2rem auto;
+  /* background-color: #fff; */
+  padding: 2rem;
+  border-radius: 8px;
+  max-width: 1000px; 
+  max-height: 90vh; 
+  overflow-y: auto; /* Allows scrolling */
+  z-index: 100; 
+}
+
+
+

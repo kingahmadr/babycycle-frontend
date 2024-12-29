@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import { PrimaryButton } from "@/components/PrimaryButton";
 import Link from "next/link";
-import { API_URL, API_URL_LOCAL } from "@/constants/apis";
+import { API_URL } from "@/constants/apis";
 import { useAuth } from "@/context/AuthContext";
 import Spinner from "@/components/Spinner";
 import {SellerModel} from "@/models/Seller";
@@ -62,7 +62,7 @@ const SellerDashboard: React.FC = () => {
     }
 
     try {
-      const sellerResponse = await fetch(`${API_URL_LOCAL}/sellers`, {
+      const sellerResponse = await fetch(`${API_URL}/sellers`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -127,7 +127,7 @@ const SellerDashboard: React.FC = () => {
       }
 
 
-      const response = await fetch(`${API_URL_LOCAL}/sellers/products/v3`, {
+      const response = await fetch(`${API_URL}/sellers/products/v3`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },

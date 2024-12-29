@@ -6,4 +6,5 @@ export interface CartsModel {
     price: number;
     quantity: number;
     total_price: number;
+    image_url: string;
 }

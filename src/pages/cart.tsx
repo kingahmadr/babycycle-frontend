@@ -17,7 +17,7 @@ const CartPage: React.FC = () => {
     throw new Error("CartContext is not available. Ensure CartProvider wraps the component.");
   }
 
-  const { cart, removeFromCart, increaseQuantity, decreaseQuantity } = cartContext;
+  const { cart, removeFromCart, increaseQuantity, decreaseQuantity, loadingCartContext } = cartContext;
 
   const [selectedAddress, setSelectedAddress] = useState<AddressModel>();
   const [selectedCardType, setSelectedCardType] = useState<string | null>(null);
@@ -45,13 +45,13 @@ const CartPage: React.FC = () => {
     } else if (user?.data.address) {
       setSelectedAddress({
         name: user?.data.username || "Guest",
-        phone: user?.data.phone || "No phone number available",
+        contact: user?.data.phone || "No phone number available",
         address: user?.data.address || "No address available",
       });
     } else {
       setSelectedAddress({
         name: "Guest",
-        phone: "No phone number available",
+        contact: "No phone number available",
         address: "No address available",
       });
     }
@@ -187,7 +187,7 @@ const CartPage: React.FC = () => {
       
     
   }
-
+  console.log('loadingCartContext', loadingCartContext)
   return (
     <div className="bg-babyBlue min-h-screen w-full flex flex-col">
       <main className="flex-1 flex flex-col lg:flex-row p-4 lg:p-20 space-y-8 lg:space-y-0 lg:space-x-20">
@@ -197,7 +197,7 @@ const CartPage: React.FC = () => {
           <div className="bg-white p-4 lg:p-6 rounded-lg shadow-md flex flex-col justify-between">
             <div>
               <p className="text-body-sm font-bold">{selectedAddress?.name}</p>
-              <p className="text-body-sm">{selectedAddress?.phone}</p>
+              <p className="text-body-sm">{selectedAddress?.contact}</p>
               <p className="text-body-sm">{selectedAddress?.address}</p>
             </div>
             <div className="flex justify-end">
@@ -209,18 +209,18 @@ const CartPage: React.FC = () => {
 
           {/* Product List */}
           <div className="flex flex-col justify-between">
-             <div className="space-y-4">
-                {Array.isArray(cart) && cart.map((item) => (
+            <div className="space-y-4">
+              {Array.isArray(cart) && cart.length > 0 ? (
+                cart.map((item) => (
                   <div
                     key={item.id}
-                    className="bg-white p-4 rounded-lg shadow-md flex flex-col sm:flex-row items-center justify-between gap-4"
-                  >
+                    className="bg-white p-4 rounded-lg shadow-md flex flex-col sm:flex-row items-center justify-between gap-4">
                     {/* Product Image and Details */}
                     <div className="flex items-center gap-x-4 w-full sm:w-1/2">
                       <Link href={`/product/${item.product_id}`} passHref>
                         <Image
-                          src="/assets/placeholder_image.jpg"
-                          alt="Product Image"
+                          src={item.image_url || "/assets/placeholder_image.jpg"} // Use dynamic image URL
+                          alt={item.name || "Product Image"}
                           width={80}
                           height={80}
                           className="rounded-lg cursor-pointer"
@@ -229,7 +229,7 @@ const CartPage: React.FC = () => {
                       <div>
                         <Link href={`/product/${item.product_id}`} passHref>
                           <h2 className="text-body-sm font-bold hover:text-textBlue hover:underline">
-                            {item.name}
+                            {item.name || "Unnamed Product"}
                           </h2>
                         </Link>
                         <p className="text-body-sm">
@@ -240,20 +240,32 @@ const CartPage: React.FC = () => {
 
                     {/* Qty Handler */}
                     <div className="flex flex-row items-center space-x-2">
-                      <span>{item.quantity}</span>
+                      <span className="text-body-sm">{item.quantity}</span>
                       <div className="flex flex-col items-center space-y-1">
-                        <button onClick={() => increaseQuantity(item.id)}>
+                        <button
+                          className={`${
+                            loadingCartContext ? "button-disabled cursor-not-allowed" : ""
+                          }`}
+                          onClick={() => increaseQuantity(item.id)}
+                          disabled={loadingCartContext} // Disable the button when loadingCartContext is true
+                        >
                           <Image
                             src="/assets/increase.png"
-                            alt="Increase"
+                            alt="Increase Quantity"
                             width={24}
                             height={24}
                           />
                         </button>
-                        <button onClick={() => decreaseQuantity(item.id)}>
+                        <button
+                          className={`${
+                            loadingCartContext ? "button-disabled cursor-not-allowed" : ""
+                          }`}
+                          onClick={() => decreaseQuantity(item.id)}
+                          disabled={loadingCartContext} // Disable the button when loadingCartContext is true
+                        >
                           <Image
                             src="/assets/decrease.png"
-                            alt="Decrease"
+                            alt="Decrease Quantity"
                             width={24}
                             height={24}
                           />
@@ -270,14 +282,21 @@ const CartPage: React.FC = () => {
                     <button onClick={() => removeFromCart(item.id)}>
                       <Image
                         src="/assets/remove.png"
-                        alt="Remove"
+                        alt="Remove Item"
                         width={24}
                         height={24}
                       />
                     </button>
                   </div>
-                ))}
-              </div>
+                ))
+              ) : (
+                <div className="bg-white p-4 rounded-lg shadow-md flex flex-col sm:flex-row items-center justify-center gap-4" >                   
+                        <p className="text-body-lg items-center p-6"> No products in cart</p>                  
+
+                </div>
+              )}
+            </div>
+
             <div className="flex py-6 justify-end">
               <Link href="/product">
                 <button className="btn-primary w-full md:w-30">Continue Shopping</button>

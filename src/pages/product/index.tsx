@@ -184,14 +184,6 @@ const ProductListing = () => {
       ? filteredData.data.slice(offset, offset + limitPagination)
       : fetchedData.slice(offset, offset + limitPagination);
 
-  // console.log('filtered data',filteredData);
-  // console.log('fetched data',fetchedData);
-  // console.log('fetched data lenght',fetchedData.length);
-  // console.log('discounts',discounts);
-  console.log('current page data',currentPageData);
-  console.log('total pages',totalPages);
-  console.log('current page',currentPage);
-
   return (
     <div className="max-w-[1440px] px-[72px] max-md:px-6 flex max-md:flex-col w-full">
       <div className="w-72 max-md:w-full uppercase py-3 flex flex-col max-md:flex-row gap-6 max-md:justify-between">

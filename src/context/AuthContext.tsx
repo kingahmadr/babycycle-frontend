@@ -51,32 +51,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     fetchUserProfile()
   }, [])
 
-  // const fetchUserProfile = async () => {
-  //   try {
-  //     const response = await fetch(API_ME, {
-  //       method: 'GET',
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //         Authorization: `Bearer ${localStorage.getItem('token')}`
-  //       }
-  //     })
-  //     if (response.ok) {
-  //       const userData = await response.json()
-  //       setUser(userData)
-  //     } else {
-  //       setUser(null)
-  //     }
-  //   } catch (error) {
-  //     alert(error)
-  //     setUser(null)
-  //   } finally {
-  //     setLoading(false)
-  //   }
-  // }
-
-  useEffect(() => {
-    fetchUserProfile()
-  }, [])
 
   const login = async (email: string, password: string) => {
     try {
