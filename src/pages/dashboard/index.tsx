@@ -9,12 +9,15 @@ import { SecondaryButton } from '@/components/SecondaryButton'
 import { enqueueSnackbar } from "notistack";
 import { AddressModel } from '@/models/Address'
 import { DataWithCount } from '@/models/DataWithCount'
-import  ModalsAddress from '@/components/ModalsAddress'
+import  Modals from '@/components/Modals'
+import Spinner from '@/components/Spinner'
+import LoadingSpinner from '@/components/LoadingSpinner'
 
 const UserDashboard = () => {
 
     const [activeTab, setActiveTab] = useState('personalData')
     const [showAddressModal, setShowAddressModal] = useState(false)
+    const [showDeleteModal, setShowDeleteModal] = useState(false)
     const [loading, setLoading] = useState(false)
     const [updatingAddressId, setUpdatingAddressId] = useState<number | null>(null);
     const router = useRouter()
@@ -60,7 +63,7 @@ const UserDashboard = () => {
             console.error('Error updating address:', error);
         }
         
-      };
+    };
 
     const handleInputChange = (index: number, field: string, value: string) => {
         setAddresses((prev) =>
@@ -177,6 +180,68 @@ const UserDashboard = () => {
               ]); 
         }
     };
+
+    const getAddressToDelete = async (id: number) => {
+        try {
+            const response = await fetch(`${API_ADDRESSES}/${id}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${localStorage.getItem('token')}`,
+                },
+            });
+            if (!response.ok) {
+                const errorData = await response.json();
+                console.error('Error updating address:', errorData);
+                enqueueSnackbar(errorData.message || 'Failed to update address.', {
+                    variant: 'error',
+                });
+                return
+            }
+           
+            const data = await response.json();
+            setAddresses(data);
+            setShowDeleteModal(true)
+            
+        } catch (error) {
+            console.error('Error updating address:', error);
+        }
+    }
+
+    const handleDeleteAddress = async (id: number) => {
+        try {
+            setLoading(true);
+            const response = await fetch(`${API_ADDRESSES}/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${localStorage.getItem('token')}`,
+                },
+            });
+            if (!response.ok) {
+                const errorData = await response.json();
+                console.error('Error deleting address:', errorData);
+                enqueueSnackbar(errorData.message || 'Failed to delete address.', {
+                    variant: 'error',
+                });
+                return
+            }
+            enqueueSnackbar('Address deleted successfully!', { variant: 'success' });
+        } catch (error) {
+            console.error('Error deleting address:', error);
+        } finally {
+            setLoading(false);
+            setShowDeleteModal(false);
+            setAddresses([
+                {
+                  address: '',
+                  name: '',
+                  contact: '',
+                }
+              ]); 
+        }
+       
+    }
 
     const setAsMain = async (id: number) => {
         try {
@@ -325,7 +390,8 @@ const UserDashboard = () => {
                             <div className="modal-overlay">
                                 <div className="modal-content">
                                     <div className="w-[506px] mx-auto flex flex-col gap-6 text-xl">                                                                                  
-                                        <ModalsAddress
+                                        <Modals
+                                            type='address'
                                             addresses={addresses}
                                             handleInputChange={handleInputChange}
                                             // onClose={() => setShowModal(false)}
@@ -400,7 +466,8 @@ const UserDashboard = () => {
                                         <div className="modal-overlay">
                                             <div className="modal-content">
                                                 <div className="w-[506px] mx-auto flex flex-col gap-6 text-xl">                                                                                  
-                                                    <ModalsAddress
+                                                    <Modals
+                                                        type='address'
                                                         addresses={addresses}
                                                         handleInputChange={handleInputChange}
                                                         // onClose={() => setShowModal(false)}
@@ -439,10 +506,41 @@ const UserDashboard = () => {
                                             </div>
                                         </div>
                                         )}
-
-                                    <PrimaryButton type="button">
-                                        Delete
+                                    <PrimaryButton 
+                                         onClick={() => {
+                                            if (address?.id !== undefined) {
+                                                getAddressToDelete(address.id);
+                                            } else {
+                                               enqueueSnackbar("Address not found.", { variant: "error" });
+                                            }
+                                        }}
+                                        type="button">
+                                            Delete
                                     </PrimaryButton>
+                                    {showDeleteModal && (
+                                        <div className="modal-overlay">
+                                            <div className="modal-content-confirmation top-[40%]">
+                                                {!loading ? (
+                                                    addresses.map((addressSelected, index) => (
+                                                        <div className="w-[506px] mx-auto flex flex-col gap-6 text-xl bg-white p-6 rounded-xl">
+                                                            <Modals
+                                                            key={index}
+                                                            type="confirmation"
+                                                            onConfirm={() => {
+                                                                if (addressSelected?.id !== undefined) {
+                                                                handleDeleteAddress(addressSelected.id);
+                                                                }
+                                                            }}
+                                                            onCancel={() => setShowDeleteModal(false)}
+                                                            />
+                                                         </div>
+                                                        ))
+                                                    ) : (
+                                                    <LoadingSpinner className='w-[100px] h-[100px] mx-auto'/>
+                                                    )}
+                                            </div>
+                                        </div>
+                                        )}
                                 </div>
                             </div>
                         </div>
