@@ -21,7 +21,7 @@ const ProductListing = () => {
   const [loading, setLoading] = useState(true);
   const [filteredData, setFilteredData] = useState<DataWithCount<ProductModel> | undefined>();
   const [fetchedData, setFetchedData] = useState<ProductModel[]>([]);
-  const limitPagination = 20
+  const [limitPagination, setLimitPagination] = useState(20);
   const limit = 0
 
 
@@ -176,6 +176,27 @@ const ProductListing = () => {
     }
   };
 
+  useEffect(() => {
+    const updatePaginationLimit = () => {
+      if (window.innerWidth < 500) {
+        setLimitPagination(5);
+      } else {
+        setLimitPagination(20);
+      }
+    };
+  
+    // Run once on mount
+    updatePaginationLimit();
+  
+    // Add resize event listener
+    window.addEventListener("resize", updatePaginationLimit);
+  
+    // Cleanup on unmount
+    return () => {
+      window.removeEventListener("resize", updatePaginationLimit);
+    };
+  }, []);
+
   const totalPages = Math.ceil((filteredData?.data.length || fetchedData.length) / limitPagination);
   const currentPage = Math.floor(offset / limitPagination) + 1;
 
@@ -185,7 +206,7 @@ const ProductListing = () => {
       : fetchedData.slice(offset, offset + limitPagination);
 
   return (
-    <div className="max-w-[1440px] px-[72px] max-md:px-6 flex max-md:flex-col w-full">
+    <div className="max-w-[1440px] px-[72px] max-md:px-6 flex max-md:flex-col w-full mobile:px-4">
       <div className="w-72 max-md:w-full uppercase py-3 flex flex-col max-md:flex-row gap-6 max-md:justify-between">
         <div className="text-xl text-buttonBlue">All Filters</div>
 
@@ -270,7 +291,7 @@ const ProductListing = () => {
       <div className="w-full">
         <div className="uppercase text-[14px] h-auto py-3 max-md:py-6 flex justify-end max-md:justify-start items-center">
           <div className="flex items-center gap-3">
-            <span className="text-buttonBlue">Sort By</span>
+            <span className="text-buttonBlue mobile:hidden">Sort By</span>
             <button
               className="w-60 h-8 flex justify-between items-center bg-white text-black border-black border-2 rounded-none px-4 text-left"
               onClick={toggleDropdown}
@@ -314,7 +335,7 @@ const ProductListing = () => {
             ></div>
           )}
         </div>
-          <div className="grid lg:grid-cols-4 max-md:grid-cols-2 md:grid-cols-2 md:gap-10 md:gap-y-10">
+          <div className="grid lg:grid-cols-4 md:grid-cols-2 md:gap-10 md:gap-y-10">
             {loading ? (
               <div className="w-[500%] h-[400%] flex justify-center items-center">
                 <Spinner />
@@ -332,8 +353,8 @@ const ProductListing = () => {
                 />
               ))
             ) : (
-              <div className="w-full h-[500px] flex justify-center items-center">
-                <span>No products available</span>
+              <div className="w-[250px] h-[250px] flex justify-center items-center">
+                <span>No products  available</span>
               </div>
             )}
           </div>
@@ -348,7 +369,7 @@ const ProductListing = () => {
               />
             </div>
             <div>
-              Showing page {currentPage} from total of {totalPages} pages
+              Page {currentPage} of {totalPages}
             </div>
             <div>
               <img

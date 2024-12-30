@@ -2,8 +2,8 @@ import Image from 'next/image'
 
 const Footer: React.FC = () => {
   return (
-    <footer className='bg-textBlue text-white py-30 px-12'>
-      <div className='max-w-[1440px] mx-auto'>
+    <footer className='bg-textBlue text-white py-30 px-12 mx-auto w-full'>
+      <div className='max-w-[1440px]'>
         <div className='flex items-center justify-between'>
           {/* Left Section: Text Content */}
           <div className='flex-grow flex flex-wrap gap-x-32'>

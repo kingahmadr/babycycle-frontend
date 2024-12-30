@@ -17,6 +17,7 @@ const config: Config = {
   
         'desktop': { 'max': '1280px' },
         // => @media (max-width: 1280px) { ... }
+        'mobile': { 'max': '425px' }
       },
       colors: {
         foreground: '#171717', // Define the foreground color here
