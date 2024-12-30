@@ -90,12 +90,13 @@ const Home = ({ newProducts, saleProducts }: ProductsProps) => {
 
       <div className="max-w-[1440px]">
         <div className="w-full flex max-md:flex-col gap-6 justify-start items-center">
-          <div className="w-[240px] max-md:w-full h-[291px] max-md:h-auto flex md:flex-col gap-around max-md:justify-between max-md:items-center">
-            <span className="h-1/2 uppercase text-6xl max-md:text-5xl">
+          <div className="w-[240px] max-md:w-full mobile:h-[200px] h-[291px] max-md:h-auto flex md:flex-col gap-around max-md:justify-between max-md:items-center">
+            <span className="h-1/2 uppercase md:text-6xl md:font-bold max-md:text-5xl mobile:text-4xl mobile:font-bold">
               Sale & Promo
             </span>
-            <div className="h-1/2 flex justify-center items-center">
+            <div className="h-1/2 flex justify-center items-center mobile:items-start w-auto">
               <PrimaryButton
+                className="mobile:rounded-lg"
                 type="button"
                 onClick={() => handleClick(PAGE_LISTING)}
               >
@@ -103,7 +104,7 @@ const Home = ({ newProducts, saleProducts }: ProductsProps) => {
               </PrimaryButton>
             </div>
           </div>
-          <div className="grid grid-rows-1 max-md:grid-rows-2 grid-cols-4 max-md:grid-cols-2 gap-6 py-16 max-md:py-4">
+          <div className="grid grid-rows-1 md:grid-rows-2 grid-cols-4 md:grid-cols-2 gap-6 py-16 md:py-4">
             {loading ? (
               <div className="w-[500%] max-md:w-[200%] h-56 flex flex-wrap justify-center items-center">
                 <Spinner />
@@ -114,15 +115,18 @@ const Home = ({ newProducts, saleProducts }: ProductsProps) => {
                 discounts[product.id] &&
                 discounts[product.id]?.is_active &&
                 product.stock !== 0 ? (
-                  <ProductCard
-                    id={product.id}
-                    key={index}
-                    image_url={product.image_url}
-                    name={product.name}
-                    price={product.price}
-                    stock={product.stock}
-                    discount={discounts[product.id]}
-                  />
+                    <div className="mobile:hidden">
+
+                        <ProductCard
+                          id={product.id}
+                          key={index}
+                          image_url={product.image_url}
+                          name={product.name}
+                          price={product.price}
+                          stock={product.stock}
+                          discount={discounts[product.id]}
+                        />
+                    </div>
                 ) : null
               )
             )}
@@ -130,7 +134,7 @@ const Home = ({ newProducts, saleProducts }: ProductsProps) => {
         </div>
 
         <div className="flex max-md:flex-col-reverse justify-between items-center gap-6">
-          <div className="grid grid-rows-1 grid-cols-4 max-md:grid-rows-2 max-md:grid-cols-2 gap-6 py-16 max-md:py-4">
+          <div className="grid grid-rows-1 md:grid-rows-2 grid-cols-4 md:grid-cols-2 gap-6 py-16 md:py-4 ">
             { loading ? (
               <div className="w-[500%] max-md:w-[200%] h-56 flex flex-wrap justify-center items-center">
                 <Spinner />
@@ -138,23 +142,27 @@ const Home = ({ newProducts, saleProducts }: ProductsProps) => {
             ) : (
             newProducts &&
               newProducts.data.map((product, index) => (
-                <ProductCard
-                  id={product.id}
-                  key={index}
-                  image_url={product.image_url}
-                  name={product.name}
-                  price={product.price}
-                  stock={product.stock}
-                />
+                <div className="mobile:hidden">
+
+                  <ProductCard
+                    id={product.id}
+                    key={index}
+                    image_url={product.image_url}
+                    name={product.name}
+                    price={product.price}
+                    stock={product.stock}
+                    />
+                </div>
               )))}
           </div>
 
-          <div className="w-[240px] max-md:w-full h-[291px] max-md:h-auto flex md:flex-col gap-around max-md:justify-between max-md:items-center">
-            <span className="h-1/2 uppercase text-6xl max-md:text-5xl">
+          <div className="w-[240px] max-md:w-full mobile:h-[200px] h-[291px] max-md:h-auto flex md:flex-col gap-around max-md:justify-between max-md:items-center">
+            <span className="h-1/2 uppercase text-6xl max-md:text-5xl mobile:text-4xl mobile:font-bold">
               New Arrival
             </span>
-            <div className="h-1/2 flex justify-center items-center">
+            <div className="h-1/2 flex justify-center items-center mobile:items-start rounded-md">
               <PrimaryButton
+                className="mobile:rounded-lg"
                 type="button"
                 onClick={() => handleClick(PAGE_LISTING)}
               >
