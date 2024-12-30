@@ -115,7 +115,7 @@ const Home = ({ newProducts, saleProducts }: ProductsProps) => {
                 discounts[product.id] &&
                 discounts[product.id]?.is_active &&
                 product.stock !== 0 ? (
-                    <div className="mobile:hidden">
+                    <div key={index} className="mobile:hidden">
 
                         <ProductCard
                           id={product.id}
@@ -142,7 +142,7 @@ const Home = ({ newProducts, saleProducts }: ProductsProps) => {
             ) : (
             newProducts &&
               newProducts.data.map((product, index) => (
-                <div className="mobile:hidden">
+                <div key={index} className="mobile:hidden">
 
                   <ProductCard
                     id={product.id}
